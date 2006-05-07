@@ -1,0 +1,55 @@
+v0.6 - Pending
+	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
+
+v0.5 - May 1, 2006
+	+ Make open image mode configurable: smart, fit, 1:1, last (Bjoern Martensen)
+	+ Option to navigate imagelist via mousewheel (default: on) (Bjoern Martensen)
+	+ Add maximum/minimum zoom levels (Bjoern Martensen)
+	+ Reduce border around image for fit mode (Bjoern Martensen)
+	+ Have Go>Random not show images twice until all images have been shown once
+	+ Allow numpad keys as shortcuts (Bjoern Martensen)
+	+ Allow panning image additionally with left-click/drag (Bjoern Martensen)
+	+ Revert retaining state of images in list introduced in v0.4
+	+ Add hourglass feedback for loading images
+	+ Bug: Small images don't zoom-to-fit (Bjoern Martensen)
+	+ Bug: Some non-image files are thought to be images (Bjoern Martensen)
+	+ Bug: Files/folders with spaces don't open from file manager (Bjoern Martensen)
+	+ Bug: Some shortcuts don't work with numslock enabled (Bjoern Martensen)
+
+v0.4 - April 25, 2006
+	+ Removed <Alt> from navigational shortcuts
+	+ Default to alphabetically populating the image list (Michael Campbell)
+	+ Ability to go to first (Home) and last (End) image in list
+	+ Retain zoom/flip/rotate state of images in list
+	+ Additional preferences:
+		- Open all images in current directory (Ralph Wabel)
+		- Default directory for 'Open' dialog
+	+ Fullscreen hides menu/tool/status bars
+
+v0.3.1 - April 4, 2006
+	+ Fixed inability to open a file from a file manager.
+
+v0.3 - April 4, 2006
+	+ Speed improvements for zooming and rotating images
+	+ Allow drag-and-drop of images/folders from file managers
+	+ Flip images vertically/horizontally
+	+ Go > Random Image
+	+ Ability to recursively load images found in all subdirectories (mirage -R or
+	  checkbox in Open Folder dialog)
+	+ Right-click menu on image
+	+ "mirage --help" information.
+	+ Fixed .desktop bug that caused multiple images to open in separate windows
+	  when launched via a file manager.
+
+v0.2 - March 29, 2006
+	+ Allow multiple files/folders to be passed as arguments or opened directly
+	+ MiddleMouseButton-Drag to pan the image (like GIMP)
+	+ Add Tools > Options for scaling quality, background color
+	+ Retain center of user-view when zooming
+	+ Display a broken image in the window instead of an error popup message
+	+ Improve handling of which images Mirage can successfully display
+
+v0.1 - March 22, 2006 (Initial release)
+	+ Fast scaling/rotating of images
+	+ Displays 'checkerboard' for transparency
+	+ Ctrl-MouseScrollDown to zoom out, Ctrl-MouseScrollUp to zoom in (like GIMP)
