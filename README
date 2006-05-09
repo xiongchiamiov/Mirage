@@ -17,17 +17,3 @@ FEATURES:
 	+ Drag-n-drop files/folders from a file manager right into Mirage
 	+ GIMP-like controls (Ctrl-MouseScroll for zooming, MiddleMouseButton-Drag for 
 	  panning
-
-TODO:
-	+ Navigation option: wrap around imagelist, notification at end of list...
-	+ In fullscreen mode, disable cursor if inactivity for X seconds
-	+ When in zoom-to-fit mode, fit the image when it's rotated
-	+ Show animation (i.e. animated gifs)
-	+ Skip or show broken icon if image not found (i.e. deleted via term) (Bjoern Martensen)
-	+ Test on Windows/Mac?
-	+ Printing support - requires gnome libs..? (Bjoern Martensen)
-	+ Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
-	+ Fading image transition? Hackish..
-	+ Load first image quicker by backgrounding search process? (Bjoern Martensen)
-	+ Add side treeview for browsing? (Bjoern Martensen)
-	+ Delete/Save images? (Bjoern Martensen)
