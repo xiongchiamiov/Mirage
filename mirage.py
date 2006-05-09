@@ -101,7 +101,7 @@ class Base:
 		conf = ConfigParser.ConfigParser()
 		if os.path.isfile(os.path.expanduser('~/.config/mirage/miragerc')):
 			conf.read(os.path.expanduser('~/.config/mirage/miragerc'))
-		else:
+		elif os.path.isfile(os.path.expanduser('~/.miragerc')):
 			conf.read(os.path.expanduser('~/.miragerc'))
 			os.remove(os.path.expanduser('~/.miragerc'))
 		try:
