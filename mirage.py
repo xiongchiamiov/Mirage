@@ -99,7 +99,11 @@ class Base:
 
 		# Load config from disk:
 		conf = ConfigParser.ConfigParser()
-		conf.read(os.path.expanduser('~/.miragerc'))
+		if os.path.isfile(os.path.expanduser('~/.config/mirage/miragerc')):
+			conf.read(os.path.expanduser('~/.config/mirage/miragerc'))
+		else:
+			conf.read(os.path.expanduser('~/.miragerc'))
+			os.remove(os.path.expanduser('~/.miragerc'))
 		try:
 			width = conf.getint('window', 'w')
 			height = conf.getint('window', 'h')
@@ -462,7 +466,9 @@ class Base:
 		conf.set('prefs', 'open_mode', self.open_mode)
 		conf.set('prefs', 'last_mode', self.last_mode)
 		conf.set('prefs', 'mousewheel_nav', self.mousewheel_nav)
-		conf.write(file(os.path.expanduser('~/.miragerc'), 'w'))
+		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
+			os.mkdir(os.path.expanduser('~/.config/mirage/'))
+		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
 		return
 
 	def delete_event(self, widget, event, data=None):
