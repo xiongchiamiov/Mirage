@@ -71,6 +71,8 @@ class Base:
 		self.zoomratio_for_zoom_to_fit = 1
 		self.curr_img_in_list = 0
 		self.mousewheel_nav = True
+		self.currimg_width = 0
+		self.currimg_height = 0
 
 		# Read any passed options/arguments:
 		try:
@@ -277,11 +279,11 @@ class Base:
 		self.vscroll.set_adjustment(self.layout.get_vadjustment())
 		self.hscroll = gtk.HScrollbar(None)
 		self.hscroll.set_adjustment(self.layout.get_hadjustment())
-		hbox = gtk.HBox(False, 0)
-		vbox.pack_start(hbox, True, True, 0)
-		hbox.pack_start(self.layout, True, True, 0)
-		hbox.pack_start(self.vscroll, False, False, 0)
-		vbox.pack_start(self.hscroll, False, False, 0)
+		self.table = gtk.Table(2, 2, False)
+		self.table.attach(self.layout, 0, 1, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		self.table.attach(self.hscroll, 0, 1, 1, 2, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
+		self.table.attach(self.vscroll, 1, 2, 0, 1, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
+		vbox.pack_start(self.table, True, True, 0)
 		if bgcolor_found == False:
 			self.bgcolor = self.layout.rc_get_style().bg[gtk.STATE_NORMAL] # Initializes color to user's default rc_style
 		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
@@ -315,6 +317,8 @@ class Base:
 
 		# Show GUI:
 		self.window.show_all()
+		self.layout.set_flags(gtk.CAN_FOCUS)
+		self.window.set_focus(self.layout)
 		self.hscroll.hide()
 		self.vscroll.hide()
 
@@ -332,7 +336,7 @@ class Base:
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65361:    # Left arrow
 				self.prev_img_in_list(None)
-			elif event.keyval == 65363:  # Right arrow
+			elif event.keyval == 65363 or event.keyval == 32:  # Right arrow or spacebar
 				self.next_img_in_list(None)
 			elif event.keyval == 65360:  # Home key
 				self.first_img_in_list(None)
@@ -421,7 +425,7 @@ class Base:
 	def x_adjustment_changed(self, xadjust):
 		try:
 			zoomratio = float(self.currimg.get_width())/self.previmg_width
-			newvalue = xadjust.get_value() * zoomratio + (self.available_image_width() - 20) * (zoomratio - 1) / 2
+			newvalue = xadjust.get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2
 			if newvalue >= xadjust.lower and newvalue <= (xadjust.upper - xadjust.page_size):
 				xadjust.set_value(newvalue)
 		except:
@@ -430,7 +434,7 @@ class Base:
 	def y_adjustment_changed(self, yadjust):
 		try:
 			zoomratio = float(self.currimg.get_width())/self.previmg_width
-			newvalue = yadjust.get_value() * zoomratio + (self.available_image_height() - 20) * (zoomratio - 1) / 2
+			newvalue = yadjust.get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2
 			if newvalue >= yadjust.lower and newvalue <= (yadjust.upper - yadjust.page_size):
 				yadjust.set_value(newvalue)
 			# Since the y adjustment happens after the x adjustment, re-initialize the
@@ -554,36 +558,36 @@ class Base:
 				light_grey = colormap.alloc_color('#666666', True, True)
 				dark_grey = colormap.alloc_color('#999999', True, True)
 				self.currimg = self.currimg.composite_color_simple(finalimg_width, finalimg_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
-		if finalimg_width > self.available_image_width():
-			self.hscroll.show()
+		if self.orientation == 0:
+			self.currimg_width, self.currimg_height = finalimg_width, finalimg_height
 		else:
-			self.hscroll.hide()
-		if finalimg_height > self.available_image_height():
-			self.vscroll.show()
-		else:
-			self.vscroll.hide()
-		self.layout.set_size(finalimg_width, finalimg_height)
-		self.center_image(finalimg_width, finalimg_height)
+			self.currimg_width, self.currimg_height = finalimg_height, finalimg_width
+		self.show_scrollbars_if_needed()
+		self.layout.set_size(self.currimg_width, self.currimg_height)
+		self.center_image()
 		self.imageview.set_from_pixbuf(self.currimg)
 		self.first_image_load = False
 		# Clean up (free memory) because I'm lazy
 		gc.collect()
 		return
+		
+	def show_scrollbars_if_needed(self):
+		if self.currimg_width > self.available_image_width():
+			self.hscroll.show()
+		else:
+			self.hscroll.hide()
+		if self.currimg_height > self.available_image_height():
+			self.vscroll.show()
+		else:
+			self.vscroll.hide()
 
-	def center_image(self, width, height):
-		if width == 0:
-			width = self.imageview.size_request()[0]
-		if height == 0:
-			height = self.imageview.size_request()[1]
-		while gtk.events_pending():
-			gtk.main_iteration()
-		x_shift = int((self.available_image_width() - width)/2)
+	def center_image(self):
+		x_shift = int((self.available_image_width() - self.currimg_width)/2)
 		if x_shift < 0:
 			x_shift = 0
-		y_shift = int((self.available_image_height() - height)/2)
+		y_shift = int((self.available_image_height() - self.currimg_height)/2)
 		if y_shift < 0:
 			y_shift = 0
-		print x_shift, y_shift
 		self.layout.move(self.imageview, x_shift, y_shift)
 		
 	def available_image_width(self):
@@ -685,7 +689,7 @@ class Base:
 			self.toolbar.hide()
 			self.menubar.hide()
 			self.window.fullscreen()
-		self.center_image(0, 0)
+		self.center_image()
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible') == True:
@@ -939,23 +943,21 @@ class Base:
 				return True
 
         def mouse_moved(self, widget, event):
-		# This handles the panning of the image by a middle click
+		# This handles the panning of the image
 		if event.is_hint:
 			x, y, state = event.window.get_pointer()
 		else:
-			x = event.x
-			y = event.y
 			state = event.state
+		x, y = event.x_root, event.y_root
 		if (state & gtk.gdk.BUTTON2_MASK) or (state & gtk.gdk.BUTTON1_MASK):
 			xadjust = self.layout.get_hadjustment()
 			newx = xadjust.value + (self.prevmousex - x)
 			if newx >= xadjust.lower and newx <= xadjust.upper - xadjust.page_size:
 				xadjust.set_value(newx)
 				self.layout.set_hadjustment(xadjust)
-
 			yadjust = self.layout.get_vadjustment()
 			newy = yadjust.value + (self.prevmousey - y)
-			if newy >= yadjust.lower and newy <=yadjust.upper - yadjust.page_size:
+			if newy >= yadjust.lower and newy <= yadjust.upper - yadjust.page_size:
 				yadjust.set_value(newy)
 				self.layout.set_vadjustment(yadjust)
 		self.prevmousex = x
@@ -966,8 +968,8 @@ class Base:
 		# Changes the cursor to the 'resize' cursor, like GIMP, on a middle click:
 		if event.button == 2 or event.button == 1:
 			self.layout.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.FLEUR))
-			self.prevmousex = event.x
-			self.prevmousey = event.y
+			self.prevmousex = event.x_root
+			self.prevmousey = event.y_root
 		# Right-click popup:
 		elif self.image_loaded == True and event.button == 3:
 			self.UIManager.get_widget('/Popup').popup(None, None, None, event.button, event.time)
@@ -1087,9 +1089,11 @@ class Base:
 			self.location -= 1
 			if self.location == -1:
 				self.location = 3
+			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
 			self.currimg = self.image_rotate(self.currimg, 90)
 			self.imageview.set_from_pixbuf(self.currimg)
-			self.center_image(0, 0)
+			self.show_scrollbars_if_needed()
+			self.center_image()
 		return
 
 	def rotate_right(self, action):
@@ -1102,9 +1106,11 @@ class Base:
 			self.location += 1
 			if self.location == 4:
 				self.location = 0
+			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
 			self.currimg = self.image_rotate(self.currimg, 270)
 			self.imageview.set_from_pixbuf(self.currimg)
-			self.center_image(0, 0)
+			self.show_scrollbars_if_needed()
+			self.center_image()
 		return
 
 	def image_flip_vert(self, action):
