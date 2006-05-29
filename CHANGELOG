@@ -1,4 +1,4 @@
-v0.6 - Pending
+v0.6 - May 29, 2006
 	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
 	+ Option to wrap around imagelist
 	+ When in zoom-to-fit mode, fit the image when it's rotated
