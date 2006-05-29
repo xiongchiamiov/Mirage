@@ -75,6 +75,7 @@ class Base:
 		self.listwrap = False
 		self.currimg_width = 0
 		self.currimg_height = 0
+		self.update_image = True
 
 		# Read any passed options/arguments:
 		try:
@@ -454,7 +455,7 @@ class Base:
 		# Update the image size on window resize if the current image was last fit:
 		if self.image_loaded == True:
 			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
-				if self.last_image_action_was_fit == True and self.zoomratio != 1:
+				if self.last_image_action_was_fit == True:
 					self.zoom_to_fit_window(None)
 				else:
 					self.center_image()
@@ -697,12 +698,12 @@ class Base:
 			self.fullscreen_mode = False
 			self.UIManager.get_widget('/Popup/FM4').hide()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
-			self.window.unfullscreen()
 			if self.toolbar_show == True:
 				self.toolbar.show()
 			self.menubar.show()
 			if self.statusbar_show == True:
 				self.statusbar.show()
+			self.window.unfullscreen()
 			self.change_cursor(None)
 		else:
 			self.fullscreen_mode = True
@@ -1155,7 +1156,6 @@ class Base:
 
 	def image_flip_vert(self, action):
 		if self.userimage != "":
-			self.last_image_action_was_fit = False
 			if self.location == 0:
 				self.location = 3
 			elif self.location == 1:
@@ -1170,7 +1170,6 @@ class Base:
 
 	def image_flip_horiz(self, action):
 		if self.userimage != "":
-			self.last_image_action_was_fit = False
 			if self.location == 0:
 				self.location = 1
 			elif self.location == 1:
@@ -1212,7 +1211,9 @@ class Base:
 				if self.listwrap == True:
 					self.curr_img_in_list = 0
 				else:
-					return
+					if self.fullscreen_mode == True:
+						self.toggle_fullscreen(None)
+						return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
@@ -1320,7 +1321,7 @@ class Base:
 		self.update_statusbar()
 		self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
 		self.image_loaded = True
-
+		
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
 			if i.get_window_type() != gtk.gdk.WINDOW_TEMP:
