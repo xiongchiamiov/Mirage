@@ -38,7 +38,7 @@ import sets
 class Base:
 
 	def __init__(self):
-
+	
 		# Constants
 		self.open_mode_smart = 0
 		self.open_mode_fit = 1
@@ -445,11 +445,13 @@ class Base:
 
 	def window_resized(self, widget, allocation):
 		# Update the image size on window resize if the current image was last fit:
-		if self.image_loaded == True and self.last_image_action_was_fit == True:
+		if self.image_loaded == True:
 			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
-				if self.zoomratio != 1:
-					print "window resized"
-					self.zoom_to_fit_window(None)
+				if self.last_image_action_was_fit == True:
+					if self.zoomratio != 1:
+						self.zoom_to_fit_window(None)
+				else:
+					self.center_image()
 		self.prevwinwidth = allocation.width
 		self.prevwinheight = allocation.height
 		return
@@ -689,7 +691,6 @@ class Base:
 			self.toolbar.hide()
 			self.menubar.hide()
 			self.window.fullscreen()
-		self.center_image()
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible') == True:
