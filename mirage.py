@@ -424,8 +424,8 @@ class Base:
 
 	def x_adjustment_changed(self, xadjust):
 		try:
-			zoomratio = float(self.currimg.get_width())/self.previmg_width
-			newvalue = xadjust.get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2
+			zoomratio = float(self.currimg_width)/self.previmg_width
+			newvalue = abs(xadjust.get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2)
 			if newvalue >= xadjust.lower and newvalue <= (xadjust.upper - xadjust.page_size):
 				xadjust.set_value(newvalue)
 		except:
@@ -433,13 +433,13 @@ class Base:
 
 	def y_adjustment_changed(self, yadjust):
 		try:
-			zoomratio = float(self.currimg.get_width())/self.previmg_width
-			newvalue = yadjust.get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2
+			zoomratio = float(self.currimg_width)/self.previmg_width
+			newvalue = abs(yadjust.get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2)
 			if newvalue >= yadjust.lower and newvalue <= (yadjust.upper - yadjust.page_size):
 				yadjust.set_value(newvalue)
 			# Since the y adjustment happens after the x adjustment, re-initialize the
 			# variables now:
-			self.previmg_width = self.currimg.get_width()
+			self.previmg_width = self.currimg_width
 		except:
 			pass
 
@@ -447,9 +447,8 @@ class Base:
 		# Update the image size on window resize if the current image was last fit:
 		if self.image_loaded == True:
 			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
-				if self.last_image_action_was_fit == True:
-					if self.zoomratio != 1:
-						self.zoom_to_fit_window(None)
+				if self.last_image_action_was_fit == True and self.zoomratio != 1:
+					self.zoom_to_fit_window(None)
 				else:
 					self.center_image()
 		self.prevwinwidth = allocation.width
@@ -1091,6 +1090,7 @@ class Base:
 			if self.location == -1:
 				self.location = 3
 			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
+			self.layout.set_size(self.currimg_width, self.currimg_height)
 			self.currimg = self.image_rotate(self.currimg, 90)
 			self.imageview.set_from_pixbuf(self.currimg)
 			self.show_scrollbars_if_needed()
@@ -1108,6 +1108,7 @@ class Base:
 			if self.location == 4:
 				self.location = 0
 			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
+			self.layout.set_size(self.currimg_width, self.currimg_height)
 			self.currimg = self.image_rotate(self.currimg, 270)
 			self.imageview.set_from_pixbuf(self.currimg)
 			self.show_scrollbars_if_needed()
