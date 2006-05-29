@@ -34,6 +34,7 @@ import random
 import imgfuncs
 import urllib
 import sets
+import gobject
 
 class Base:
 
@@ -670,6 +671,19 @@ class Base:
 	def exit_app(self, action):
 		self.save_settings()
 		gtk.main_quit()
+		
+	def hide_cursor(self):
+		if self.fullscreen_mode == True:
+			pix_data = """/* XPM */
+			static char * invisible_xpm[] = {
+			"1 1 1 1",
+			"       c None",
+			" "};"""
+			color = gtk.gdk.Color()
+			pix = gtk.gdk.pixmap_create_from_data(None, pix_data, 1, 1, 1, color, color)
+			invisible = gtk.gdk.Cursor(pix, pix, color, color, 0, 0)
+			self.change_cursor(invisible)
+		return False
 
 	def toggle_fullscreen(self, action):
 		if self.fullscreen_mode == True:
@@ -682,6 +696,7 @@ class Base:
 			self.menubar.show()
 			if self.statusbar_show == True:
 				self.statusbar.show()
+			self.change_cursor(None)
 		else:
 			self.fullscreen_mode = True
 			self.UIManager.get_widget('/Popup/FM4').show()
@@ -690,6 +705,7 @@ class Base:
 			self.toolbar.hide()
 			self.menubar.hide()
 			self.window.fullscreen()
+			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible') == True:
@@ -962,12 +978,16 @@ class Base:
 				self.layout.set_vadjustment(yadjust)
 		self.prevmousex = x
 		self.prevmousey = y
+		if self.fullscreen_mode == True:
+			# Show cursor on movement, then hide after 2 seconds of no movement
+			self.change_cursor(None)
+			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
 		return True
 
 	def button_pressed(self, widget, event):
 		# Changes the cursor to the 'resize' cursor, like GIMP, on a middle click:
 		if event.button == 2 or event.button == 1:
-			self.layout.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.FLEUR))
+			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.FLEUR))
 			self.prevmousex = event.x_root
 			self.prevmousey = event.y_root
 		# Right-click popup:
@@ -978,7 +998,7 @@ class Base:
 	def button_released(self, widget, event):
 		# Resets the cursor when middle mouse button is released
 		if event.button == 2 or event.button == 1:
-			self.layout.window.set_cursor(None)
+			self.change_cursor(None)
 		return True
 
 	def zoom_in(self, action):
@@ -1152,10 +1172,12 @@ class Base:
 				self.curr_img_in_list -= 1
 			else:
 				self.curr_img_in_list = len(self.image_list) - 1
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+			if self.fullscreen_mode == False:
+				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
 			self.load_new_image()
-			self.change_cursor(None)
+			if self.fullscreen_mode == False:
+				self.change_cursor(None)
 
 	def next_img_in_list(self, action):
 		if len(self.image_list) > 1:
@@ -1164,10 +1186,12 @@ class Base:
 				self.curr_img_in_list += 1
 			else:
 				self.curr_img_in_list = 0
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+			if self.fullscreen_mode == False:
+				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
 			self.load_new_image()
-			self.change_cursor(None)
+			if self.fullscreen_mode == False:
+				self.change_cursor(None)
 
 	def random_img_in_list(self, action):
 		if len(self.image_list) > 1:
@@ -1188,10 +1212,12 @@ class Base:
 			self.curr_img_in_list = j
 			self.randomlist[j] = True
 			self.userimage = str(self.image_list[self.curr_img_in_list])
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+			if self.fullscreen_mode == False:
+				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
 			self.load_new_image()
-			self.change_cursor(None)
+			if self.fullscreen_mode == False:
+				self.change_cursor(None)
 
 	def first_img_in_list(self, action):
 		if len(self.image_list) > 1:
@@ -1249,7 +1275,8 @@ class Base:
 
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
-			i.set_cursor(type)
+			if i.get_window_type() != gtk.gdk.WINDOW_TEMP:
+				i.set_cursor(type)
 		self.layout.window.set_cursor(type)
 		
 	def expand_filelist_and_load_image(self, inputlist):
