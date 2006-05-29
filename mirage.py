@@ -1101,7 +1101,6 @@ class Base:
 
 	def rotate_left(self, action):
 		if self.userimage != "":
-			self.last_image_action_was_fit = False
 			if self.orientation == 0:
 				self.orientation = 1
 			else:
@@ -1109,17 +1108,19 @@ class Base:
 			self.location -= 1
 			if self.location == -1:
 				self.location = 3
-			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
-			self.layout.set_size(self.currimg_width, self.currimg_height)
-			self.currimg = self.image_rotate(self.currimg, 90)
-			self.imageview.set_from_pixbuf(self.currimg)
-			self.show_scrollbars_if_needed()
-			self.center_image()
+			if self.last_image_action_was_fit == True:
+				self.zoom_to_fit_or_1_to_1(None)
+			else:
+				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
+				self.layout.set_size(self.currimg_width, self.currimg_height)
+				self.currimg = self.image_rotate(self.currimg, 90)
+				self.imageview.set_from_pixbuf(self.currimg)
+				self.show_scrollbars_if_needed()
+				self.center_image()
 		return
 
 	def rotate_right(self, action):
 		if self.userimage != "":
-			self.last_image_action_was_fit = False
 			if self.orientation == 0:
 				self.orientation = 1
 			else:
@@ -1127,12 +1128,15 @@ class Base:
 			self.location += 1
 			if self.location == 4:
 				self.location = 0
-			self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
-			self.layout.set_size(self.currimg_width, self.currimg_height)
-			self.currimg = self.image_rotate(self.currimg, 270)
-			self.imageview.set_from_pixbuf(self.currimg)
-			self.show_scrollbars_if_needed()
-			self.center_image()
+			if self.last_image_action_was_fit == True:
+				self.zoom_to_fit_or_1_to_1(None)
+			else:
+				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
+				self.layout.set_size(self.currimg_width, self.currimg_height)
+				self.currimg = self.image_rotate(self.currimg, 270)
+				self.imageview.set_from_pixbuf(self.currimg)
+				self.show_scrollbars_if_needed()
+				self.center_image()
 		return
 
 	def image_flip_vert(self, action):

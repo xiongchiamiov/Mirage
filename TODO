@@ -1,5 +1,4 @@
 + Navigation option: wrap around imagelist, notification at end of list...
-+ When in zoom-to-fit mode, fit the image when it's rotated
 + Show animation (i.e. animated gifs)
 + Skip or show broken icon if image not found (i.e. deleted via term) (Bjoern Martensen)
 + Test on Windows/Mac?

@@ -1,5 +1,6 @@
 v0.6 - Pending
-	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
+	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movements
+	+ When in zoom-to-fit mode, fit the image when it's rotated
 	+ Bug: Ensure that scrollbars don't show up unless needed
 	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
 
