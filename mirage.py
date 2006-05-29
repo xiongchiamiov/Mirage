@@ -1328,11 +1328,11 @@ class Base:
 		self.layout.window.set_cursor(type)
 		
 	def expand_filelist_and_load_image(self, inputlist):
+		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
+		# expands it into a list of all pictures found; returns new list
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 		while gtk.events_pending():
 			gtk.main_iteration()
-		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
-		# expands it into a list of all pictures found; returns new list
 		first_image_found = False
 		self.randomlist = []
 		filelist = []
@@ -1352,7 +1352,7 @@ class Base:
 			inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
 		# If first argument is image, use for initial loading:
 		if os.path.isfile(inputlist[0]):
-			item_fullpath = os.path.abspath(inputlist[itemnum])
+			item_fullpath = os.path.abspath(inputlist[0])
 			if self.valid_image(item_fullpath) == True:
 				first_image_found = True
 				first_image = item_fullpath

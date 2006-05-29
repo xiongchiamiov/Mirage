@@ -5,6 +5,7 @@ v0.6 - Pending
 	+ Show broken icon if image not found (i.e. deleted) (Bjoern Martensen)
 	+ Bug: Ensure that scrollbars don't show up unless needed
 	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
+	+ Other small bugfixes
 
 v0.5 - May 1, 2006
 	+ Make open image mode configurable: smart, fit, 1:1, last (Bjoern Martensen)
