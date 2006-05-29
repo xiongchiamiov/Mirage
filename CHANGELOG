@@ -1,6 +1,8 @@
 v0.6 - Pending
-	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movements
+	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
+	+ Option to wrap around imagelist
 	+ When in zoom-to-fit mode, fit the image when it's rotated
+	+ Show broken icon if image not found (i.e. deleted) (Bjoern Martensen)
 	+ Bug: Ensure that scrollbars don't show up unless needed
 	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
 

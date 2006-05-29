@@ -72,6 +72,7 @@ class Base:
 		self.zoomratio_for_zoom_to_fit = 1
 		self.curr_img_in_list = 0
 		self.mousewheel_nav = True
+		self.listwrap = False
 		self.currimg_width = 0
 		self.currimg_height = 0
 
@@ -132,6 +133,7 @@ class Base:
 			self.open_mode = conf.getint('prefs', 'open_mode')
 			self.last_mode = conf.getint('prefs', 'last_mode')
 			self.mousewheel_nav = conf.getboolean('prefs', 'mousewheel')
+			self.listwrap = conf.getboolean('prefs', 'listwrap')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
 
@@ -419,8 +421,12 @@ class Base:
 
 	def put_error_image_to_window(self):
 		self.imageview.set_from_stock(gtk.STOCK_MISSING_IMAGE, gtk.ICON_SIZE_LARGE_TOOLBAR)
+		self.currimg_width = self.imageview.size_request()[0]
+		self.currimg_height = self.imageview.size_request()[1]
+		self.center_image()
 		self.set_go_sensitivities(False)
 		self.set_image_sensitivities(False)
+		self.update_statusbar()
 		return
 
 	def x_adjustment_changed(self, xadjust):
@@ -476,6 +482,7 @@ class Base:
 		conf.set('prefs', 'open_mode', self.open_mode)
 		conf.set('prefs', 'last_mode', self.last_mode)
 		conf.set('prefs', 'mousewheel_nav', self.mousewheel_nav)
+		conf.set('prefs', 'listwrap', self.listwrap)
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/mirage/'))
 		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
@@ -729,10 +736,13 @@ class Base:
 
 	def update_statusbar(self):
 		# Update status bar:
-		st = os.stat(self.userimage)
-		filesize = st[6]/1000
-		ratio = int(100 * self.zoomratio)
-		status_text=str(self.originalimg.get_width()) + "x" + str(self.originalimg.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
+		try:
+			st = os.stat(self.userimage)
+			filesize = st[6]/1000
+			ratio = int(100 * self.zoomratio)
+			status_text=str(self.originalimg.get_width()) + "x" + str(self.originalimg.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
+		except:
+			status_text="Cannot load image."
 		context_id = self.statusbar.get_context_id("i don't get this")
 		self.statusbar.push(context_id, status_text)
 		return
@@ -833,10 +843,13 @@ class Base:
 		table_navigation.attach(navlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		mousewheelnav = gtk.CheckButton(label="Use mousewheel for imagelist navigation", use_underline=False)
 		mousewheelnav.set_active(self.mousewheel_nav)
-		gtk.Tooltips().set_tip(mousewheelnav, "If enabled, mousewheel-down/up will go to the next/previous image. Note that disabling mousewheel navigation will allow panning images with the mousewheel; panning is otherwise available with left-click/drag or middle-click/drag.")
+		gtk.Tooltips().set_tip(mousewheelnav, "If enabled, mousewheel-down/up will go to the next/previous image.")
+		listwrap = gtk.CheckButton(label="Wrap around imagelist", use_underline=False)
+		listwrap.set_active(self.listwrap)
+		gtk.Tooltips().set_tip(listwrap, "If enabled, navigating will wrap around from the last image to the first (and vice versa).")
 		table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(mousewheelnav, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_navigation.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_navigation.attach(listwrap, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -875,6 +888,7 @@ class Base:
 				self.use_last_dir = False
 			self.open_mode = combobox.get_active()
 			self.mousewheel_nav = mousewheelnav.get_active()
+			self.listwrap = listwrap.get_active()
 			self.prefs_dialog.destroy()
 
 	def use_fixed_dir_clicked(self, button):
@@ -1175,11 +1189,17 @@ class Base:
 			if self.curr_img_in_list > 0:
 				self.curr_img_in_list -= 1
 			else:
-				self.curr_img_in_list = len(self.image_list) - 1
+				if self.listwrap == True:
+					self.curr_img_in_list = len(self.image_list) - 1
+				else:
+					return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			self.load_new_image()
+			try:
+				self.load_new_image()
+			except:
+				self.image_load_failed()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
@@ -1189,11 +1209,17 @@ class Base:
 			if self.curr_img_in_list < len(self.image_list) - 1:
 				self.curr_img_in_list += 1
 			else:
-				self.curr_img_in_list = 0
+				if self.listwrap == True:
+					self.curr_img_in_list = 0
+				else:
+					return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			self.load_new_image()
+			try:
+				self.load_new_image()
+			except:
+				self.image_load_failed()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
@@ -1219,7 +1245,10 @@ class Base:
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			self.load_new_image()
+			try:
+				self.load_new_image()
+			except:
+				self.image_load_failed()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
@@ -1229,7 +1258,10 @@ class Base:
 			self.curr_img_in_list = 0
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			self.load_new_image()
+			try:
+				self.load_new_image()
+			except:
+				self.image_load_failed()
 			self.change_cursor(None)
 
 	def last_img_in_list(self, action):
@@ -1238,7 +1270,10 @@ class Base:
 			self.curr_img_in_list = len(self.image_list)-1
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			self.load_new_image()
+			try:
+				self.load_new_image()
+			except:
+				self.image_load_failed()
 			self.change_cursor(None)
 
 	def reinitialize_randomlist(self):
@@ -1246,6 +1281,14 @@ class Base:
 		for i in range(len(self.image_list)):
 			self.randomlist.append(False)
 		self.randomlist[self.curr_img_in_list] = True
+		
+	def image_load_failed(self):
+		self.userimage = str(self.image_list[self.curr_img_in_list])
+		if self.verbose == True and self.userimage != "":
+			print "Loading:", self.userimage
+		self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
+		self.put_error_image_to_window()
+		self.image_loaded = False
 			
 	def load_new_image(self):
 		self.currimg = None
@@ -1276,6 +1319,7 @@ class Base:
 				self.zoom_1_to_1(None)
 		self.update_statusbar()
 		self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
+		self.image_loaded = True
 
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
@@ -1379,8 +1423,7 @@ class Base:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
 			except:
-				self.put_error_image_to_window()
-				self.image_loaded = False
+				self.image_load_failed()
 				pass
 		self.change_cursor(None)
 

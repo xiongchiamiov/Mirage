@@ -1,6 +1,4 @@
-+ Navigation option: wrap around imagelist, notification at end of list...
 + Show animation (i.e. animated gifs)
-+ Skip or show broken icon if image not found (i.e. deleted via term) (Bjoern Martensen)
 + Test on Windows/Mac?
 + Printing support - requires gnome libs..? (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
