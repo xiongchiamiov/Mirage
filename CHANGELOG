@@ -1,4 +1,5 @@
 v0.6 - Pending
+	+ Bug: Ensure that scrollbars don't show up unless needed
 	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
 
 v0.5 - May 1, 2006
