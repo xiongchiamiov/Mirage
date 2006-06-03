@@ -1,3 +1,6 @@
+v0.7 - Pending
+	+ Set go navigation items' sensitivity based on context
+
 v0.6 - May 29, 2006
 	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
 	+ Option to wrap around imagelist

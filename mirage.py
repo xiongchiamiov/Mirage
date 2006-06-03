@@ -146,8 +146,8 @@ class Base:
 			('GoMenu', None, '_Go'),  
 			('HelpMenu', None, '_Help'),  
 			('ToolsMenu', None, '_Tools'),  
-			('Open Image', gtk.STOCK_OPEN, '_Open Image', '<control>O', 'Open Image', self.open_file),  
-			('Open Folder', gtk.STOCK_DIRECTORY, 'Open _Folder', '<control>F', 'Open Folder', self.open_folder),  
+			('Open Image', gtk.STOCK_OPEN, '_Open Image...', '<control>O', 'Open Image', self.open_file),  
+			('Open Folder', gtk.STOCK_DIRECTORY, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
 			('Exit', gtk.STOCK_QUIT, 'E_xit', '<control>Q', 'Exit', self.exit_app),  
 			('Previous Image', gtk.STOCK_GO_BACK, '_Previous Image', 'Left', 'Previous Image', self.prev_img_in_list),  
 			('Next Image', gtk.STOCK_GO_FORWARD, '_Next Image', 'Right', 'Next Image', self.next_img_in_list),  
@@ -321,10 +321,10 @@ class Base:
 
 		# Show GUI:
 		self.window.show_all()
-		self.layout.set_flags(gtk.CAN_FOCUS)
-		self.window.set_focus(self.layout)
 		self.hscroll.hide()
 		self.vscroll.hide()
+		self.layout.set_flags(gtk.CAN_FOCUS)
+		self.window.set_focus(self.layout)
 
 		# If arguments (filenames) were passed, try to open them:
 		self.image_list = []
@@ -391,6 +391,22 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/ImageMenu/Out').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)		
 		self.UIManager.get_widget('/Popup/Out').set_sensitive(enable)
+		
+	def set_next_image_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/GoMenu/Next Image').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Next Image').set_sensitive(enable)
+
+	def set_previous_image_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainToolbar/Previous2').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Previous Image').set_sensitive(enable)
+		
+	def set_first_image_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainMenu/GoMenu/First Image').set_sensitive(enable)
+		
+	def set_last_image_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainMenu/GoMenu/Last Image').set_sensitive(enable)
 
 	def print_version(self):
 		print "Version: Mirage", __version__
@@ -671,6 +687,7 @@ class Base:
 			filenames = dialog.get_filenames()
 			dialog.destroy()
 			self.expand_filelist_and_load_image(filenames)
+			self.set_go_navigation_sensitivities()
 			self.recursive = False
 		else:
 			dialog.destroy()
@@ -890,6 +907,7 @@ class Base:
 			self.open_mode = combobox.get_active()
 			self.mousewheel_nav = mousewheelnav.get_active()
 			self.listwrap = listwrap.get_active()
+			self.set_go_navigation_sensitivities()
 			self.prefs_dialog.destroy()
 
 	def use_fixed_dir_clicked(self, button):
@@ -1199,6 +1217,7 @@ class Base:
 				self.load_new_image()
 			except:
 				self.image_load_failed()
+			self.set_go_navigation_sensitivities()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
@@ -1213,7 +1232,7 @@ class Base:
 				else:
 					if self.fullscreen_mode == True:
 						self.toggle_fullscreen(None)
-						return
+					return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
@@ -1221,6 +1240,7 @@ class Base:
 				self.load_new_image()
 			except:
 				self.image_load_failed()
+			self.set_go_navigation_sensitivities()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
@@ -1250,11 +1270,12 @@ class Base:
 				self.load_new_image()
 			except:
 				self.image_load_failed()
+			self.set_go_navigation_sensitivities()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
 
 	def first_img_in_list(self, action):
-		if len(self.image_list) > 1:
+		if len(self.image_list) > 1 and self.curr_img_in_list != 0:
 			self.randomlist = []
 			self.curr_img_in_list = 0
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1263,10 +1284,11 @@ class Base:
 				self.load_new_image()
 			except:
 				self.image_load_failed()
+			self.set_go_navigation_sensitivities()
 			self.change_cursor(None)
 
 	def last_img_in_list(self, action):
-		if len(self.image_list) > 1:
+		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1:
 			self.randomlist = []
 			self.curr_img_in_list = len(self.image_list)-1
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1275,7 +1297,31 @@ class Base:
 				self.load_new_image()
 			except:
 				self.image_load_failed()
+			self.set_go_navigation_sensitivities()
 			self.change_cursor(None)
+	
+	def set_go_navigation_sensitivities(self):
+		if self.curr_img_in_list == 0:
+			if self.listwrap == False:
+				self.set_previous_image_sensitivities(False)
+			else:
+				self.set_previous_image_sensitivities(True)
+			self.set_first_image_sensitivities(False)
+			self.set_next_image_sensitivities(True)
+			self.set_last_image_sensitivities(True)
+		elif self.curr_img_in_list == len(self.image_list)-1:
+			self.set_previous_image_sensitivities(True)
+			self.set_first_image_sensitivities(True)
+			if self.listwrap == False:
+				self.set_next_image_sensitivities(False)
+			else:
+				self.set_next_image_sensitivities(True)
+			self.set_last_image_sensitivities(False)
+		else:
+			self.set_previous_image_sensitivities(True)
+			self.set_first_image_sensitivities(True)
+			self.set_next_image_sensitivities(True)
+			self.set_last_image_sensitivities(True)
 
 	def reinitialize_randomlist(self):
 		self.randomlist = []
