@@ -145,7 +145,7 @@ class Base:
 			('ImageMenu', None, '_Image'),  
 			('GoMenu', None, '_Go'),  
 			('HelpMenu', None, '_Help'),  
-			('ToolsMenu', None, '_Tools'),  
+			('SettingsMenu', None, '_Settings'),  
 			('Open Image', gtk.STOCK_OPEN, '_Open Image...', '<control>O', 'Open Image', self.open_file),  
 			('Open Folder', gtk.STOCK_DIRECTORY, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
 			('Exit', gtk.STOCK_QUIT, 'E_xit', '<control>Q', 'Exit', self.exit_app),  
@@ -165,7 +165,7 @@ class Base:
 			('Flip Vertically', None, 'Flip _Vertically', '<Ctrl>V', 'Flip Vertically', self.image_flip_vert),  
 			('Flip Horizontally', None, 'Flip _Horizontally', '<Ctrl>H', 'Flip Horizontally', self.image_flip_horiz),  
 			('About', gtk.STOCK_ABOUT, '_About', 'F1', 'About', self.show_about),  
-			('Options', gtk.STOCK_PREFERENCES, '_Options', None, 'Options', self.show_prefs),  
+			('Preferences', gtk.STOCK_PREFERENCES, '_Preferences', None, 'Preferences', self.show_prefs),  
 			('Full Screen', gtk.STOCK_FULLSCREEN, '_Full Screen', '<Shift>Return', 'Full Screen', self.toggle_fullscreen),
 			('Exit Full Screen', gtk.STOCK_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.toggle_fullscreen),
 			)
@@ -225,8 +225,8 @@ class Base:
 			      <menuitem action="Flip Vertically"/>
 			      <menuitem action="Flip Horizontally"/>
 			    </menu>
-			    <menu action="ToolsMenu">  
-			      <menuitem action="Options"/>  
+			    <menu action="SettingsMenu">  
+			      <menuitem action="Preferences"/>  
 			    </menu>  
 			    <menu action="HelpMenu">  
 			      <menuitem action="About"/>  
@@ -766,7 +766,7 @@ class Base:
 		return
 
 	def show_prefs(self, action):
-		self.prefs_dialog = gtk.Dialog(title="Mirage Options", parent=self.window)
+		self.prefs_dialog = gtk.Dialog(title="Mirage Preferences", parent=self.window)
 		self.prefs_dialog.set_has_separator(False)
 		self.prefs_dialog.set_resizable(False)
 		# Add "general" prefs:
@@ -1113,7 +1113,6 @@ class Base:
 			if self.first_image_load == True and self.zoomratio > 1:
 				# Revert to 1:1 zoom
 				self.zoom_1_to_1(action)
-				self.last_image_action_was_fit = True
 			else:
 				self.put_zoom_image_to_window()
 				self.update_statusbar()
@@ -1230,8 +1229,6 @@ class Base:
 				if self.listwrap == True:
 					self.curr_img_in_list = 0
 				else:
-					if self.fullscreen_mode == True:
-						self.toggle_fullscreen(None)
 					return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1434,7 +1431,7 @@ class Base:
 			# If it's a directory that was explicitly selected or passed to
 			# the program, get all the files in the dir.
 			# Retrieve only images in the top directory specified by the user
-			# only explicitly told to recurse (via -R or in Tools>Options)
+			# only explicitly told to recurse (via -R or in Settings>Preferences)
 			elif os.path.isdir(item_fullpath):
 				folderlist.append(item)
 		# Sort the filelist and folderlist alphabetically, and recurse into folderlist:

@@ -1,3 +1,4 @@
++ image wrapping: yes/no/ask
 + Show animation (i.e. animated gifs)
 + Test on Windows/Mac?
 + Printing support - requires gnome libs..? (Bjoern Martensen)
