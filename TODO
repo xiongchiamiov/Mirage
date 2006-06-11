@@ -2,7 +2,7 @@
 + Fullscreen mode - xfce panel appears when the child window pops up
 + "Open with ..." (for opening the image in an editor, i.e., gimp)
 + Disable screen saver in fullscreen_mode
-+ Show animation (i.e. animated gifs)
++ Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac?
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)

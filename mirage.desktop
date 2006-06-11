@@ -1,11 +1,11 @@
 [Desktop Entry]
 Name=Mirage
-Comment=A simple GTK+ Image Viewer
+Comment=A fast GTK+ Image Viewer
 Exec=mirage %U
 Terminal=false
 Type=Application
 Icon=mirage.png
 Categories=GTK;Application;Graphics;
-Version=0.6
+Version=0.7
 Encoding=UTF-8
 MimeType=image/bmp;image/g3fax;image/gif;image/jpeg;image/jpg;image/pjpeg;image/png;image/tiff;image/x-bmp;image/x-compressed-xcf;image/x-fits;image/x-gray;image/x-pcx;image/x-png;image/x-portable-anymap;image/x-portable-bitmap;image/x-portable-graymap;image/x-portable-pixmap;image/x-psd;image/x-sgi;image/x-sun-raster;image/x-tga;image/x-xbitmap;image/x-xcf;image/x-xpixmap;image/x-xwindowdump;

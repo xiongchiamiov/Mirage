@@ -3,11 +3,11 @@
 from distutils.core import setup, Extension
 
 setup(name='Mirage',
-        version='0.6',
-        description='A simple GTK+ image viewer',
+        version='0.7',
+        description='A fast GTK+ image viewer',
         author='Scott Horowitz',
         author_email='stonecrest@gmail.com',
-        url='http://www.theskyiscrape.com/scott/mirage.html',
+        url='http://mirageiv.berlios.de',
         classifiers=[
             'Environment :: X11 Applications',
             'Intended Audience :: End Users/Desktop',

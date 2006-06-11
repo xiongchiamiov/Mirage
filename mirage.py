@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = "0.6"
+__version__ = "0.7"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -77,6 +77,7 @@ class Base:
 		self.currimg_height = 0
 		self.update_image = True
 		self.user_prompt_visible = False
+		self.image_is_animation = False
 
 		# Read any passed options/arguments:
 		try:
@@ -200,20 +201,20 @@ class Base:
 			      <menuitem action="Quit"/>  
 			    </menu>
 			    <menu action="EditMenu">
+			      <menuitem action="Rotate Left"/>
+			      <menuitem action="Rotate Right"/>
+			      <separator name="FM1"/>  
+			      <menuitem action="Flip Vertically"/>
+			      <menuitem action="Flip Horizontally"/>
+			      <separator name="FM2"/>  
+			      <menuitem action="Preferences"/>  
+			    </menu>
+			    <menu action="ViewMenu">
 			      <menuitem action="Out"/>
 			      <menuitem action="In"/>
 			      <menuitem action="1:1"/>
 			      <menuitem action="Fit"/>
-			      <separator name="FM1"/>  
-			      <menuitem action="Rotate Left"/>
-			      <menuitem action="Rotate Right"/>
-			      <separator name="FM2"/>  
-			      <menuitem action="Flip Vertically"/>
-			      <menuitem action="Flip Horizontally"/>
-			      <separator name="FM3"/>  
-			      <menuitem action="Preferences"/>  
-			    </menu>
-			    <menu action="ViewMenu">
+			      <separator name="FM2"/> 
 			      <menuitem action="Toolbar"/>
 			      <menuitem action="Status Bar"/>
 			      <separator name="FM1"/>  
@@ -368,26 +369,30 @@ class Base:
 		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
 
 	def set_image_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/EditMenu/Out').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/In').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/1:1').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Fit').set_sensitive(enable)
+		self.set_zoom_in_sensitivities(enable)
+		self.set_zoom_out_sensitivities(enable)
+		self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
-		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)
-		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/1:1').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Fit').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/1:1').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Fit').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Rotate Left').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Flip Vertically').set_sensitive(enable)
+		self.UIManager.get_widget('/Popup/Flip Horizontally').set_sensitive(enable)
 		
 	def set_zoom_in_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/EditMenu/In').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)		
 		self.UIManager.get_widget('/Popup/In').set_sensitive(enable)
 
 	def set_zoom_out_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/EditMenu/Out').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/ViewMenu/Out').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)		
 		self.UIManager.get_widget('/Popup/Out').set_sensitive(enable)
 		
@@ -406,6 +411,20 @@ class Base:
 		
 	def set_last_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Last Image').set_sensitive(enable)
+		
+	def set_zoom_sensitivities(self):
+		if self.image_is_animation == False:
+			if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
+				self.set_zoom_out_sensitivities(False)
+			else:
+				self.set_zoom_out_sensitivities(True)
+			if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
+				self.set_zoom_in_sensitivities(False)
+			else:
+				self.set_zoom_in_sensitivities(True)
+		else:
+			self.set_zoom_out_sensitivities(False)
+			self.set_zoom_in_sensitivities(False)
 
 	def print_version(self):
 		print "Version: Mirage", __version__
@@ -519,70 +538,73 @@ class Base:
 		# Calculate image size:
 		finalimg_width = int(self.originalimg.get_width() * self.zoomratio)
 		finalimg_height = int(self.originalimg.get_height() * self.zoomratio)
-		# If self.zoomratio < 1, scale first so that rotating/flipping is performed
-		# on the smaller image for speed improvements
-		if self.zoomratio < 1:
-			# Scale image:
-			if self.originalimg.get_has_alpha() == False:
-				self.currimg = self.originalimg.scale_simple(finalimg_width, finalimg_height, self.zoom_quality)
-			else:
-				colormap = self.imageview.get_colormap()
-				light_grey = colormap.alloc_color('#666666', True, True)
-				dark_grey = colormap.alloc_color('#999999', True, True)
-				self.currimg = self.originalimg.composite_color_simple(finalimg_width, finalimg_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)		
-			# Now check if we need any rotating/flipping
-			if self.orientation == 1:
-				if self.location == 0:
-					self.currimg = self.image_rotate(self.currimg, 270)
-					self.currimg = self.image_flip(self.currimg, False)
-				elif self.location == 1:
-					self.currimg = self.image_rotate(self.currimg, 270)
-				elif self.location == 2:
-					self.currimg = self.image_rotate(self.currimg, 270)
-					self.currimg = self.image_flip(self.currimg, True)
-				elif self.location == 3:
-					self.currimg = self.image_rotate(self.currimg, 90)
-			else:
-				if self.location == 1:
-					self.currimg = self.image_flip(self.currimg, False)
-				elif self.location == 2:
-					self.currimg = self.image_rotate(self.currimg, 180)
-				elif self.location == 3:
-					self.currimg = self.image_flip(self.currimg, True)
-		# If self.zoomratio >= 1, perform any rotating/flipping on the smaller image
-		# (before scaling up) for speed improvements
-		if self.zoomratio >= 1:
-			# Check if we need any rotating/flipping
-			if self.orientation == 1:
-				finalimg_width, finalimg_height = finalimg_height, finalimg_width
-				if self.location == 0:
-					self.currimg = self.image_rotate(self.originalimg, 270)
-					self.currimg = self.image_flip(self.currimg, False)
-				elif self.location == 1:
-					self.currimg = self.image_rotate(self.originalimg, 270)
-				elif self.location == 2:
-					self.currimg = self.image_rotate(self.originalimg, 270)
-					self.currimg = self.image_flip(self.currimg, True)
-				elif self.location == 3:
-					self.currimg = self.image_rotate(self.originalimg, 90)
-			else:
-				if self.location == 0:
-					self.currimg = self.originalimg
-				elif self.location == 1:
-					self.currimg = self.image_flip(self.originalimg, False)
-				elif self.location == 2:
-					self.currimg = self.image_rotate(self.originalimg, 180)
-				elif self.location == 3:
-					self.currimg = self.image_flip(self.originalimg, True)
-			# Scale image:
-			if self.originalimg.get_has_alpha() == False:
-				if self.zoomratio != 1:
-					self.currimg = self.currimg.scale_simple(finalimg_width, finalimg_height, self.zoom_quality)
-			else:
-				colormap = self.imageview.get_colormap()
-				light_grey = colormap.alloc_color('#666666', True, True)
-				dark_grey = colormap.alloc_color('#999999', True, True)
-				self.currimg = self.currimg.composite_color_simple(finalimg_width, finalimg_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+		if self.image_is_animation  == False:
+			# If self.zoomratio < 1, scale first so that rotating/flipping is performed
+			# on the smaller image for speed improvements
+			if self.zoomratio < 1:
+				# Scale image:
+				if self.originalimg.get_has_alpha() == False:
+					self.currimg = self.originalimg.scale_simple(finalimg_width, finalimg_height, self.zoom_quality)
+				else:
+					colormap = self.imageview.get_colormap()
+					light_grey = colormap.alloc_color('#666666', True, True)
+					dark_grey = colormap.alloc_color('#999999', True, True)
+					self.currimg = self.originalimg.composite_color_simple(finalimg_width, finalimg_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)		
+				# Now check if we need any rotating/flipping
+				if self.orientation == 1:
+					if self.location == 0:
+						self.currimg = self.image_rotate(self.currimg, 270)
+						self.currimg = self.image_flip(self.currimg, False)
+					elif self.location == 1:
+						self.currimg = self.image_rotate(self.currimg, 270)
+					elif self.location == 2:
+						self.currimg = self.image_rotate(self.currimg, 270)
+						self.currimg = self.image_flip(self.currimg, True)
+					elif self.location == 3:
+						self.currimg = self.image_rotate(self.currimg, 90)
+				else:
+					if self.location == 1:
+						self.currimg = self.image_flip(self.currimg, False)
+					elif self.location == 2:
+						self.currimg = self.image_rotate(self.currimg, 180)
+					elif self.location == 3:
+						self.currimg = self.image_flip(self.currimg, True)
+			# If self.zoomratio >= 1, perform any rotating/flipping on the smaller image
+			# (before scaling up) for speed improvements
+			if self.zoomratio >= 1:
+				# Check if we need any rotating/flipping
+				if self.orientation == 1:
+					finalimg_width, finalimg_height = finalimg_height, finalimg_width
+					if self.location == 0:
+						self.currimg = self.image_rotate(self.originalimg, 270)
+						self.currimg = self.image_flip(self.currimg, False)
+					elif self.location == 1:
+						self.currimg = self.image_rotate(self.originalimg, 270)
+					elif self.location == 2:
+						self.currimg = self.image_rotate(self.originalimg, 270)
+						self.currimg = self.image_flip(self.currimg, True)
+					elif self.location == 3:
+						self.currimg = self.image_rotate(self.originalimg, 90)
+				else:
+					if self.location == 0:
+						self.currimg = self.originalimg
+					elif self.location == 1:
+						self.currimg = self.image_flip(self.originalimg, False)
+					elif self.location == 2:
+						self.currimg = self.image_rotate(self.originalimg, 180)
+					elif self.location == 3:
+						self.currimg = self.image_flip(self.originalimg, True)
+				# Scale image:
+				if self.originalimg.get_has_alpha() == False:
+					if self.zoomratio != 1:
+						self.currimg = self.currimg.scale_simple(finalimg_width, finalimg_height, self.zoom_quality)
+				else:
+					colormap = self.imageview.get_colormap()
+					light_grey = colormap.alloc_color('#666666', True, True)
+					dark_grey = colormap.alloc_color('#999999', True, True)
+					self.currimg = self.currimg.composite_color_simple(finalimg_width, finalimg_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+		else:
+			self.currimg = self.originalimg
 		if self.orientation == 0:
 			self.currimg_width, self.currimg_height = finalimg_width, finalimg_height
 		else:
@@ -590,7 +612,10 @@ class Base:
 		self.show_scrollbars_if_needed()
 		self.layout.set_size(self.currimg_width, self.currimg_height)
 		self.center_image()
-		self.imageview.set_from_pixbuf(self.currimg)
+		if self.image_is_animation  == False:
+			self.imageview.set_from_pixbuf(self.currimg)
+		else:
+			self.imageview.set_from_animation(self.currimg)
 		self.first_image_load = False
 		# Clean up (free memory) because I'm lazy
 		gc.collect()
@@ -650,7 +675,7 @@ class Base:
 		return
 
 	def open_file_or_folder(self, action, isfile):
-		# If file = True, file; If file = False, folder
+		# If isfile = True, file; If isfile = False, folder
 		dialog = gtk.FileChooserDialog(title="Open",action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
 		if isfile == True:
 			filter = gtk.FileFilter()
@@ -1039,37 +1064,25 @@ class Base:
 		return True
 
 	def zoom_in(self, action):
-		if self.userimage != "":
-			if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_out_sensitivities(True)
-			if self.zoomratio < self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.zoomratio = self.zoomratio * 1.25
-				if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-					self.set_zoom_in_sensitivities(False)
-				self.last_image_action_was_fit = False
-				self.put_zoom_image_to_window()
-				self.update_statusbar()
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/In').get_property('sensitive') == True:
+			self.zoomratio = self.zoomratio * 1.25
+			self.set_zoom_sensitivities()
+			self.last_image_action_was_fit = False
+			self.put_zoom_image_to_window()
+			self.update_statusbar()
 		return
 
 	def zoom_out(self, action):
-		if self.userimage != "":
-			if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_in_sensitivities(True)
-			if self.zoomratio > self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.zoomratio = self.zoomratio * 1/1.25
-				if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-					self.set_zoom_out_sensitivities(False)
-				self.last_image_action_was_fit = False
-				self.put_zoom_image_to_window()
-				self.update_statusbar()
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Out').get_property('sensitive') == True:
+			self.zoomratio = self.zoomratio * 1/1.25
+			self.set_zoom_sensitivities()
+			self.last_image_action_was_fit = False
+			self.put_zoom_image_to_window()
+			self.update_statusbar()
 		return
 
 	def zoom_to_fit_window(self, action):
-		if self.userimage != "":
-			if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_out_sensitivities(True)
-			if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_in_sensitivities(True)
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').get_property('sensitive') == True:
 			self.last_mode = self.open_mode_fit
 			self.last_image_action_was_fit = True
 			# Calculate zoomratio needed to fit to window:
@@ -1087,16 +1100,13 @@ class Base:
 			else:
 				max_ratio = width_ratio
 			self.zoomratio = 1/float(max_ratio)
+			self.set_zoom_sensitivities()
 			self.put_zoom_image_to_window()
 			self.update_statusbar()
 		return
 
 	def zoom_to_fit_or_1_to_1(self, action):
 		if self.userimage != "":
-			if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_out_sensitivities(True)
-			if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_in_sensitivities(True)
 			self.last_image_action_was_fit = True
 			# Calculate zoomratio needed to fit to window:
 			win_width = self.available_image_width()
@@ -1114,6 +1124,7 @@ class Base:
 				max_ratio = width_ratio
 			self.zoomratio = 1/float(max_ratio)
 			self.zoomratio_for_zoom_to_fit = self.zoomratio
+			self.set_zoom_sensitivities()
 			if self.first_image_load == True and self.zoomratio > 1:
 				# Revert to 1:1 zoom
 				self.zoom_1_to_1(action)
@@ -1123,11 +1134,7 @@ class Base:
 		return
 
 	def zoom_1_to_1(self, action):
-		if self.userimage != "":
-			if self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_out_sensitivities(True)
-			if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_in_sensitivities(True)
+		if self.userimage != "" and (self.image_is_animation == True or (self.image_is_animation == False and self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').get_property('sensitive') == True)):
 			self.last_mode = self.open_mode_1to1
 			self.last_image_action_was_fit = False
 			self.zoomratio = 1
@@ -1136,7 +1143,7 @@ class Base:
 		return
 
 	def rotate_left(self, action):
-		if self.userimage != "":
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').get_property('sensitive') == True:
 			if self.orientation == 0:
 				self.orientation = 1
 			else:
@@ -1156,7 +1163,7 @@ class Base:
 		return
 
 	def rotate_right(self, action):
-		if self.userimage != "":
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').get_property('sensitive') == True:
 			if self.orientation == 0:
 				self.orientation = 1
 			else:
@@ -1176,7 +1183,7 @@ class Base:
 		return
 
 	def image_flip_vert(self, action):
-		if self.userimage != "":
+		if self.userimage != ""  and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').get_property('sensitive') == True:
 			if self.location == 0:
 				self.location = 3
 			elif self.location == 1:
@@ -1190,7 +1197,7 @@ class Base:
 		return
 
 	def image_flip_horiz(self, action):
-		if self.userimage != "":
+		if self.userimage != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').get_property('sensitive') == True:
 			if self.location == 0:
 				self.location = 1
 			elif self.location == 1:
@@ -1383,31 +1390,36 @@ class Base:
 			
 	def load_new_image(self):
 		self.currimg = None
-		self.userimage = str(self.image_list[self.curr_img_in_list])
-		if self.verbose == True and self.userimage != "":
-			print "Loading:", self.userimage
-		self.originalimg = gtk.gdk.pixbuf_new_from_file(self.userimage)
 		self.first_image_load = True
 		self.location = 0
 		self.orientation = 0
-		if self.zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-			self.set_zoom_in_sensitivities(True)
-		elif self.zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-			self.set_zoom_out_sensitivities(True)
 		self.zoomratio = 1
-		if self.open_mode == self.open_mode_smart:
-			self.zoom_to_fit_or_1_to_1(None)
-		elif self.open_mode == self.open_mode_fit:
-			self.zoom_to_fit_window(None)
-		elif self.open_mode == self.open_mode_1to1:
-			self.zoom_1_to_1(None)
-		elif self.open_mode == self.open_mode_last:
-			if self.last_mode == self.open_mode_smart:
+		self.userimage = str(self.image_list[self.curr_img_in_list])
+		if self.verbose == True and self.userimage != "":
+			print "Loading:", self.userimage
+		animtest = gtk.gdk.PixbufAnimation(self.userimage)
+		if animtest.is_static_image() == True:
+			self.image_is_animation = False
+			self.originalimg = animtest.get_static_image()
+			self.set_image_sensitivities(True)
+			if self.open_mode == self.open_mode_smart:
 				self.zoom_to_fit_or_1_to_1(None)
-			elif self.last_mode == self.open_mode_fit:
+			elif self.open_mode == self.open_mode_fit:
 				self.zoom_to_fit_window(None)
-			elif self.last_mode == self.open_mode_1to1:
+			elif self.open_mode == self.open_mode_1to1:
 				self.zoom_1_to_1(None)
+			elif self.open_mode == self.open_mode_last:
+				if self.last_mode == self.open_mode_smart:
+					self.zoom_to_fit_or_1_to_1(None)
+				elif self.last_mode == self.open_mode_fit:
+					self.zoom_to_fit_window(None)
+				elif self.last_mode == self.open_mode_1to1:
+					self.zoom_1_to_1(None)
+		else:
+			self.image_is_animation = True
+			self.originalimg = animtest
+			self.zoom_1_to_1(None)
+			self.set_image_sensitivities(False)
 		self.update_statusbar()
 		self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
 		self.image_loaded = True
@@ -1505,17 +1517,19 @@ class Base:
 						self.curr_img_in_list = itemnum
 			if self.verbose == True and self.userimage != "":
 				print "Loading:", self.userimage
-			try:
-				self.originalimg = gtk.gdk.pixbuf_new_from_file(str(self.image_list[self.curr_img_in_list]))
-				self.load_new_image()
+			#try:
+			self.originalimg = gtk.gdk.pixbuf_new_from_file(str(self.image_list[self.curr_img_in_list]))
+			self.load_new_image()
+			if self.image_is_animation == False:
 				self.previmg_width = self.currimg.get_width()
-				self.image_loaded = True
-				self.set_image_sensitivities(True)
-				while gtk.events_pending():
-					gtk.main_iteration(True)
-			except:
-				self.image_load_failed()
-				pass
+			else:
+				self.previmg_width = self.currimg.get_static_image().get_width()
+			self.image_loaded = True
+			while gtk.events_pending():
+				gtk.main_iteration(True)
+			#except:
+			#	self.image_load_failed()
+			#	pass
 		self.change_cursor(None)
 
 	def expand_directory(self, item, inputlist, stop_when_image_found, stop_now):
