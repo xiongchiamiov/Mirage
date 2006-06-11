@@ -3,7 +3,7 @@
 __version__ = "0.6"
 
 __license__ = """
-Mirage, a simple GTK+ Image Viewer
+Mirage, a fast GTK+ Image Viewer
 Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it
@@ -142,14 +142,13 @@ class Base:
 		# Define the main menubar and toolbar:
 		actions = (  
 			('FileMenu', None, '_File'),  
+			('EditMenu', None, '_Edit'),
 			('ViewMenu', None, '_View'),  
-			('ImageMenu', None, '_Image'),  
 			('GoMenu', None, '_Go'),  
 			('HelpMenu', None, '_Help'),  
-			('SettingsMenu', None, '_Settings'),  
 			('Open Image', gtk.STOCK_OPEN, '_Open Image...', '<control>O', 'Open Image', self.open_file),  
 			('Open Folder', gtk.STOCK_DIRECTORY, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
-			('Exit', gtk.STOCK_QUIT, 'E_xit', '<control>Q', 'Exit', self.exit_app),  
+			('Quit', gtk.STOCK_QUIT, '_Quit', '<control>Q', 'Quit', self.exit_app),  
 			('Previous Image', gtk.STOCK_GO_BACK, '_Previous Image', 'Left', 'Previous Image', self.prev_img_in_list),  
 			('Next Image', gtk.STOCK_GO_FORWARD, '_Next Image', 'Right', 'Next Image', self.next_img_in_list),  
 			('Previous2', gtk.STOCK_GO_BACK, '_Previous', 'Left', 'Previous', self.prev_img_in_list),  
@@ -198,7 +197,21 @@ class Base:
 			      <menuitem action="Open Image"/>  
 			      <menuitem action="Open Folder"/>  
 			      <separator name="FM1"/>  
-			      <menuitem action="Exit"/>  
+			      <menuitem action="Quit"/>  
+			    </menu>
+			    <menu action="EditMenu">
+			      <menuitem action="Out"/>
+			      <menuitem action="In"/>
+			      <menuitem action="1:1"/>
+			      <menuitem action="Fit"/>
+			      <separator name="FM1"/>  
+			      <menuitem action="Rotate Left"/>
+			      <menuitem action="Rotate Right"/>
+			      <separator name="FM2"/>  
+			      <menuitem action="Flip Vertically"/>
+			      <menuitem action="Flip Horizontally"/>
+			      <separator name="FM3"/>  
+			      <menuitem action="Preferences"/>  
 			    </menu>
 			    <menu action="ViewMenu">
 			      <menuitem action="Toolbar"/>
@@ -214,21 +227,6 @@ class Base:
 			      <menuitem action="First Image"/>
 			      <menuitem action="Last Image"/>
 			    </menu>
-			    <menu action="ImageMenu">
-			      <menuitem action="Out"/>
-			      <menuitem action="In"/>
-			      <menuitem action="1:1"/>
-			      <menuitem action="Fit"/>
-			      <separator name="FM1"/>  
-			      <menuitem action="Rotate Left"/>
-			      <menuitem action="Rotate Right"/>
-			      <separator name="FM2"/>  
-			      <menuitem action="Flip Vertically"/>
-			      <menuitem action="Flip Horizontally"/>
-			    </menu>
-			    <menu action="SettingsMenu">  
-			      <menuitem action="Preferences"/>  
-			    </menu>  
 			    <menu action="HelpMenu">  
 			      <menuitem action="About"/>  
 			    </menu>  
@@ -370,26 +368,26 @@ class Base:
 		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
 
 	def set_image_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Out').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/In').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/1:1').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Fit').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Rotate Left').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Rotate Right').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Flip Vertically').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Flip Horizontally').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Out').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/In').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/1:1').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Fit').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/1:1').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Fit').set_sensitive(enable)
 		
 	def set_zoom_in_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/ImageMenu/In').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/In').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)		
 		self.UIManager.get_widget('/Popup/In').set_sensitive(enable)
 
 	def set_zoom_out_sensitivities(self, enable):
-		self.UIManager.get_widget('/MainMenu/ImageMenu/Out').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Out').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)		
 		self.UIManager.get_widget('/Popup/Out').set_sensitive(enable)
 		
@@ -965,7 +963,7 @@ class Base:
 		self.about_dialog = gtk.AboutDialog()
 		self.about_dialog.set_name('Mirage')
 		self.about_dialog.set_version(__version__)
-		self.about_dialog.set_comments('A simple GTK+ Image Viewer.')
+		self.about_dialog.set_comments('A fast GTK+ Image Viewer.')
 		self.about_dialog.set_license(__license__)
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
