@@ -72,10 +72,11 @@ class Base:
 		self.zoomratio_for_zoom_to_fit = 1
 		self.curr_img_in_list = 0
 		self.mousewheel_nav = True
-		self.listwrap = False
+		self.listwrap_mode = 0     # 0=no, 1=yes, 2=ask
 		self.currimg_width = 0
 		self.currimg_height = 0
 		self.update_image = True
+		self.user_prompt_visible = False
 
 		# Read any passed options/arguments:
 		try:
@@ -133,8 +134,8 @@ class Base:
 			self.open_all_images = conf.getboolean('prefs', 'open_all')
 			self.open_mode = conf.getint('prefs', 'open_mode')
 			self.last_mode = conf.getint('prefs', 'last_mode')
-			self.mousewheel_nav = conf.getboolean('prefs', 'mousewheel')
-			self.listwrap = conf.getboolean('prefs', 'listwrap')
+			self.mousewheel_nav = conf.getboolean('prefs', 'mousewheel_nav')
+			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
 
@@ -499,7 +500,7 @@ class Base:
 		conf.set('prefs', 'open_mode', self.open_mode)
 		conf.set('prefs', 'last_mode', self.last_mode)
 		conf.set('prefs', 'mousewheel_nav', self.mousewheel_nav)
-		conf.set('prefs', 'listwrap', self.listwrap)
+		conf.set('prefs', 'listwrap_mode', self.listwrap_mode)
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/mirage/'))
 		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
@@ -698,7 +699,7 @@ class Base:
 		gtk.main_quit()
 		
 	def hide_cursor(self):
-		if self.fullscreen_mode == True:
+		if self.fullscreen_mode == True and self.user_prompt_visible == False:
 			pix_data = """/* XPM */
 			static char * invisible_xpm[] = {
 			"1 1 1 1",
@@ -861,13 +862,18 @@ class Base:
 		table_navigation.attach(navlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		mousewheelnav = gtk.CheckButton(label="Use mousewheel for imagelist navigation", use_underline=False)
 		mousewheelnav.set_active(self.mousewheel_nav)
-		gtk.Tooltips().set_tip(mousewheelnav, "If enabled, mousewheel-down/up will go to the next/previous image.")
-		listwrap = gtk.CheckButton(label="Wrap around imagelist", use_underline=False)
-		listwrap.set_active(self.listwrap)
-		gtk.Tooltips().set_tip(listwrap, "If enabled, navigating will wrap around from the last image to the first (and vice versa).")
+		gtk.Tooltips().set_tip(mousewheelnav, "If enabled, mousewheel-down (up) will go to the next (previous) image.")
+		hbox_listwrap = gtk.HBox()
+		hbox_listwrap.pack_start(gtk.Label("Wrap around imagelist:"), False, False, 0)
+		combobox2 = gtk.combo_box_new_text()
+		combobox2.append_text("No")
+		combobox2.append_text("Yes")
+		combobox2.append_text("Prompt User")
+		combobox2.set_active(self.listwrap_mode)
+		hbox_listwrap.pack_start(combobox2, False, False, 5)
 		table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(mousewheelnav, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_navigation.attach(listwrap, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_navigation.attach(hbox_listwrap, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -906,7 +912,7 @@ class Base:
 				self.use_last_dir = False
 			self.open_mode = combobox.get_active()
 			self.mousewheel_nav = mousewheelnav.get_active()
-			self.listwrap = listwrap.get_active()
+			self.listwrap_mode = combobox2.get_active()
 			self.set_go_navigation_sensitivities()
 			self.prefs_dialog.destroy()
 
@@ -1205,10 +1211,29 @@ class Base:
 			if self.curr_img_in_list > 0:
 				self.curr_img_in_list -= 1
 			else:
-				if self.listwrap == True:
+				if self.listwrap_mode == 0:
+					return
+				elif self.listwrap_mode == 1:
 					self.curr_img_in_list = len(self.image_list) - 1
 				else:
-					return
+					if self.fullscreen_mode == True:
+						self.change_cursor(None)
+					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the first image in the list. Wrap around to the last image?")
+					dialog.set_default_response(gtk.RESPONSE_YES)
+					self.user_prompt_visible = True
+					response = dialog.run()
+					if response == gtk.RESPONSE_YES:
+						self.curr_img_in_list = len(self.image_list)-1
+						dialog.destroy()
+						self.user_prompt_visible = False
+						if self.fullscreen_mode == True:
+							self.hide_cursor
+					else:
+						dialog.destroy()
+						self.user_prompt_visible = False
+						if self.fullscreen_mode == True:
+							self.hide_cursor
+						return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
@@ -1226,10 +1251,29 @@ class Base:
 			if self.curr_img_in_list < len(self.image_list) - 1:
 				self.curr_img_in_list += 1
 			else:
-				if self.listwrap == True:
+				if self.listwrap_mode == 0:
+					return
+				elif self.listwrap_mode == 1:
 					self.curr_img_in_list = 0
 				else:
-					return
+					if self.fullscreen_mode == True:
+						self.change_cursor(None)
+					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the last image in the list. Wrap around to the first image?")
+					dialog.set_default_response(gtk.RESPONSE_YES)
+					self.user_prompt_visible = True
+					response = dialog.run()
+					if response == gtk.RESPONSE_YES:
+						self.curr_img_in_list = 0
+						dialog.destroy()
+						self.user_prompt_visible = False
+						if self.fullscreen_mode == True:
+							self.hide_cursor
+					else:
+						dialog.destroy()
+						self.user_prompt_visible = False
+						if self.fullscreen_mode == True:
+							self.hide_cursor
+						return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
@@ -1298,8 +1342,13 @@ class Base:
 			self.change_cursor(None)
 	
 	def set_go_navigation_sensitivities(self):
-		if self.curr_img_in_list == 0:
-			if self.listwrap == False:
+		if self.image_loaded == False or len(self.image_list) == 1:
+			self.set_previous_image_sensitivities(False)
+			self.set_first_image_sensitivities(False)
+			self.set_next_image_sensitivities(False)
+			self.set_last_image_sensitivities(False)
+		elif self.curr_img_in_list == 0:
+			if self.listwrap_mode == 0:
 				self.set_previous_image_sensitivities(False)
 			else:
 				self.set_previous_image_sensitivities(True)
@@ -1309,7 +1358,7 @@ class Base:
 		elif self.curr_img_in_list == len(self.image_list)-1:
 			self.set_previous_image_sensitivities(True)
 			self.set_first_image_sensitivities(True)
-			if self.listwrap == False:
+			if self.listwrap_mode == 0:
 				self.set_next_image_sensitivities(False)
 			else:
 				self.set_next_image_sensitivities(True)
@@ -1367,7 +1416,7 @@ class Base:
 		
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
-			if i.get_window_type() != gtk.gdk.WINDOW_TEMP:
+			if i.get_window_type() != gtk.gdk.WINDOW_TEMP and i.get_window_type() != gtk.gdk.WINDOW_CHILD:
 				i.set_cursor(type)
 		self.layout.window.set_cursor(type)
 		
