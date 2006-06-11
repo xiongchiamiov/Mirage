@@ -411,7 +411,7 @@ class Base:
 
 	def print_version(self):
 		print "Version: Mirage", __version__
-		print "Website: http://www.theskyiscrape.com/scott/mirage.html"
+		print "Website: http://mirageiv.berlios.de"
 
 	def print_usage(self):
 		self.print_version()
@@ -969,7 +969,7 @@ class Base:
 		self.about_dialog.set_license(__license__)
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
-		self.about_dialog.set_website('http://www.theskyiscrape.com/scott/mirage.html')
+		self.about_dialog.set_website('http://mirageiv.berlios.de')
 		self.about_dialog.set_logo(icon_pixbuf)
 		self.about_dialog.connect('response', self.close_about)
 		self.about_dialog.connect('delete_event', self.close_about)
