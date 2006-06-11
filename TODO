@@ -1,5 +1,5 @@
++ Add slideshow
 + Fullscreen mode - xfce panel appears when the child window pops up
-+ Clean up menus
 + "Open with ..." (for opening the image in an editor, i.e., gimp)
 + Disable screen saver in fullscreen_mode
 + Show animation (i.e. animated gifs)

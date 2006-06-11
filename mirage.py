@@ -147,7 +147,7 @@ class Base:
 			('GoMenu', None, '_Go'),  
 			('HelpMenu', None, '_Help'),  
 			('Open Image', gtk.STOCK_OPEN, '_Open Image...', '<control>O', 'Open Image', self.open_file),  
-			('Open Folder', gtk.STOCK_DIRECTORY, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
+			('Open Folder', gtk.STOCK_OPEN, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
 			('Quit', gtk.STOCK_QUIT, '_Quit', '<control>Q', 'Quit', self.exit_app),  
 			('Previous Image', gtk.STOCK_GO_BACK, '_Previous Image', 'Left', 'Previous Image', self.prev_img_in_list),  
 			('Next Image', gtk.STOCK_GO_FORWARD, '_Next Image', 'Right', 'Next Image', self.next_img_in_list),  
@@ -1216,7 +1216,7 @@ class Base:
 				else:
 					if self.fullscreen_mode == True:
 						self.change_cursor(None)
-					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the first image in the list. Wrap around to the last image?")
+					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the first image in the list. Wrap around to the last image?")
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					self.user_prompt_visible = True
 					response = dialog.run()
@@ -1256,7 +1256,7 @@ class Base:
 				else:
 					if self.fullscreen_mode == True:
 						self.change_cursor(None)
-					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the last image in the list. Wrap around to the first image?")
+					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the last image in the list. Wrap around to the first image?")
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					self.user_prompt_visible = True
 					response = dialog.run()

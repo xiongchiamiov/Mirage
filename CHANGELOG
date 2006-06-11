@@ -2,6 +2,7 @@ v0.7 - Pending
 	+ Set go navigation items' sensitivity based on context
 	+ Image wrapping options: yes/no/prompt (Bjoern Martensen)
 	+ Bug: 1:1 images are sometimes incorrectly set to fit (Bjoern Martensen)
+	+ Other bugfixes, interface tweaks
 
 v0.6 - May 29, 2006
 	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
