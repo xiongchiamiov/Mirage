@@ -1,6 +1,4 @@
 + Add slideshow
-+ Fullscreen mode - xfce panel appears when the child window pops up
-+ "Open with ..." (for opening the image in an editor, i.e., gimp)
 + Disable screen saver in fullscreen_mode
 + Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac?
@@ -10,3 +8,4 @@
 + Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Add side treeview for browsing? (Bjoern Martensen)
 + Delete/Save images? (Bjoern Martensen)
++ "Open with ..." (for opening the image in an editor, i.e., gimp)?
