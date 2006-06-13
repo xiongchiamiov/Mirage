@@ -349,13 +349,17 @@ class Base:
 	def topwindow_keypress(self, widget, event):
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65361:    # Left arrow
-				self.prev_img_in_list(None)
+				if self.slideshow_mode == False:
+					self.prev_img_in_list(None)
 			elif event.keyval == 65363 or event.keyval == 32:  # Right arrow or spacebar
-				self.next_img_in_list(None)
+				if self.slideshow_mode == False:
+					self.next_img_in_list(None)
 			elif event.keyval == 65360:  # Home key
-				self.first_img_in_list(None)
+				if self.slideshow_mode == False:
+					self.first_img_in_list(None)
 			elif event.keyval == 65367:  # End key
-				self.last_img_in_list(None)
+				if self.slideshow_mode == False:
+					self.last_img_in_list(None)
 			#elif event.keyval == 114:    # "R" key
 			#	self.random_img_in_list(None)
 			elif event.keyval == 65307:  # Escape key
@@ -363,9 +367,11 @@ class Base:
 					self.toggle_fullscreen(None)
 		elif event.state == gtk.gdk.CONTROL_MASK or event.state == gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65456:    # "0" key on numpad
-				self.zoom_to_fit_window(None)
+				if self.slideshow_mode == False:
+					self.zoom_to_fit_window(None)
 			if event.keyval == 65457:    # "1" key on numpad
-				self.zoom_1_to_1(None)
+				if self.slideshow_mode == False:
+					self.zoom_1_to_1(None)
 				
 	def set_go_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
@@ -820,7 +826,7 @@ class Base:
 		self.prefs_dialog = gtk.Dialog(title="Mirage Preferences", parent=self.window)
 		self.prefs_dialog.set_has_separator(False)
 		self.prefs_dialog.set_resizable(False)
-		# Add "Visual" prefs:
+		# Add "General" prefs:
 		table_settings = gtk.Table(13, 3, False)
 		table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		bglabel = gtk.Label()
@@ -922,9 +928,9 @@ class Base:
 		combobox2.set_active(self.listwrap_mode)
 		hbox_listwrap.pack_start(combobox2, False, False, 5)
 		table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_navigation.attach(mousewheelnav, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_navigation.attach(hbox_listwrap, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_navigation.attach(gtk.Label(), 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_navigation.attach(hbox_listwrap, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_navigation.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_navigation.attach(mousewheelnav, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -953,8 +959,8 @@ class Base:
 		randomize.set_active(self.slideshow_random)
 		table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_slideshow.attach(randomize, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_slideshow.attach(gtk.Label(), 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_slideshow.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_slideshow.attach(randomize, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -963,7 +969,7 @@ class Base:
 		table_slideshow.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
-		notebook.append_page(table_settings, gtk.Label(str="Visual"))
+		notebook.append_page(table_settings, gtk.Label(str="General"))
 		notebook.append_page(table_behavior, gtk.Label(str="Behavior"))
 		notebook.append_page(table_navigation, gtk.Label(str="Navigation"))
 		notebook.append_page(table_slideshow, gtk.Label(str="Slideshow"))
@@ -1064,7 +1070,7 @@ class Base:
 		return True
 
 	def mousewheel_scrolled(self, widget, event):
-		if event.type == gtk.gdk.SCROLL:
+		if event.type == gtk.gdk.SCROLL and self.slideshow_mode == False:
 			# Zooming of the image by Ctrl-mousewheel
 			if event.state == gtk.gdk.CONTROL_MASK:
 				if event.direction == gtk.gdk.SCROLL_UP:
@@ -1143,6 +1149,8 @@ class Base:
 		return
 
 	def zoom_to_fit_window(self, action):
+		if action != None and self.slideshow_mode == True:
+			return
 		if self.userimage != "" and (self.slideshow_mode == True or self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').get_property('sensitive') == True):
 			self.last_mode = self.open_mode_fit
 			self.last_image_action_was_fit = True
@@ -1168,6 +1176,8 @@ class Base:
 		return
 
 	def zoom_to_fit_or_1_to_1(self, action):
+		if action != None and self.slideshow_mode == True:
+			return
 		if self.userimage != "":
 			self.last_image_action_was_fit = True
 			# Calculate zoomratio needed to fit to window:
@@ -1197,6 +1207,8 @@ class Base:
 		return
 
 	def zoom_1_to_1(self, action):
+		if action != None and self.slideshow_mode == True:
+			return
 		if self.userimage != "" and (self.slideshow_mode == True or self.image_is_animation == True or (self.image_is_animation == False and self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').get_property('sensitive') == True)):
 			self.last_mode = self.open_mode_1to1
 			self.last_image_action_was_fit = False
@@ -1366,6 +1378,8 @@ class Base:
 				self.set_go_navigation_sensitivities()
 
 	def random_img_in_list(self, action):
+		if action != None and self.slideshow_mode == True:
+			return
 		if self.slideshow_abort == True:
 			self.slideshow_abort = False
 			return
@@ -1431,7 +1445,7 @@ class Base:
 				self.set_go_navigation_sensitivities()
 
 	def first_img_in_list(self, action):
-		if len(self.image_list) > 1 and self.curr_img_in_list != 0:
+		if len(self.image_list) > 1 and self.curr_img_in_list != 0 and self.slideshow_mode == False:
 			self.randomlist = []
 			self.curr_img_in_list = 0
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1444,7 +1458,7 @@ class Base:
 			self.change_cursor(None)
 
 	def last_img_in_list(self, action):
-		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1:
+		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1 and self.slideshow_mode == False:
 			self.randomlist = []
 			self.curr_img_in_list = len(self.image_list)-1
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
