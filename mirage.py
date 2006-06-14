@@ -82,7 +82,7 @@ class Base:
 		self.slideshow_mode = False
 		self.delayoptions = [2,3,5,10,15,30]
 		self.slideshow_random = False
-		self.show_slideshow_controls = False
+		self.slideshow_controls_visible = False
 		self.controls_moving = False
 
 		# Read any passed options/arguments:
@@ -351,16 +351,24 @@ class Base:
 		self.layout.add(self.slideshow_controls)
 		self.layout.move(self.slideshow_controls, -100, -100)
 		self.slideshow_controls2 = gtk.HBox()
-		ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
-		alignment = ss_exit.get_children()[0]
+		self.ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
+		alignment = self.ss_exit.get_children()[0]
 		hbox2 = alignment.get_children()[0]
 		image, label = hbox2.get_children()
 		label.set_text('')
-		ss_exit.set_property('can-focus', False)
-		ss_exit.connect('clicked', self.leave_fullscreen)
-		self.slideshow_controls2.pack_start(ss_exit, False, False, 0)
-		self.layout.add(self.slideshow_controls2)
-		self.layout.move(self.slideshow_controls2, -100, -100)
+		self.ss_exit.set_property('can-focus', False)
+		self.ss_exit.connect('clicked', self.leave_fullscreen)
+		self.ss_delaycombo = gtk.combo_box_new_text()
+		self.ss_delaycombo.append_text(str(self.delayoptions[0]) + " seconds")
+		self.ss_delaycombo.append_text(str(self.delayoptions[1]) + " seconds")
+		self.ss_delaycombo.append_text(str(self.delayoptions[2]) + " seconds")
+		self.ss_delaycombo.append_text(str(self.delayoptions[3]) + " seconds")
+		self.ss_delaycombo.append_text(str(self.delayoptions[4]) + " seconds")
+		self.ss_delaycombo.append_text(str(self.delayoptions[5]) + " seconds")
+		self.ss_delaycombo.set_active(self.slideshow_delay)
+		self.ss_delaycombo.connect('changed', self.delay_changed)
+		self.slideshow_controls2.pack_start(self.ss_delaycombo, False, False, 0)
+		self.slideshow_controls2.pack_start(self.ss_exit, False, False, 0)
 
 		# Connect signals
 		self.window.connect("delete_event", self.delete_event)
@@ -389,7 +397,9 @@ class Base:
 		self.window.set_focus(self.layout)
 		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
 		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
-		ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
+		self.ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
+		self.layout.add(self.slideshow_controls2)
+		self.layout.move(self.slideshow_controls2, -100, -100)
 
 		# If arguments (filenames) were passed, try to open them:
 		self.image_list = []
@@ -529,6 +539,16 @@ class Base:
 		print "  -V, --verbose                Show more detailed information"
 		print "  -R, --recursive              Recursively include all images found in"
 		print "                               subdirectories of FOLDERS"
+
+	def delay_changed(self, action):
+		self.slideshow_delay = self.ss_delaycombo.get_active()
+		if self.slideshow_mode == True:
+			gobject.source_remove(self.timer_delay)
+			if self.slideshow_random == True:
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+			else:
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
+		self.window.set_focus(self.layout)
 
 	def motion_cb(self, widget, context, x, y, time):
 		context.drag_status(gtk.gdk.ACTION_COPY, time)
@@ -813,7 +833,7 @@ class Base:
 		gtk.main_quit()
 		
 	def hide_cursor(self):
-		if self.fullscreen_mode == True and self.user_prompt_visible == False and self.show_slideshow_controls == False:
+		if self.fullscreen_mode == True and self.user_prompt_visible == False and self.slideshow_controls_visible == False:
 			pix_data = """/* XPM */
 			static char * invisible_xpm[] = {
 			"1 1 1 1",
@@ -836,6 +856,8 @@ class Base:
 			self.window.fullscreen()
 			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
 			self.set_slideshow_sensitivities()
+		else:
+			self.leave_fullscreen(action)
 		
 	def leave_fullscreen(self, action):
 		if self.fullscreen_mode == True:
@@ -1170,12 +1192,12 @@ class Base:
 		if self.fullscreen_mode == True:
 			# Show cursor on movement, then hide after 2 seconds of no movement
 			self.change_cursor(None)
-			if self.show_slideshow_controls == False:
+			if self.slideshow_controls_visible == False:
 				gobject.source_remove(self.timer_id)
 				while gtk.events_pending():
 					gtk.main_iteration()
 				self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
-			if y > self.available_image_height()-50:
+			if y > 0.9*self.available_image_height():
 				self.slideshow_controls_show()
 			else:
 				self.slideshow_controls_hide()
@@ -1838,10 +1860,11 @@ class Base:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
 				
 	def slideshow_controls_show(self):
-		if self.show_slideshow_controls == False and self.controls_moving == False:
-			self.show_slideshow_controls = True
-			
-			hbox_width = self.ss_start.size_request()[0]/2
+		if self.slideshow_controls_visible == False and self.controls_moving == False:
+			self.slideshow_controls_visible = True
+			self.slideshow_controls2.show_all()
+
+			hbox_width = self.ss_exit.size_request()[0] + self.ss_delaycombo.size_request()[0]
 			hbox_height = self.ss_start.size_request()[1]
 
 			y_min = int(self.available_image_height())
@@ -1849,7 +1872,7 @@ class Base:
 			
 			self.controls_moving = True
 			y = y_min
-			while y > y_max and self.show_slideshow_controls == True:
+			while y > y_max and self.slideshow_controls_visible == True:
 				y -= 1
 				self.layout.move(self.slideshow_controls, 2, y)
 				self.layout.move(self.slideshow_controls2, int(self.available_image_width() - hbox_width - 2), y)
@@ -1858,10 +1881,10 @@ class Base:
 			self.controls_moving = False
 			
 	def slideshow_controls_hide(self):
-		if self.show_slideshow_controls == True and self.controls_moving == False:
-			self.show_slideshow_controls = False
+		if self.slideshow_controls_visible == True and self.controls_moving == False:
+			self.slideshow_controls_visible = False
 
-			hbox_width = self.ss_start.size_request()[0]/2
+			hbox_width = self.ss_exit.size_request()[0] + self.ss_delaycombo.size_request()[0]
 			hbox_height = self.ss_start.size_request()[1]
 
 			y_min = int(self.available_image_height())
@@ -1869,7 +1892,7 @@ class Base:
 
 			self.controls_moving = True
 			y = y_max
-			while y < y_min and self.show_slideshow_controls == False:
+			while y < y_min and self.slideshow_controls_visible == False:
 				y += 1
 				self.layout.move(self.slideshow_controls, 2, y)
 				self.layout.move(self.slideshow_controls2, int(self.available_image_width() - hbox_width - 2), y)
