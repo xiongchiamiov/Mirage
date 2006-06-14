@@ -82,6 +82,7 @@ class Base:
 		self.slideshow_mode = False
 		self.delayoptions = [2,3,5,10,15,30]
 		self.slideshow_random = False
+		self.show_slideshow_controls = False
 
 		# Read any passed options/arguments:
 		try:
@@ -175,8 +176,8 @@ class Base:
 			('Preferences', gtk.STOCK_PREFERENCES, '_Preferences', None, 'Preferences', self.show_prefs),  
 			('Full Screen', gtk.STOCK_FULLSCREEN, '_Full Screen', '<Shift>Return', 'Full Screen', self.toggle_fullscreen),
 			('Exit Full Screen', gtk.STOCK_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.toggle_fullscreen),
-			('Start Slideshow', None, '_Start Slideshow', 'F5', 'Start Slideshow', self.toggle_slideshow),
-			('Stop Slideshow', None, '_Stop Slideshow', 'F5', 'Stop Slideshow', self.toggle_slideshow),
+			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, '_Start Slideshow', 'F5', 'Start Slideshow', self.toggle_slideshow),
+			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, '_Stop Slideshow', 'F5', 'Stop Slideshow', self.toggle_slideshow),
 			)
 		toggle_actions = (
 			('Status Bar', None, '_Status Bar', None, 'Status Bar', self.toggle_status_bar, self.statusbar_show),  
@@ -351,22 +352,17 @@ class Base:
 	def topwindow_keypress(self, widget, event):
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65361:    # Left arrow
-				if self.slideshow_mode == False:
-					self.prev_img_in_list(None)
+				self.prev_img_in_list(None)
 			elif event.keyval == 65363 or event.keyval == 32:  # Right arrow or spacebar
-				if self.slideshow_mode == False:
-					self.next_img_in_list(None)
+				self.next_img_in_list(None)
 			elif event.keyval == 65360:  # Home key
-				if self.slideshow_mode == False:
-					self.first_img_in_list(None)
+				self.first_img_in_list(None)
 			elif event.keyval == 65367:  # End key
-				if self.slideshow_mode == False:
-					self.last_img_in_list(None)
+				self.last_img_in_list(None)
 			#elif event.keyval == 114:    # "R" key
 			#	self.random_img_in_list(None)
 			elif event.keyval == 65307:  # Escape key
-				if self.fullscreen_mode == True:
-					self.toggle_fullscreen(None)
+				self.toggle_fullscreen(None)
 		elif event.state == gtk.gdk.CONTROL_MASK or event.state == gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65456:    # "0" key on numpad
 				self.zoom_to_fit_window(None)
@@ -575,7 +571,6 @@ class Base:
 		return False
 
 	def put_zoom_image_to_window(self):
-		previmg = self.currimg
 		# Always start with the original image to preserve quality!
 		# Calculate image size:
 		finalimg_width = int(self.originalimg.get_width() * self.zoomratio)
@@ -656,8 +651,10 @@ class Base:
 		self.center_image()
 		if self.image_is_animation  == False:
 			self.imageview.set_from_pixbuf(self.currimg)
+			self.previmage_is_animation = False
 		else:
 			self.imageview.set_from_animation(self.currimg)
+			self.previmage_is_animation = True
 		self.first_image_load = False
 		# Clean up (free memory) because I'm lazy
 		gc.collect()
@@ -764,7 +761,7 @@ class Base:
 		gtk.main_quit()
 		
 	def hide_cursor(self):
-		if self.fullscreen_mode == True and self.user_prompt_visible == False:
+		if self.fullscreen_mode == True and self.user_prompt_visible == False and self.show_slideshow_controls == False:
 			pix_data = """/* XPM */
 			static char * invisible_xpm[] = {
 			"1 1 1 1",
@@ -1088,7 +1085,7 @@ class Base:
 					self.zoom_in(None)
 				return True
 			# Navigation of images with mousewheel:
-			elif self.mousewheel_nav == True and self.slideshow_mode == False:
+			elif self.mousewheel_nav == True:
 				if event.direction == gtk.gdk.SCROLL_UP:
 					self.prev_img_in_list(None)
 				elif event.direction == gtk.gdk.SCROLL_DOWN:
@@ -1118,7 +1115,15 @@ class Base:
 		if self.fullscreen_mode == True:
 			# Show cursor on movement, then hide after 2 seconds of no movement
 			self.change_cursor(None)
-			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
+			if self.show_slideshow_controls == False:
+				gobject.source_remove(self.timer_id)
+				while gtk.events_pending():
+					gtk.main_iteration()
+				self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
+			if y > self.available_image_height()-50:
+				self.slideshow_controls_show()
+			else:
+				self.slideshow_controls_hide()
 		return True
 
 	def button_pressed(self, widget, event):
@@ -1287,6 +1292,8 @@ class Base:
 		return
 
 	def prev_img_in_list(self, action):
+		if self.slideshow_mode == True and action != "ss":
+			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1:
 			self.randomlist = []
 			if self.curr_img_in_list > 0:
@@ -1325,8 +1332,15 @@ class Base:
 			self.set_go_navigation_sensitivities()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
+			if self.slideshow_mode == True:
+				if self.slideshow_random == True:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				else:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
 
 	def next_img_in_list(self, action):
+		if self.slideshow_mode == True and action != "ss":
+			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1:
 			self.randomlist = []
 			if self.curr_img_in_list < len(self.image_list) - 1:
@@ -1359,23 +1373,25 @@ class Base:
 						if self.slideshow_mode == True:
 							self.toggle_slideshow(None)
 						return
-			if self.fullscreen_mode == False and self.slideshow_mode == False:
+			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
-			try:
-				self.load_new_image()
-			except:
-				self.image_load_failed()
+			#try:
+			self.load_new_image()
+			#except:
+			#	self.image_load_failed()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
+			self.set_go_navigation_sensitivities()
 			if self.slideshow_mode == True:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, action)
-			else:
-				self.set_go_navigation_sensitivities()
+				if self.slideshow_random == True:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				else:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
 
 	def random_img_in_list(self, action):
-		if action != None and self.slideshow_mode == True:
-			return
+		if self.slideshow_mode == True and action != "ss":
+			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1:
 			if self.randomlist == []:
 				self.reinitialize_randomlist()
@@ -1421,7 +1437,7 @@ class Base:
 			self.curr_img_in_list = j
 			self.randomlist[j] = True
 			self.userimage = str(self.image_list[self.curr_img_in_list])
-			if self.fullscreen_mode == False and self.slideshow_mode == False:
+			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			gtk.main_iteration()
 			try:
@@ -1430,13 +1446,17 @@ class Base:
 				self.image_load_failed()
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
+			self.set_go_navigation_sensitivities()
 			if self.slideshow_mode == True:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, action)
-			else:
-				self.set_go_navigation_sensitivities()
+				if self.slideshow_random == True:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				else:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
 
 	def first_img_in_list(self, action):
-		if len(self.image_list) > 1 and self.curr_img_in_list != 0 and self.slideshow_mode == False:
+		if self.slideshow_mode == True and action != "ss":
+			gobject.source_remove(self.timer_delay)
+		if len(self.image_list) > 1 and self.curr_img_in_list != 0:
 			self.randomlist = []
 			self.curr_img_in_list = 0
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1447,9 +1467,16 @@ class Base:
 				self.image_load_failed()
 			self.set_go_navigation_sensitivities()
 			self.change_cursor(None)
+			if self.slideshow_mode == True:
+				if self.slideshow_random == True:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				else:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
 
 	def last_img_in_list(self, action):
-		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1 and self.slideshow_mode == False:
+		if self.slideshow_mode == True and action != "ss":
+			gobject.source_remove(self.timer_delay)
+		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1:
 			self.randomlist = []
 			self.curr_img_in_list = len(self.image_list)-1
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1460,7 +1487,12 @@ class Base:
 				self.image_load_failed()
 			self.set_go_navigation_sensitivities()
 			self.change_cursor(None)
-	
+			if self.slideshow_mode == True:
+				if self.slideshow_random == True:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				else:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
+
 	def set_go_navigation_sensitivities(self):
 		if self.image_loaded == False or len(self.image_list) == 1:
 			self.set_previous_image_sensitivities(False)
@@ -1725,18 +1757,15 @@ class Base:
 			self.set_window_title()
 			self.set_slideshow_sensitivities()
 			if self.slideshow_random == False:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, action)
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
 			else:
 				self.reinitialize_randomlist()
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, action)
-			self.set_go_sensitivities(False)
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
 		else:
 			self.slideshow_mode = False
 			gobject.source_remove(self.timer_delay)
 			self.set_window_title()
 			self.set_slideshow_sensitivities()
-			if len(self.image_list) > 1:
-				self.set_go_sensitivities(True)
 			self.set_zoom_sensitivities()
 			
 	def set_window_title(self):
@@ -1747,7 +1776,75 @@ class Base:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage) + " - Slideshow Mode")
 			else:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
+				
+	def slideshow_controls_show(self):
+		if self.show_slideshow_controls == False:
+			self.show_slideshow_controls = True
 			
+			self.slideshow_controls = gtk.HBox(False, 0)
+			
+			back = gtk.Button("", gtk.STOCK_GO_BACK)
+			alignment = back.get_children()[0]
+			hbox2 = alignment.get_children()[0]
+			image, label = hbox2.get_children()
+			label.set_text('')
+			back.set_property('can-focus', False)
+			back.connect('clicked', self.prev_img_in_list)
+			self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
+			alignment = self.ss_start.get_children()[0]
+			hbox2 = alignment.get_children()[0]
+			image, label = hbox2.get_children()
+			label.set_text('')
+			self.ss_start.set_property('can-focus', False)
+			self.ss_start.connect('clicked', self.toggle_slideshow)
+			forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
+			alignment = forward.get_children()[0]
+			hbox2 = alignment.get_children()[0]
+			image, label = hbox2.get_children()
+			label.set_text('')
+			forward.set_property('can-focus', False)
+			forward.connect('clicked', self.next_img_in_list)
+			
+			hbox_width = 3 * self.ss_start.size_request()[0]
+			hbox_height = self.ss_start.size_request()[1]
+
+			self.slideshow_controls.pack_start(back, False, False, 0)
+			self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
+			self.slideshow_controls.pack_start(forward, False, False, 0)
+			
+			self.layout.add(self.slideshow_controls)
+			x = 0
+			y_min = int(self.available_image_height())
+			y_max = int(self.available_image_height() - hbox_height - 5)
+			self.layout.move(self.slideshow_controls, x, y_min)
+			self.slideshow_controls.show_all()
+			
+			y = y_min
+			while y > y_max:
+				y = int(y - 1)
+				self.layout.move(self.slideshow_controls, x, y)
+				while gtk.events_pending():
+					gtk.main_iteration()				
+			
+	def slideshow_controls_hide(self):
+		if self.show_slideshow_controls == True:
+			self.show_slideshow_controls = False
+
+			hbox_width = 3 * self.ss_start.size_request()[0]
+			hbox_height = self.ss_start.size_request()[1]
+
+			x = 0
+			y_min = int(self.available_image_height())
+			y_max = int(self.available_image_height() - hbox_height - 5)
+
+
+			y = y_max
+			while y < y_min:
+				y = int(y + 1)
+				self.layout.move(self.slideshow_controls, x, y)
+				while gtk.events_pending():
+					gtk.main_iteration()
+
 	def main(self):
 		gtk.main()
 
