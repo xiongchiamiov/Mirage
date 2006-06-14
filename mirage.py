@@ -83,6 +83,7 @@ class Base:
 		self.delayoptions = [2,3,5,10,15,30]
 		self.slideshow_random = False
 		self.show_slideshow_controls = False
+		self.controls_moving = False
 
 		# Read any passed options/arguments:
 		try:
@@ -313,6 +314,43 @@ class Base:
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(width,height)
+		self.slideshow_controls = gtk.HBox()
+		self.ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
+		alignment = self.ss_back.get_children()[0]
+		hbox2 = alignment.get_children()[0]
+		image, label = hbox2.get_children()
+		label.set_text('')
+		self.ss_back.set_property('can-focus', False)
+		self.ss_back.connect('clicked', self.prev_img_in_list)
+		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
+		alignment = self.ss_start.get_children()[0]
+		hbox2 = alignment.get_children()[0]
+		image, label = hbox2.get_children()
+		label.set_text('')
+		self.ss_start.set_property('can-focus', False)
+		self.ss_start.connect('clicked', self.toggle_slideshow)
+		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
+		self.ss_stop = gtk.Button("", gtk.STOCK_MEDIA_STOP)
+		alignment = self.ss_stop.get_children()[0]
+		hbox2 = alignment.get_children()[0]
+		image, label = hbox2.get_children()
+		label.set_text('')
+		self.ss_stop.set_property('can-focus', False)
+		self.ss_stop.connect('clicked', self.toggle_slideshow)
+		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
+		self.ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
+		alignment = self.ss_forward.get_children()[0]
+		hbox2 = alignment.get_children()[0]
+		image, label = hbox2.get_children()
+		label.set_text('')
+		self.ss_forward.set_property('can-focus', False)
+		self.ss_forward.connect('clicked', self.next_img_in_list)
+		self.slideshow_controls.pack_start(self.ss_back, False, False, 0)
+		self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
+		self.slideshow_controls.pack_start(self.ss_stop, False, False, 0)
+		self.slideshow_controls.pack_start(self.ss_forward, False, False, 0)
+		self.layout.add(self.slideshow_controls)
+		self.layout.move(self.slideshow_controls, -100, -100)
 
 		# Connect signals
 		self.window.connect("delete_event", self.delete_event)
@@ -336,6 +374,7 @@ class Base:
 		self.window.show_all()
 		self.hscroll.hide()
 		self.vscroll.hide()
+		self.ss_stop.hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
 
@@ -1761,12 +1800,16 @@ class Base:
 			else:
 				self.reinitialize_randomlist()
 				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+			self.ss_stop.show()
+			self.ss_start.hide()
 		else:
 			self.slideshow_mode = False
 			gobject.source_remove(self.timer_delay)
 			self.set_window_title()
 			self.set_slideshow_sensitivities()
 			self.set_zoom_sensitivities()
+			self.ss_stop.hide()
+			self.ss_start.show()
 			
 	def set_window_title(self):
 		if len(self.image_list) == 0:
@@ -1778,72 +1821,43 @@ class Base:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
 				
 	def slideshow_controls_show(self):
-		if self.show_slideshow_controls == False:
+		if self.show_slideshow_controls == False and self.controls_moving == False:
 			self.show_slideshow_controls = True
-			
-			self.slideshow_controls = gtk.HBox(False, 0)
-			
-			back = gtk.Button("", gtk.STOCK_GO_BACK)
-			alignment = back.get_children()[0]
-			hbox2 = alignment.get_children()[0]
-			image, label = hbox2.get_children()
-			label.set_text('')
-			back.set_property('can-focus', False)
-			back.connect('clicked', self.prev_img_in_list)
-			self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
-			alignment = self.ss_start.get_children()[0]
-			hbox2 = alignment.get_children()[0]
-			image, label = hbox2.get_children()
-			label.set_text('')
-			self.ss_start.set_property('can-focus', False)
-			self.ss_start.connect('clicked', self.toggle_slideshow)
-			forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
-			alignment = forward.get_children()[0]
-			hbox2 = alignment.get_children()[0]
-			image, label = hbox2.get_children()
-			label.set_text('')
-			forward.set_property('can-focus', False)
-			forward.connect('clicked', self.next_img_in_list)
 			
 			hbox_width = 3 * self.ss_start.size_request()[0]
 			hbox_height = self.ss_start.size_request()[1]
 
-			self.slideshow_controls.pack_start(back, False, False, 0)
-			self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
-			self.slideshow_controls.pack_start(forward, False, False, 0)
-			
-			self.layout.add(self.slideshow_controls)
-			x = 0
 			y_min = int(self.available_image_height())
 			y_max = int(self.available_image_height() - hbox_height - 5)
-			self.layout.move(self.slideshow_controls, x, y_min)
-			self.slideshow_controls.show_all()
+			self.layout.move(self.slideshow_controls, 0, y_min)
 			
+			self.controls_moving = True
 			y = y_min
-			while y > y_max:
+			while y > y_max and self.show_slideshow_controls == True:
 				y = int(y - 1)
-				self.layout.move(self.slideshow_controls, x, y)
+				self.layout.move(self.slideshow_controls, 5, y)
 				while gtk.events_pending():
-					gtk.main_iteration()				
+					gtk.main_iteration()
+			self.controls_moving = False
 			
 	def slideshow_controls_hide(self):
-		if self.show_slideshow_controls == True:
+		if self.show_slideshow_controls == True and self.controls_moving == False:
 			self.show_slideshow_controls = False
 
 			hbox_width = 3 * self.ss_start.size_request()[0]
 			hbox_height = self.ss_start.size_request()[1]
 
-			x = 0
 			y_min = int(self.available_image_height())
 			y_max = int(self.available_image_height() - hbox_height - 5)
 
-
+			self.controls_moving = True
 			y = y_max
-			while y < y_min:
+			while y < y_min and self.show_slideshow_controls == False:
 				y = int(y + 1)
-				self.layout.move(self.slideshow_controls, x, y)
+				self.layout.move(self.slideshow_controls, 5, y)
 				while gtk.events_pending():
 					gtk.main_iteration()
+			self.controls_moving = False
 
 	def main(self):
 		gtk.main()
