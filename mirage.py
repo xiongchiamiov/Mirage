@@ -175,8 +175,8 @@ class Base:
 			('Flip Horizontally', None, 'Flip _Horizontally', '<Ctrl>H', 'Flip Horizontally', self.image_flip_horiz),  
 			('About', gtk.STOCK_ABOUT, '_About', 'F1', 'About', self.show_about),  
 			('Preferences', gtk.STOCK_PREFERENCES, '_Preferences', None, 'Preferences', self.show_prefs),  
-			('Full Screen', gtk.STOCK_FULLSCREEN, '_Full Screen', '<Shift>Return', 'Full Screen', self.toggle_fullscreen),
-			('Exit Full Screen', gtk.STOCK_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.toggle_fullscreen),
+			('Full Screen', gtk.STOCK_FULLSCREEN, '_Full Screen', '<Shift>Return', 'Full Screen', self.enter_fullscreen),
+			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, '_Start Slideshow', 'F5', 'Start Slideshow', self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, '_Stop Slideshow', 'F5', 'Stop Slideshow', self.toggle_slideshow),
 			)
@@ -314,14 +314,15 @@ class Base:
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(width,height)
+		#Slideshow control buttons:
 		self.slideshow_controls = gtk.HBox()
-		self.ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
-		alignment = self.ss_back.get_children()[0]
+		ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
+		alignment = ss_back.get_children()[0]
 		hbox2 = alignment.get_children()[0]
 		image, label = hbox2.get_children()
 		label.set_text('')
-		self.ss_back.set_property('can-focus', False)
-		self.ss_back.connect('clicked', self.prev_img_in_list)
+		ss_back.set_property('can-focus', False)
+		ss_back.connect('clicked', self.prev_img_in_list)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
 		alignment = self.ss_start.get_children()[0]
 		hbox2 = alignment.get_children()[0]
@@ -329,7 +330,6 @@ class Base:
 		label.set_text('')
 		self.ss_start.set_property('can-focus', False)
 		self.ss_start.connect('clicked', self.toggle_slideshow)
-		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
 		self.ss_stop = gtk.Button("", gtk.STOCK_MEDIA_STOP)
 		alignment = self.ss_stop.get_children()[0]
 		hbox2 = alignment.get_children()[0]
@@ -337,20 +337,30 @@ class Base:
 		label.set_text('')
 		self.ss_stop.set_property('can-focus', False)
 		self.ss_stop.connect('clicked', self.toggle_slideshow)
-		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
-		self.ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
-		alignment = self.ss_forward.get_children()[0]
+		ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
+		alignment = ss_forward.get_children()[0]
 		hbox2 = alignment.get_children()[0]
 		image, label = hbox2.get_children()
 		label.set_text('')
-		self.ss_forward.set_property('can-focus', False)
-		self.ss_forward.connect('clicked', self.next_img_in_list)
-		self.slideshow_controls.pack_start(self.ss_back, False, False, 0)
+		ss_forward.set_property('can-focus', False)
+		ss_forward.connect('clicked', self.next_img_in_list)
+		self.slideshow_controls.pack_start(ss_back, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_stop, False, False, 0)
-		self.slideshow_controls.pack_start(self.ss_forward, False, False, 0)
+		self.slideshow_controls.pack_start(ss_forward, False, False, 0)
 		self.layout.add(self.slideshow_controls)
 		self.layout.move(self.slideshow_controls, -100, -100)
+		self.slideshow_controls2 = gtk.HBox()
+		ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
+		alignment = ss_exit.get_children()[0]
+		hbox2 = alignment.get_children()[0]
+		image, label = hbox2.get_children()
+		label.set_text('')
+		ss_exit.set_property('can-focus', False)
+		ss_exit.connect('clicked', self.leave_fullscreen)
+		self.slideshow_controls2.pack_start(ss_exit, False, False, 0)
+		self.layout.add(self.slideshow_controls2)
+		self.layout.move(self.slideshow_controls2, -100, -100)
 
 		# Connect signals
 		self.window.connect("delete_event", self.delete_event)
@@ -377,6 +387,9 @@ class Base:
 		self.ss_stop.hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
+		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
+		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
+		ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
 
 		# If arguments (filenames) were passed, try to open them:
 		self.image_list = []
@@ -401,7 +414,7 @@ class Base:
 			#elif event.keyval == 114:    # "R" key
 			#	self.random_img_in_list(None)
 			elif event.keyval == 65307:  # Escape key
-				self.toggle_fullscreen(None)
+				self.leave_fullscreen(None)
 		elif event.state == gtk.gdk.CONTROL_MASK or event.state == gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 65456:    # "0" key on numpad
 				self.zoom_to_fit_window(None)
@@ -812,7 +825,19 @@ class Base:
 			self.change_cursor(invisible)
 		return False
 
-	def toggle_fullscreen(self, action):
+	def enter_fullscreen(self, action):
+		if self.fullscreen_mode == False:
+			self.fullscreen_mode = True
+			self.UIManager.get_widget('/Popup/FM3').show()
+			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
+			self.statusbar.hide()
+			self.toolbar.hide()
+			self.menubar.hide()
+			self.window.fullscreen()
+			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
+			self.set_slideshow_sensitivities()
+		
+	def leave_fullscreen(self, action):
 		if self.fullscreen_mode == True:
 			self.fullscreen_mode = False
 			self.UIManager.get_widget('/Popup/FM3').hide()
@@ -824,16 +849,7 @@ class Base:
 				self.statusbar.show()
 			self.window.unfullscreen()
 			self.change_cursor(None)
-		else:
-			self.fullscreen_mode = True
-			self.UIManager.get_widget('/Popup/FM3').show()
-			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
-			self.statusbar.hide()
-			self.toolbar.hide()
-			self.menubar.hide()
-			self.window.fullscreen()
-			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
-		self.set_slideshow_sensitivities()
+			self.set_slideshow_sensitivities()
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible') == True:
@@ -1791,25 +1807,26 @@ class Base:
 		return old_pix
 		
 	def toggle_slideshow(self, action):
-		if self.slideshow_mode == False:
-			self.slideshow_mode = True
-			self.set_window_title()
-			self.set_slideshow_sensitivities()
-			if self.slideshow_random == False:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
+		if len(self.image_list) > 1:
+			if self.slideshow_mode == False:
+				self.slideshow_mode = True
+				self.set_window_title()
+				self.set_slideshow_sensitivities()
+				if self.slideshow_random == False:
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.next_img_in_list, "ss")
+				else:
+					self.reinitialize_randomlist()
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
+				self.ss_stop.show()
+				self.ss_start.hide()
 			else:
-				self.reinitialize_randomlist()
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.slideshow_delay]*1000, self.random_img_in_list, "ss")
-			self.ss_stop.show()
-			self.ss_start.hide()
-		else:
-			self.slideshow_mode = False
-			gobject.source_remove(self.timer_delay)
-			self.set_window_title()
-			self.set_slideshow_sensitivities()
-			self.set_zoom_sensitivities()
-			self.ss_stop.hide()
-			self.ss_start.show()
+				self.slideshow_mode = False
+				gobject.source_remove(self.timer_delay)
+				self.set_window_title()
+				self.set_slideshow_sensitivities()
+				self.set_zoom_sensitivities()
+				self.ss_stop.hide()
+				self.ss_start.show()
 			
 	def set_window_title(self):
 		if len(self.image_list) == 0:
@@ -1824,18 +1841,18 @@ class Base:
 		if self.show_slideshow_controls == False and self.controls_moving == False:
 			self.show_slideshow_controls = True
 			
-			hbox_width = 3 * self.ss_start.size_request()[0]
+			hbox_width = self.ss_start.size_request()[0]/2
 			hbox_height = self.ss_start.size_request()[1]
 
 			y_min = int(self.available_image_height())
-			y_max = int(self.available_image_height() - hbox_height - 5)
-			self.layout.move(self.slideshow_controls, 0, y_min)
+			y_max = int(self.available_image_height() - hbox_height - 2)
 			
 			self.controls_moving = True
 			y = y_min
 			while y > y_max and self.show_slideshow_controls == True:
-				y = int(y - 1)
-				self.layout.move(self.slideshow_controls, 5, y)
+				y -= 1
+				self.layout.move(self.slideshow_controls, 2, y)
+				self.layout.move(self.slideshow_controls2, int(self.available_image_width() - hbox_width - 2), y)
 				while gtk.events_pending():
 					gtk.main_iteration()
 			self.controls_moving = False
@@ -1844,17 +1861,18 @@ class Base:
 		if self.show_slideshow_controls == True and self.controls_moving == False:
 			self.show_slideshow_controls = False
 
-			hbox_width = 3 * self.ss_start.size_request()[0]
+			hbox_width = self.ss_start.size_request()[0]/2
 			hbox_height = self.ss_start.size_request()[1]
 
 			y_min = int(self.available_image_height())
-			y_max = int(self.available_image_height() - hbox_height - 5)
+			y_max = int(self.available_image_height() - hbox_height - 2)
 
 			self.controls_moving = True
 			y = y_max
 			while y < y_min and self.show_slideshow_controls == False:
-				y = int(y + 1)
-				self.layout.move(self.slideshow_controls, 5, y)
+				y += 1
+				self.layout.move(self.slideshow_controls, 2, y)
+				self.layout.move(self.slideshow_controls2, int(self.available_image_width() - hbox_width - 2), y)
 				while gtk.events_pending():
 					gtk.main_iteration()
 			self.controls_moving = False
