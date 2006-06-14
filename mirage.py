@@ -202,6 +202,7 @@ class Base:
 			    <menuitem action="Stop Slideshow"/> 
 			    <separator name="FM3"/>  
 			    <menuitem action="Exit Full Screen"/>
+			    <menuitem action="Full Screen"/>
 			  </popup>
 			  <menubar name="MainMenu">
 			    <menu action="FileMenu">  
@@ -285,8 +286,6 @@ class Base:
 		self.UIManager.add_ui_from_string(uiDescription)
 		self.window.add_accel_group(self.UIManager.get_accel_group())
 		self.menubar = self.UIManager.get_widget('/MainMenu')
-		self.UIManager.get_widget('/Popup/FM3').hide()
-		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 		self.set_slideshow_sensitivities()
 		vbox.pack_start(self.menubar, False, False, 0)
 		self.toolbar = self.UIManager.get_widget('/MainToolbar')
@@ -400,6 +399,7 @@ class Base:
 		self.ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
 		self.layout.add(self.slideshow_controls2)
 		self.layout.move(self.slideshow_controls2, -100, -100)
+		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 
 		# If arguments (filenames) were passed, try to open them:
 		self.image_list = []
@@ -500,10 +500,7 @@ class Base:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').set_sensitive(True)
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').hide()
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').set_sensitive(False)
-		if self.fullscreen_mode == False or len(self.image_list) <= 1:
-			self.UIManager.get_widget('/Popup/Start Slideshow').hide()
-			self.UIManager.get_widget('/Popup/Stop Slideshow').hide()
-		elif self.slideshow_mode == True:
+		if self.slideshow_mode == True:
 			self.UIManager.get_widget('/Popup/Start Slideshow').hide()
 			self.UIManager.get_widget('/Popup/Stop Slideshow').show()
 		else:
@@ -848,7 +845,7 @@ class Base:
 	def enter_fullscreen(self, action):
 		if self.fullscreen_mode == False:
 			self.fullscreen_mode = True
-			self.UIManager.get_widget('/Popup/FM3').show()
+			self.UIManager.get_widget('/Popup/Full Screen').hide()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
 			self.statusbar.hide()
 			self.toolbar.hide()
@@ -862,7 +859,7 @@ class Base:
 	def leave_fullscreen(self, action):
 		if self.fullscreen_mode == True:
 			self.fullscreen_mode = False
-			self.UIManager.get_widget('/Popup/FM3').hide()
+			self.UIManager.get_widget('/Popup/Full Screen').show()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 			if self.toolbar_show == True:
 				self.toolbar.show()
@@ -1398,6 +1395,8 @@ class Base:
 						self.user_prompt_visible = False
 						if self.fullscreen_mode == True:
 							self.hide_cursor
+						if self.slideshow_mode == True:
+							self.toggle_slideshow(None)
 						return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
