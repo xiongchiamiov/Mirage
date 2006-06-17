@@ -1813,6 +1813,8 @@ class Base:
 		if stop_now == False:
 			filelist = []
 			folderlist = []
+			if os.access(item, os.R_OK) == False:
+				return inputlist
 			for item2 in os.listdir(item):
 				item2 = item + "/" + item2
 				item_fullpath2 = os.path.abspath(item2)
