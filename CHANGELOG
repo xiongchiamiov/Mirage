@@ -1,8 +1,10 @@
 v0.7 - Pending
+	+ Ability to do slideshows
 	+ Display animated images
-	+ Set go navigation items' sensitivity based on context
+	+ Edit > Open in Editor
 	+ Image wrapping options: yes/no/prompt (Bjoern Martensen)
-	+ Cleaned up menubar
+	+ Cleaned up menubar, preferences
+	+ Set go navigation items' sensitivity based on context
 	+ Bug: 1:1 images are sometimes incorrectly set to fit (Bjoern Martensen)
 	+ Other bugfixes, interface tweaks
 

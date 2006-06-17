@@ -83,6 +83,8 @@ class Base:
 		self.slideshow_random = False
 		self.slideshow_controls_visible = False	# fullscreen slideshow controls
 		self.controls_moving = False
+		self.zoomvalue = 3.0
+		self.editor = "gimp-remote"
 
 		# Read any passed options/arguments:
 		try:
@@ -120,15 +122,6 @@ class Base:
 			height = conf.getint('window', 'h')
 			self.toolbar_show = conf.getboolean('window', 'toolbar')
 			self.statusbar_show = conf.getboolean('window', 'statusbar')
-			self.zoom_quality = conf.get('prefs', 'quality')
-			if str(self.zoom_quality) == str(gtk.gdk.INTERP_NEAREST):
-				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif str(self.zoom_quality) == str(gtk.gdk.INTERP_TILES):
-				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif str(self.zoom_quality) == str(gtk.gdk.INTERP_BILINEAR):
-				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif str(self.zoom_quality) == str(gtk.gdk.INTERP_HYPER):
-				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			bgr = conf.getint('prefs', 'bgcolor-red')
 			bgg = conf.getint('prefs', 'bgcolor-green')
 			bgb = conf.getint('prefs', 'bgcolor-blue')
@@ -144,6 +137,16 @@ class Base:
 			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
 			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
 			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
+			self.zoomvalue = conf.getfloat('prefs', 'zoomvalue')
+			if int(round(self.zoomvalue, 0)) == 1:
+				self.zoom_quality = gtk.gdk.INTERP_NEAREST
+			elif int(round(self.zoomvalue, 0)) == 2:
+				self.zoom_quality = gtk.gdk.INTERP_TILES
+			elif int(round(self.zoomvalue, 0)) == 3:
+				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
+			elif int(round(self.zoomvalue, 0)) == 4:
+				self.zoom_quality = gtk.gdk.INTERP_HYPER
+			self.editor = conf.get('prefs', 'editor')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -183,6 +186,7 @@ class Base:
 			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, '_Start Slideshow', 'F5', 'Start Slideshow', self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, '_Stop Slideshow', 'F5', 'Stop Slideshow', self.toggle_slideshow),
+			('Open in Editor', gtk.STOCK_EXECUTE, 'Open in _Editor', '<Ctrl>E', 'Open in Editor', self.load_editor)
 			)
 		toggle_actions = (
 			('Status Bar', None, '_Status Bar', None, 'Status Bar', self.toggle_status_bar, self.statusbar_show),  
@@ -221,6 +225,8 @@ class Base:
 			      <separator name="FM1"/>  
 			      <menuitem action="Flip Vertically"/>
 			      <menuitem action="Flip Horizontally"/>
+			      <separator name="FM3"/>
+			      <menuitem action="Open in Editor"/>
 			      <separator name="FM2"/>  
 			      <menuitem action="Preferences"/>  
 			    </menu>
@@ -464,6 +470,7 @@ class Base:
 		self.UIManager.get_widget('/Popup/Fit').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Rotate Left').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').set_sensitive(enable)
 		
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
@@ -625,7 +632,6 @@ class Base:
 		conf.set('window', 'toolbar', self.toolbar_show)
 		conf.set('window', 'statusbar', self.statusbar_show)
 		conf.add_section('prefs')
-		conf.set('prefs', 'quality', self.zoom_quality)
 		conf.set('prefs', 'bgcolor-red', self.bgcolor.red)
 		conf.set('prefs', 'bgcolor-green', self.bgcolor.green)
 		conf.set('prefs', 'bgcolor-blue', self.bgcolor.blue)
@@ -639,6 +645,8 @@ class Base:
 		conf.set('prefs', 'listwrap_mode', self.listwrap_mode)
 		conf.set('prefs', 'slideshow_delay', self.slideshow_delay)
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
+		conf.set('prefs', 'zoomvalue', self.zoomvalue)
+		conf.set('prefs', 'editor', self.editor)
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/mirage/'))
 		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
@@ -939,25 +947,26 @@ class Base:
 		zoomlabel.set_markup("<b>Zoom Quality</b>")
 		zoomlabel.set_alignment(0, 1)
 		table_settings.attach(zoomlabel, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		zoompref = gtk.RadioButton()
-		zoompref1 = gtk.RadioButton(group=zoompref, label="Nearest (Fastest)")
-		zoompref2 = gtk.RadioButton(group=zoompref, label="Tiles")
-		zoompref3 = gtk.RadioButton(group=zoompref, label="Bilinear")
-		zoompref4 = gtk.RadioButton(group=zoompref, label="Hyper (Highest Quality)")
-		table_settings.attach(zoompref1, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(zoompref2, 1, 3, 9, 10,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(zoompref3, 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(zoompref4, 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		if self.zoom_quality == gtk.gdk.INTERP_NEAREST:
-			zoompref1.set_active(True)
-		elif self.zoom_quality == gtk.gdk.INTERP_TILES:
-			zoompref2.set_active(True)
-		elif self.zoom_quality == gtk.gdk.INTERP_BILINEAR:
-			zoompref3.set_active(True)
-		elif self.zoom_quality == gtk.gdk.INTERP_HYPER:
-			zoompref4.set_active(True)
+		table_settings.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		zoompref = gtk.HScale()
+		zoompref.set_range(1, 4)
+		zoompref.set_increments(1,4)
+		zoompref.set_draw_value(False)
+		zoompref.set_value(self.zoomvalue)
+		zoom_hbox = gtk.HBox(False, 0)
+		zoom_label1 = gtk.Label()
+		zoom_label1.set_markup("<i>Fastest</i>")
+		zoom_label1.set_alignment(0, 0)
+		zoom_label2 = gtk.Label()
+		zoom_label2.set_markup("<i>Best</i>")
+		zoom_label2.set_alignment(1, 0)
+		zoom_hbox.pack_start(zoom_label1, True, True, 0)
+		zoom_hbox.pack_start(zoom_label2, True, True, 0)
+		table_settings.attach(zoompref, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(zoom_hbox, 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# Add "Behavior" tab:
 		table_behavior = gtk.Table(13, 2, False)
 		table_behavior.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1005,7 +1014,6 @@ class Base:
 			self.defaultdir.set_sensitive(True)
 		table_behavior.attach(self.defaultdir, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
 		table_behavior.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_behavior.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# Add "Navigation" tab:
 		table_navigation = gtk.Table(13, 2, False)
 		table_navigation.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1064,12 +1072,33 @@ class Base:
 		table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		# Add "Editor" tab:
+		table_editor = gtk.Table(13, 2, False)
+		table_editor.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		editorlabel = gtk.Label()
+		editorlabel.set_markup("<b>External Image Editor</b>")
+		editorlabel.set_alignment(0, 1)
+		table_editor.attach(editorlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table_editor.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		editorlabel = gtk.Label("The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\").")
+		editorlabel.set_line_wrap(True)
+		editorlabel.set_size_request(275, -1)
+		table_editor.attach(editorlabel, 1, 3, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		editortext = gtk.Entry()
+		editortext.set_text(self.editor)
+		table_editor.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_editor.attach(editortext, 1, 3, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_editor.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_editor.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_editor.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_editor.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
 		notebook.append_page(table_settings, gtk.Label(str="General"))
 		notebook.append_page(table_behavior, gtk.Label(str="Behavior"))
 		notebook.append_page(table_navigation, gtk.Label(str="Navigation"))
 		notebook.append_page(table_slideshow, gtk.Label(str="Slideshow"))
+		notebook.append_page(table_editor, gtk.Label(str="Editor"))
 		notebook.set_current_page(0)
 		hbox = gtk.HBox()
 		self.prefs_dialog.vbox.pack_start(hbox, False, False, 7)
@@ -1081,13 +1110,14 @@ class Base:
 		self.close_button.grab_focus()
 		response = self.prefs_dialog.run()
 		if response == gtk.RESPONSE_CLOSE or response == -4:
-			if zoompref1.get_active() == True:
+			self.zoomvalue = float(zoompref.get_value())
+			if int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif zoompref2.get_active() == True:
+			elif int(round(self.zoomvalue, 0)) == 2:
 				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif zoompref3.get_active() == True:
+			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif zoompref4.get_active() == True:
+			elif int(round(self.zoomvalue, 0)) == 4:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.open_all_images = openallimages.get_active()
 			if openpref1.get_active() == True:
@@ -1102,6 +1132,7 @@ class Base:
 			self.curr_slideshow_delay = self.slideshow_delay
 			self.slideshow_random = randomize.get_active()
 			self.curr_slideshow_random = self.slideshow_random
+			self.editor = editortext.get_text()
 			self.prefs_dialog.destroy()
 			
 	def use_fixed_dir_clicked(self, button):
@@ -1929,6 +1960,14 @@ class Base:
 				while gtk.events_pending():
 					gtk.main_iteration()
 			self.controls_moving = False
+			
+	def load_editor(self, action):
+		if self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').get_property('sensitive') == True:
+			test = os.spawnlp(os.P_WAIT, self.editor, self.editor, self.userimage)
+			if test == 127:
+				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, "Unable to launch \"" + self.editor + "\". Please specify a valid application from Edit > Preferences.")
+				error_dialog.run()
+				error_dialog.destroy()
 
 	def main(self):
 		gtk.main()
