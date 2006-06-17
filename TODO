@@ -1,3 +1,4 @@
++ Try to make zooming smoother
 + Disable screen saver in fullscreen_mode
 + Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac?
