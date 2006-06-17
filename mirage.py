@@ -398,10 +398,9 @@ class Base:
 		self.layout.get_vadjustment().connect("changed", self.y_adjustment_changed)
 
 		# Show GUI:
+		self.hscroll.set_no_show_all(True)
+		self.vscroll.set_no_show_all(True)
 		self.window.show_all()
-		self.hscroll.hide()
-		self.vscroll.hide()
-		self.ss_stop.hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
 		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
@@ -873,7 +872,9 @@ class Base:
 		
 	def leave_fullscreen(self, action):
 		if self.fullscreen_mode == True:
-			self.slideshow_controls_hide()
+			self.slideshow_controls_visible = False
+			self.slideshow_window.hide_all()
+			self.slideshow_window2.hide_all()
 			self.fullscreen_mode = False
 			self.UIManager.get_widget('/Popup/Full Screen').show()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
