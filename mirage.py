@@ -957,7 +957,7 @@ class Base:
                 self.prefs_dialog = gtk.Dialog(title="Mirage Preferences", parent=self.window)
                 self.prefs_dialog.set_has_separator(False)
                 self.prefs_dialog.set_resizable(False)
-                # Add "General" prefs:
+                # Add "Interface" prefs:
 		table_settings = gtk.Table(13, 3, False)
                 table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 bglabel = gtk.Label()
@@ -1120,9 +1120,9 @@ class Base:
                 table_editor.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 # Add tabs:
 		notebook = gtk.Notebook()
-                notebook.append_page(table_settings, gtk.Label(str="General"))
                 notebook.append_page(table_behavior, gtk.Label(str="Behavior"))
                 notebook.append_page(table_navigation, gtk.Label(str="Navigation"))
+                notebook.append_page(table_settings, gtk.Label(str="Interface"))
                 notebook.append_page(table_slideshow, gtk.Label(str="Slideshow"))
                 notebook.append_page(table_editor, gtk.Label(str="Editor"))
                 notebook.set_current_page(0)
