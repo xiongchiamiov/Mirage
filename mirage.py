@@ -603,22 +603,27 @@ class Base:
 		if self.updating_adjustments == True:
 			return
 		self.updating_adjustments = True
-                try:
-                        zoomratio = float(self.currimg_width)/self.previmg_width
-                        newvalue = abs(self.layout.get_hadjustment().get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2)
-                        if newvalue >= self.layout.get_hadjustment().lower and newvalue <= (self.layout.get_hadjustment().upper - self.layout.get_hadjustment().page_size):
-                                self.layout.get_hadjustment().set_value(newvalue)
-                        newvalue = abs(self.layout.get_vadjustment().get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2)
-                        if newvalue >= self.layout.get_vadjustment().lower and newvalue <= (self.layout.get_vadjustment().upper - self.layout.get_vadjustment().page_size):
-                                self.layout.get_vadjustment().set_value(newvalue)
-                        # Since the y adjustment happens after the x adjustment, re-initialize the
-			# variables now:
-			self.previmg_width = self.currimg_width
-                except:
-                        pass
+		if self.hscroll.get_property('visible') == True:
+			try:
+	                        zoomratio = float(self.currimg_width)/self.previmg_width
+				newvalue = abs(self.layout.get_hadjustment().get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2)
+				if newvalue >= self.layout.get_hadjustment().lower and newvalue <= (self.layout.get_hadjustment().upper - self.layout.get_hadjustment().page_size):
+	                                self.layout.get_hadjustment().set_value(newvalue)
+			except:
+	                        pass
+		if self.vscroll.get_property('visible') == True:
+			try:
+				newvalue = abs(self.layout.get_vadjustment().get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2)
+				if newvalue >= self.layout.get_vadjustment().lower and newvalue <= (self.layout.get_vadjustment().upper - self.layout.get_vadjustment().page_size):
+	                                self.layout.get_vadjustment().set_value(newvalue)
+				self.previmg_width = self.currimg_width
+			except:
+				pass
 		self.updating_adjustments = False
 
         def window_resized(self, widget, allocation):
+		#while gtk.events_pending():
+		#	gtk.main_iteration()
                 # Update the image size on window resize if the current image was last fit:
 		if self.image_loaded == True:
                         if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
