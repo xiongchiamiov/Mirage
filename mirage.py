@@ -370,13 +370,28 @@ class Base:
                 label.set_text('')
                 self.ss_exit.set_property('can-focus', False)
                 self.ss_exit.connect('clicked', self.leave_fullscreen)
-		factory = gtk.IconFactory()
-		pixbuf = gtk.gdk.pixbuf_new_from_file("stock_shuffle.png")
-		iconset = gtk.IconSet(pixbuf)
-		factory.add('test', iconset)
-		factory.add_default()
                 self.ss_randomize = gtk.ToggleButton()
-		self.ss_randomize.set_image(gtk.image_new_from_stock('test', gtk.ICON_SIZE_MENU))
+		factory = gtk.IconFactory()
+                iconname = 'stock_shuffle.png'
+                if os.path.exists(iconname):
+                        icon_path = iconname
+                elif os.path.exists('../share/mirage/' + iconname):
+                        icon_path = '../share/mirage/' + iconname
+                elif os.path.exists('/usr/local/share/mirage/' + iconname):
+                        icon_path = '/usr/local/share/mirage/' + iconname
+                elif os.path.exists('/usr/share/mirage/' + iconname):
+                        icon_path = '/usr/share/mirage/' + iconname
+		else:
+			icon_path = ''
+                try:
+			pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
+			iconset = gtk.IconSet(pixbuf)
+			factory.add('test', iconset)
+			factory.add_default()
+			self.ss_randomize.set_image(gtk.image_new_from_stock('test', gtk.ICON_SIZE_MENU))
+	                self.ss_randomize.set_size_request(ss_back.size_request()[0], -1)
+                except:
+			self.ss_randomize.set_label("Rand")
                 self.ss_randomize.connect('toggled', self.random_changed)
                 self.ss_delaycombo = gtk.combo_box_new_text()
                 self.ss_delaycombo.append_text(str(self.delayoptions[0]) + " seconds")
@@ -420,7 +435,6 @@ class Base:
                 self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
                 self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
                 self.ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
-                self.ss_randomize.set_size_request(self.ss_exit.size_request()[0], -1)
                 self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 
                 # If arguments (filenames) were passed, try to open them:
@@ -622,8 +636,6 @@ class Base:
 		self.updating_adjustments = False
 
         def window_resized(self, widget, allocation):
-		#while gtk.events_pending():
-		#	gtk.main_iteration()
                 # Update the image size on window resize if the current image was last fit:
 		if self.image_loaded == True:
                         if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:

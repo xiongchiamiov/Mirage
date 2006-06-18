@@ -15,5 +15,5 @@ FEATURES:
 	+ Fast scaling/rotating/flipping of images
 	+ Can open multiple files/folders and cycle through the list
 	+ Drag-n-drop files/folders from a file manager right into Mirage
-	+ GIMP-like controls (Ctrl-MouseScroll for zooming, MiddleMouseButton-Drag for 
-	  panning
+	+ Slideshow mode
+	+ Ability to launch an external editor
