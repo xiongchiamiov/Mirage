@@ -1931,7 +1931,7 @@ class Base:
                                         self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.random_img_in_list, "ss")
                                 self.ss_start.hide()
                                 self.ss_stop.show()
-				timer_screensaver = gobject.timeout_add(55000, self.disable_screensaver_in_slideshow_mode)
+				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
                         else:
                                 self.slideshow_mode = False
                                 gobject.source_remove(self.timer_delay)
@@ -2010,8 +2010,10 @@ class Base:
 				
 	def disable_screensaver_in_slideshow_mode(self):
 		if self.slideshow_mode == True and self.disable_screensaver == True:
-			os.spawnlp(os.P_NOWAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
-			timer_screensaver = gobject.timeout_add(55000, self.disable_screensaver_in_slideshow_mode)
+			test = os.spawnlp(os.P_WAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
+			print test
+			if test <> 127:
+				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
 	
         def main(self):
                 gtk.main()
