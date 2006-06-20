@@ -86,6 +86,7 @@ class Base:
                 self.zoomvalue = 3.0
                 self.editor = "gimp-remote"
 		self.updating_adjustments = False
+		self.disable_screensaver = False
 
                 # Read any passed options/arguments:
 		try:
@@ -148,6 +149,7 @@ class Base:
                         elif int(round(self.zoomvalue, 0)) == 4:
                                 self.zoom_quality = gtk.gdk.INTERP_HYPER
                         self.editor = conf.get('prefs', 'editor')
+			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
                 except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
                 # slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -671,6 +673,7 @@ class Base:
                 conf.set('prefs', 'slideshow_random', self.slideshow_random)
                 conf.set('prefs', 'zoomvalue', self.zoomvalue)
                 conf.set('prefs', 'editor', self.editor)
+		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
                 if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
                         os.mkdir(os.path.expanduser('~/.config/mirage/'))
                 conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
@@ -961,13 +964,17 @@ class Base:
 		table_settings = gtk.Table(13, 3, False)
                 table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 bglabel = gtk.Label()
-                bglabel.set_markup("<b>Background Color</b>")
+                bglabel.set_markup("<b>Interface</b>")
                 bglabel.set_alignment(0, 1)
                 table_settings.attach(bglabel, 1, 3, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 table_settings.attach(gtk.Label(), 1, 3, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		color_hbox = gtk.HBox(False, 0)
+		colortext = gtk.Label("Background Color:  ")
                 colorbutton = gtk.ColorButton(self.bgcolor)
                 colorbutton.connect('color-set', self.bgcolor_selected)
-                table_settings.attach(colorbutton, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		color_hbox.pack_start(colortext, False, False, 0)
+		color_hbox.pack_start(colorbutton, True, True, 0)
+                table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_settings.attach(gtk.Label(), 1, 3, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 zoomlabel = gtk.Label()
                 zoomlabel.set_markup("<b>Zoom Quality</b>")
@@ -1088,12 +1095,14 @@ class Base:
                 hbox_delay.pack_start(delaycombo, False, False, 5)
                 randomize = gtk.CheckButton("Randomize order of images")
                 randomize.set_active(self.slideshow_random)
+		disable_screensaver = gtk.CheckButton("Disable screensaver in slideshow mode")
+		disable_screensaver.set_active(self.disable_screensaver)
                 table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-                table_slideshow.attach(randomize, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-                table_slideshow.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-                table_slideshow.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+                table_slideshow.attach(disable_screensaver, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+                table_slideshow.attach(randomize, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+                table_slideshow.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1159,6 +1168,7 @@ class Base:
                         self.slideshow_random = randomize.get_active()
                         self.curr_slideshow_random = self.slideshow_random
                         self.editor = editortext.get_text()
+			self.disable_screensaver = disable_screensaver.get_active()
                         self.prefs_dialog.destroy()
                         
         def use_fixed_dir_clicked(self, button):
@@ -1921,6 +1931,7 @@ class Base:
                                         self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.random_img_in_list, "ss")
                                 self.ss_start.hide()
                                 self.ss_stop.show()
+				timer_screensaver = gobject.timeout_add(55000, self.disable_screensaver_in_slideshow_mode)
                         else:
                                 self.slideshow_mode = False
                                 gobject.source_remove(self.timer_delay)
@@ -1996,7 +2007,12 @@ class Base:
                                 error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, "Unable to launch \"" + self.editor + "\". Please specify a valid application from Edit > Preferences.")
                                 error_dialog.run()
                                 error_dialog.destroy()
-
+				
+	def disable_screensaver_in_slideshow_mode(self):
+		if self.slideshow_mode == True and self.disable_screensaver == True:
+			os.spawnlp(os.P_NOWAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
+			timer_screensaver = gobject.timeout_add(55000, self.disable_screensaver_in_slideshow_mode)
+	
         def main(self):
                 gtk.main()
 
