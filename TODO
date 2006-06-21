@@ -3,7 +3,7 @@
 + Test on Windows/Mac?
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
-+ Fading image transition? Hackish.. I've got an idea now..
++ Fading image transition? Hackish..
 + Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Add side treeview for browsing? (Bjoern Martensen)
 + Delete/Save images? (Bjoern Martensen)

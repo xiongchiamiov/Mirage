@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Mirage is a simple GTK+ Image Viewer
+"""Mirage is a fast GTK+ Image Viewer
 """
 
 __author__ = "Scott Horowitz"

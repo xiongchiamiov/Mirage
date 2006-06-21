@@ -2011,7 +2011,6 @@ class Base:
 	def disable_screensaver_in_slideshow_mode(self):
 		if self.slideshow_mode == True and self.disable_screensaver == True:
 			test = os.spawnlp(os.P_WAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
-			print test
 			if test <> 127:
 				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
 	
