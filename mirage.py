@@ -674,6 +674,8 @@ class Base:
                 conf.set('prefs', 'zoomvalue', self.zoomvalue)
                 conf.set('prefs', 'editor', self.editor)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
+		if os.path.exists(os.path.expanduser('~/.config/')) == False:
+			os.mkdir(os.path.expanduser('~/.config/'))
                 if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
                         os.mkdir(os.path.expanduser('~/.config/mirage/'))
                 conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
