@@ -35,6 +35,10 @@ import imgfuncs
 import urllib
 import sets
 import gobject
+try:
+	import gconf
+except:
+	pass
 
 class Base:
 
@@ -425,8 +429,22 @@ class Base:
                 self.layout.connect("motion-notify-event", self.mouse_moved)
                 self.layout.connect("button-release-event", self.button_released)
 		self.imageview.connect("expose-event", self.expose_event)
-                #self.layout.get_hadjustment().connect("value-changed", self.x_adjustment_changed)
-                #self.layout.get_vadjustment().connect("value-changed", self.y_adjustment_changed)
+
+		# Since GNOME does its own thing for the toolbar style...
+		# Requires gnome-python installed to work
+		try:
+			test = gconf.client_get_default()
+			style = test.get_string('/desktop/gnome/interface/toolbar_style')
+			if style == "both":
+				self.toolbar.set_style(gtk.TOOLBAR_BOTH)
+			elif style == "both-horiz":
+				self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+			elif style == "icons":
+				self.toolbar.set_style(gtk.TOOLBAR_ICONS)
+			elif style == "text":
+				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
+		except:
+			pass
 
                 # Show GUI:
 		self.hscroll.set_no_show_all(True)
@@ -448,7 +466,7 @@ class Base:
                 else:
                         self.set_go_sensitivities(False)
                         self.set_image_sensitivities(False)
-
+				
         def topwindow_keypress(self, widget, event):
                 if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
                         if event.keyval == 65361:    # Left arrow

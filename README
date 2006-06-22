@@ -2,7 +2,8 @@ Mirage, a simple GTK+ Image Viewer
 Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
 
 REQUIREMENTS:
-	The only requirement is PyGTK 2.6.0 or newer
+	The only requirement is PyGTK 2.6.0 or newer. Gnome-python is also an optional
+	requirement if you want Mirage's toolbar to follow your Gnome setting.
 
 INSTALLATION:
 	Just run 'python setup.py install' as root.
