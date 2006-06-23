@@ -468,7 +468,7 @@ class Base:
                         self.set_image_sensitivities(False)
 				
         def topwindow_keypress(self, widget, event):
-                if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
+                if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
                         if event.keyval == 65361:    # Left arrow
 				self.prev_img_in_list(None)
                         elif event.keyval == 65363 or event.keyval == 32:  # Right arrow or spacebar
