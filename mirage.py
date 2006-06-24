@@ -431,10 +431,10 @@ class Base:
 		self.imageview.connect("expose-event", self.expose_event)
 
 		# Since GNOME does its own thing for the toolbar style...
-		# Requires gnome-python installed to work
+		# Requires gnome-python installed to work (but optional)
 		try:
-			test = gconf.client_get_default()
-			style = test.get_string('/desktop/gnome/interface/toolbar_style')
+			client = gconf.client_get_default()
+			style = client.get_string('/desktop/gnome/interface/toolbar_style')
 			if style == "both":
 				self.toolbar.set_style(gtk.TOOLBAR_BOTH)
 			elif style == "both-horiz":
@@ -443,6 +443,8 @@ class Base:
 				self.toolbar.set_style(gtk.TOOLBAR_ICONS)
 			elif style == "text":
 				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
+			client.add_dir("/desktop/gnome/interface", gconf.CLIENT_PRELOAD_NONE)
+			client.notify_add("/desktop/gnome/interface/toolbar_style", self.gconf_key_changed) 
 		except:
 			pass
 
@@ -466,7 +468,21 @@ class Base:
                 else:
                         self.set_go_sensitivities(False)
                         self.set_image_sensitivities(False)
-				
+			
+	def gconf_key_changed(self, client, cnxn_id, entry, label):
+		if entry.value.type == gconf.VALUE_STRING:
+			style = entry.value.to_string()
+			if style == "both":
+				self.toolbar.set_style(gtk.TOOLBAR_BOTH)
+			elif style == "both-horiz":
+				self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
+			elif style == "icons":
+				self.toolbar.set_style(gtk.TOOLBAR_ICONS)
+			elif style == "text":
+				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
+			if self.image_loaded == True and self.last_image_action_was_fit == True:
+				self.zoom_to_fit_window(None)
+			
         def topwindow_keypress(self, widget, event):
                 if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
                         if event.keyval == 65361:    # Left arrow
