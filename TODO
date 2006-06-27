@@ -1,9 +1,15 @@
+0.8
++ Skip hidden files when loading images (make pref?)
++ Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Try to make zooming smoother
++ Pg Up/Down shortcuts to skip ahead/back 5 or 10 images
++ Documentation
+
+Future
 + Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac?
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
 + Fading image transition? Hackish..
-+ Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Add side treeview for browsing? (Bjoern Martensen)
 + Delete/Save images? (Bjoern Martensen)
