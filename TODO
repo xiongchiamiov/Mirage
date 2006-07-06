@@ -3,11 +3,13 @@
 + Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Try to make zooming smoother
 + Pg Up/Down shortcuts to skip ahead/back 5 or 10 images
++ In slideshow mode, pre-load next image so the user-specified delay is accurate
 + Documentation
 
 Future
++ Remove gcc requirement when flipping is included in pygtk
 + Allow image manipulations (rotate, zoom) on animated images
-+ Test on Windows/Mac?
++ Test on Windows/Mac? Wait until gcc requirement is gone.
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
 + Fading image transition? Hackish..
