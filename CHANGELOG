@@ -1,6 +1,7 @@
 v0.8 - Pending
 	+ Toolbar style follows gnome preference (requires optional gnome-python
 	  dependency) (Eugenia Loli-Queru)
+	+ Skip hidden files/dirs when loading images
 	+ Bug: Caps-lock breaks some shortcuts (Abisser T'khin)
 	+ Bug fixes
 

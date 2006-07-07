@@ -1778,6 +1778,7 @@ class Base:
                 self.layout.window.set_cursor(type)
                 
         def expand_filelist_and_load_image(self, inputlist):
+		self.images_found = 0
                 # Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found; returns new list
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1823,23 +1824,25 @@ class Base:
                 # Note: If we want case insensitive sorts, use .sort(key=str.lower)
 		inputlist.sort()
                 for item in inputlist:
-                        item_fullpath = os.path.abspath(item)
-                        # If the item is a filename, test to see if it's a valid image
-			# that we can read; if not, discard it:
-			if os.path.isfile(item_fullpath):
-                                if self.valid_image(item_fullpath) == True:
-                                        if first_image_found == False:
-                                                first_image_found = True
-                                                first_image = item_fullpath
-                                        filelist.append(item)
-                                        if self.verbose == True:
-                                                print "Found:", item_fullpath, "[" + str(len(filelist)) + "]"
-                        # If it's a directory that was explicitly selected or passed to
-			# the program, get all the files in the dir.
-			# Retrieve only images in the top directory specified by the user
-			# only explicitly told to recurse (via -R or in Settings>Preferences)
-			elif os.path.isdir(item_fullpath):
-                                folderlist.append(item)
+			if item[0] != '.':
+				item_fullpath = os.path.abspath(item)
+				# If the item is a filename, test to see if it's a valid image
+				# that we can read; if not, discard it:
+				if os.path.isfile(item_fullpath):
+	                                if self.valid_image(item_fullpath) == True:
+						if first_image_found == False:
+	                                                first_image_found = True
+							first_image = item_fullpath
+						filelist.append(item)
+						if self.verbose == True:
+							self.images_found += 1
+	                                                print "Found:", item_fullpath, "[" + str(self.images_found) + "]"
+				# If it's a directory that was explicitly selected or passed to
+				# the program, get all the files in the dir.
+				# Retrieve only images in the top directory specified by the user
+				# only explicitly told to recurse (via -R or in Settings>Preferences)
+				elif os.path.isdir(item_fullpath):
+	                                folderlist.append(item)
                 # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 		if len(filelist) > 0:
                         filelist = list(set(filelist))
@@ -1848,7 +1851,8 @@ class Base:
                         folderlist.sort()
                         folderlist = list(set(folderlist))
                         for item in folderlist:
-                                filelist = self.expand_directory(item, filelist, False, False)
+				if item[0] != '.':
+					filelist = self.expand_directory(item, filelist, False, False)
                 # We now have the full list, update to full paths:
 		for item in filelist:
                         self.image_list.append(os.path.abspath(item))
@@ -1888,17 +1892,19 @@ class Base:
                         if os.access(item, os.R_OK) == False:
                                 return inputlist
                         for item2 in os.listdir(item):
-                                item2 = item + "/" + item2
-                                item_fullpath2 = os.path.abspath(item2)
-                                if os.path.isfile(item_fullpath2):
-                                        if self.valid_image(item_fullpath2) == True:
-                                                filelist.append(item2)
-                                                if stop_when_image_found == True:
-                                                        stop_now = True
-                                                if self.verbose == True:
-                                                        print "Found:", item_fullpath2, "[" + str(len(self.image_list)) + "]"
-                                elif os.path.isdir(item_fullpath2) and self.recursive == True:
-                                        folderlist.append(item_fullpath2)
+				if item2[0] != '.':
+					item2 = item + "/" + item2
+					item_fullpath2 = os.path.abspath(item2)
+					if os.path.isfile(item_fullpath2):
+	                                        if self.valid_image(item_fullpath2) == True:
+							filelist.append(item2)
+							if stop_when_image_found == True:
+	                                                        stop_now = True
+							if self.verbose == True:
+								self.images_found += 1
+	                                                        print "Found:", item_fullpath2, "[" + str(self.images_found) + "]"
+					elif os.path.isdir(item_fullpath2) and self.recursive == True:
+	                                        folderlist.append(item_fullpath2)
                         # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(filelist) > 0:
                                 filelist.sort()

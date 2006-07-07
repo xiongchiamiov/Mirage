@@ -1,5 +1,4 @@
 0.8
-+ Skip hidden files when loading images (make pref?)
 + Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Try to make zooming smoother
 + Pg Up/Down shortcuts to skip ahead/back 5 or 10 images
