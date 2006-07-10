@@ -3,8 +3,6 @@ v0.8
 + Try to make zooming smoother
 + In slideshow mode, pre-load next image so the user-specified delay is accurate
 + Documentation
-+ Allow language translations
-+ Additionally use +/- shortcuts for zooming (Bjoern Martensen)
 
 Future
 + Remove gcc requirement when mirroring/rotating is included in pygtk

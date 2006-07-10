@@ -1,3 +1,7 @@
+v0.8 - Pending
+	+ Added German translation (Bjoern Martensen)
+	+ Additional shortcuts: +/- for zooming in/out (Bjoern Martensen)
+
 v0.7.1 - July 9, 2006
 	+ Toolbar style follows gnome preference (requires optional gnome-python
 	  dependency) (Eugenia Loli-Queru)
