@@ -35,6 +35,8 @@ import imgfuncs
 import urllib
 import sets
 import gobject
+import gettext
+import locale
 try:
 	import gconf
 except:
@@ -43,6 +45,8 @@ except:
 class Base:
 
         def __init__(self):
+	
+		gettext.install('mirage', './i18n', unicode=1)
         
                 # Constants
 		self.open_mode_smart = 0
@@ -169,35 +173,35 @@ class Base:
                         ('ViewMenu', None, '_View'),  
                         ('GoMenu', None, '_Go'),  
                         ('HelpMenu', None, '_Help'),  
-                        ('Open Image', gtk.STOCK_OPEN, '_Open Image...', '<control>O', 'Open Image', self.open_file),  
-                        ('Open Folder', gtk.STOCK_OPEN, 'Open _Folder...', '<control>F', 'Open Folder', self.open_folder),  
-                        ('Quit', gtk.STOCK_QUIT, '_Quit', '<control>Q', 'Quit', self.exit_app),  
-                        ('Previous Image', gtk.STOCK_GO_BACK, '_Previous Image', 'Left', 'Previous Image', self.prev_img_in_list),  
-                        ('Next Image', gtk.STOCK_GO_FORWARD, '_Next Image', 'Right', 'Next Image', self.next_img_in_list),  
-                        ('Previous2', gtk.STOCK_GO_BACK, '_Previous', 'Left', 'Previous', self.prev_img_in_list),  
-                        ('Next2', gtk.STOCK_GO_FORWARD, '_Next', 'Right', 'Next', self.next_img_in_list),  
-                        ('Random Image', None, '_Random Image', 'R', 'Random Image', self.random_img_in_list),  
-                        ('First Image', gtk.STOCK_GOTO_FIRST, '_First Image', 'Home', 'First Image', self.first_img_in_list),  
-                        ('Last Image', gtk.STOCK_GOTO_LAST, '_Last Image', 'End', 'Last Image', self.last_img_in_list),  
-                        ('In', gtk.STOCK_ZOOM_IN, 'Zoom _In', '<Ctrl>Up', 'Zoom In', self.zoom_in),  
-                        ('Out', gtk.STOCK_ZOOM_OUT, 'Zoom _Out', '<Ctrl>Down', 'Zoom Out', self.zoom_out),  
-                        ('Fit', gtk.STOCK_ZOOM_FIT, 'Zoom To _Fit', '<Ctrl>0', 'Fit', self.zoom_to_fit_window),  
-                        ('1:1', gtk.STOCK_ZOOM_100, '_1:1', '<Ctrl>1', '1:1', self.zoom_1_to_1),  
-                        ('Rotate Left', None, 'Rotate _Left', '<Ctrl>Left', 'Rotate Left', self.rotate_left),  
-                        ('Rotate Right', None, 'Rotate _Right', '<Ctrl>Right', 'Rotate Right', self.rotate_right),  
-                        ('Flip Vertically', None, 'Flip _Vertically', '<Ctrl>V', 'Flip Vertically', self.image_flip_vert),  
-                        ('Flip Horizontally', None, 'Flip _Horizontally', '<Ctrl>H', 'Flip Horizontally', self.image_flip_horiz),  
-                        ('About', gtk.STOCK_ABOUT, '_About', 'F1', 'About', self.show_about),  
-                        ('Preferences', gtk.STOCK_PREFERENCES, '_Preferences', None, 'Preferences', self.show_prefs),  
-                        ('Full Screen', gtk.STOCK_FULLSCREEN, '_Full Screen', '<Shift>Return', 'Full Screen', self.enter_fullscreen),
-                        ('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, 'E_xit Full Screen', None, 'Full Screen', self.leave_fullscreen),
-                        ('Start Slideshow', gtk.STOCK_MEDIA_PLAY, '_Start Slideshow', 'F5', 'Start Slideshow', self.toggle_slideshow),
-                        ('Stop Slideshow', gtk.STOCK_MEDIA_STOP, '_Stop Slideshow', 'F5', 'Stop Slideshow', self.toggle_slideshow),
-                        ('Open in Editor', gtk.STOCK_EXECUTE, 'Open in _Editor', '<Ctrl>E', 'Open in Editor', self.load_editor)
+                        ('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<control>O', 'Open Image', self.open_file),  
+                        ('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<control>F', 'Open Folder', self.open_folder),  
+                        ('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', 'Quit', self.exit_app),  
+                        ('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', 'Previous Image', self.prev_img_in_list),  
+                        ('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', 'Next Image', self.next_img_in_list),  
+                        ('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', 'Previous', self.prev_img_in_list),  
+                        ('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', 'Next', self.next_img_in_list),  
+                        ('Random Image', None, _('_Random Image'), 'R', 'Random Image', self.random_img_in_list),  
+                        ('First Image', gtk.STOCK_GOTO_FIRST, _('_First Image'), 'Home', 'First Image', self.first_img_in_list),  
+                        ('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', 'Last Image', self.last_img_in_list),  
+                        ('In', gtk.STOCK_ZOOM_IN, _('Zoom _In'), '<Ctrl>Up', 'Zoom In', self.zoom_in),  
+                        ('Out', gtk.STOCK_ZOOM_OUT, _('Zoom _Out'), '<Ctrl>Down', 'Zoom Out', self.zoom_out),  
+                        ('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', 'Fit', self.zoom_to_fit_window),  
+                        ('1:1', gtk.STOCK_ZOOM_100, _('_1:1'), '<Ctrl>1', '1:1', self.zoom_1_to_1),  
+                        ('Rotate Left', None, _('Rotate _Left'), '<Ctrl>Left', 'Rotate Left', self.rotate_left),  
+                        ('Rotate Right', None, _('Rotate _Right'), '<Ctrl>Right', 'Rotate Right', self.rotate_right),  
+                        ('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', 'Flip Vertically', self.image_flip_vert),  
+                        ('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', 'Flip Horizontally', self.image_flip_horiz),  
+                        ('About', gtk.STOCK_ABOUT, _('_About'), 'F1', 'About', self.show_about),  
+                        ('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences'), None, 'Preferences', self.show_prefs),  
+                        ('Full Screen', gtk.STOCK_FULLSCREEN, _('_Full Screen'), '<Shift>Return', 'Full Screen', self.enter_fullscreen),
+                        ('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, 'Full Screen', self.leave_fullscreen),
+                        ('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', 'Start Slideshow', self.toggle_slideshow),
+                        ('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', 'Stop Slideshow', self.toggle_slideshow),
+                        ('Open in Editor', gtk.STOCK_EXECUTE, _('Open in _Editor'), '<Ctrl>E', 'Open in Editor', self.load_editor)
                         )
                 toggle_actions = (
-                        ('Status Bar', None, '_Status Bar', None, 'Status Bar', self.toggle_status_bar, self.statusbar_show),  
-                        ('Toolbar', None, '_Toolbar', None, 'Toolbar', self.toggle_toolbar, self.toolbar_show),  
+                        ('Status Bar', None, _('_Status Bar'), None, 'Status Bar', self.toggle_status_bar, self.statusbar_show),  
+                        ('Toolbar', None, _('_Toolbar'), None, 'Toolbar', self.toggle_toolbar, self.toolbar_show),  
                                 )
                 uiDescription = """  
                         <ui>  
@@ -599,20 +603,20 @@ class Base:
                         self.set_zoom_in_sensitivities(False)
 
         def print_version(self):
-                print "Version: Mirage", __version__
-                print "Website: http://mirageiv.berlios.de"
+                print _("Version: Mirage"), __version__
+                print _("Website: http://mirageiv.berlios.de")
 
         def print_usage(self):
                 self.print_version()
                 print ""
-                print "Usage: mirage [OPTION]... FILES|FOLDERS..."
+                print _("Usage: mirage [OPTION]... FILES|FOLDERS...")
                 print ""
-                print "Options:"
-                print "  -h, --help                   Show this help and exit"
-                print "  -v, --version                Show version information and exit"
-                print "  -V, --verbose                Show more detailed information"
-                print "  -R, --recursive              Recursively include all images found in"
-                print "                               subdirectories of FOLDERS"
+                print _("Options:")
+                print _("  -h, --help                   Show this help and exit")
+                print _("  -v, --version                Show version information and exit")
+                print _("  -V, --verbose                Show more detailed information")
+                print _("  -R, --recursive              Recursively include all images found in")
+                print _("                               subdirectories of FOLDERS")
 
         def delay_changed(self, action):
                 self.curr_slideshow_delay = self.ss_delaycombo.get_active()
@@ -871,14 +875,14 @@ class Base:
 
         def open_file_or_folder(self, action, isfile):
                 # If isfile = True, file; If isfile = False, folder
-		dialog = gtk.FileChooserDialog(title="Open",action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+		dialog = gtk.FileChooserDialog(title=_("Open"),action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
                 if isfile == True:
                         filter = gtk.FileFilter()
-                        filter.set_name("Images")
+                        filter.set_name(_("Images"))
                         filter.add_pixbuf_formats()
                         dialog.add_filter(filter)
                         filter = gtk.FileFilter()
-                        filter.set_name("All files")
+                        filter.set_name(_("All files"))
                         filter.add_pattern("*")
                         dialog.add_filter(filter)
                         preview = gtk.Image()
@@ -887,7 +891,7 @@ class Base:
                         dialog.connect("update-preview", self.update_preview, preview)
                 else:
                         dialog.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-                        recursivebutton = gtk.CheckButton(label="Include images in subdirectories")
+                        recursivebutton = gtk.CheckButton(label=_("Include images in subdirectories"))
                         dialog.set_extra_widget(recursivebutton)
                 dialog.set_default_response(gtk.RESPONSE_OK)
                 dialog.set_select_multiple(True)
@@ -988,24 +992,24 @@ class Base:
                         ratio = int(100 * self.zoomratio)
                         status_text=str(self.originalimg.get_width()) + "x" + str(self.originalimg.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
                 except:
-                        status_text="Cannot load image."
+                        status_text=_("Cannot load image.")
                 self.statusbar.push(self.statusbar.get_context_id(""), status_text)
                 return
 
         def show_prefs(self, action):
-                self.prefs_dialog = gtk.Dialog(title="Mirage Preferences", parent=self.window)
+                self.prefs_dialog = gtk.Dialog(title=_("Mirage Preferences"), parent=self.window)
                 self.prefs_dialog.set_has_separator(False)
                 self.prefs_dialog.set_resizable(False)
                 # Add "Interface" prefs:
 		table_settings = gtk.Table(13, 3, False)
                 table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 bglabel = gtk.Label()
-                bglabel.set_markup("<b>Interface</b>")
+                bglabel.set_markup("<b>_('Interface')</b>")
                 bglabel.set_alignment(0, 1)
                 table_settings.attach(bglabel, 1, 3, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 table_settings.attach(gtk.Label(), 1, 3, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		color_hbox = gtk.HBox(False, 0)
-		colortext = gtk.Label("Background Color:  ")
+		colortext = gtk.Label("_('Background Color'):  ")
                 colorbutton = gtk.ColorButton(self.bgcolor)
                 colorbutton.connect('color-set', self.bgcolor_selected)
 		color_hbox.pack_start(colortext, False, False, 0)
@@ -1013,7 +1017,7 @@ class Base:
                 table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_settings.attach(gtk.Label(), 1, 3, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 zoomlabel = gtk.Label()
-                zoomlabel.set_markup("<b>Zoom Quality</b>")
+                zoomlabel.set_markup("<b>_('Zoom Quality')</b>")
                 zoomlabel.set_alignment(0, 1)
                 table_settings.attach(zoomlabel, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 table_settings.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1024,10 +1028,10 @@ class Base:
                 zoompref.set_value(self.zoomvalue)
                 zoom_hbox = gtk.HBox(False, 0)
                 zoom_label1 = gtk.Label()
-                zoom_label1.set_markup("<i>Fastest</i>")
+                zoom_label1.set_markup("<i>_('Fastest')</i>")
                 zoom_label1.set_alignment(0, 0)
                 zoom_label2 = gtk.Label()
-                zoom_label2.set_markup("<i>Best</i>")
+                zoom_label2.set_markup("<i>_('Best')</i>")
                 zoom_label2.set_alignment(1, 0)
                 zoom_hbox.pack_start(zoom_label1, True, True, 0)
                 zoom_hbox.pack_start(zoom_label2, True, True, 0)
@@ -1040,33 +1044,33 @@ class Base:
 		table_behavior = gtk.Table(13, 2, False)
                 table_behavior.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 openlabel = gtk.Label()
-                openlabel.set_markup("<b>Open Behavior</b>")
+                openlabel.set_markup("<b>_('Open Behavior')</b>")
                 openlabel.set_alignment(0, 1)
                 table_behavior.attach(openlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 table_behavior.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 hbox_openmode = gtk.HBox()
-                hbox_openmode.pack_start(gtk.Label("Open new image in:"), False, False, 0)
+                hbox_openmode.pack_start(gtk.Label("_('Open new image in'):"), False, False, 0)
                 combobox = gtk.combo_box_new_text()
-                combobox.append_text("Smart Mode")
-                combobox.append_text("Zoom To Fit Mode")
-                combobox.append_text("1:1 Mode")
-                combobox.append_text("Last Active Mode")
+                combobox.append_text(_("Smart Mode"))
+                combobox.append_text(_("Zoom To Fit Mode"))
+                combobox.append_text(_("1:1 Mode"))
+                combobox.append_text(_("Last Active Mode"))
                 combobox.set_active(self.open_mode)
-                gtk.Tooltips().set_tip(combobox, "Smart mode uses 1:1 for images smaller than the window and Fit To Window for images larger..")
+                gtk.Tooltips().set_tip(combobox, _("Smart mode uses 1:1 for images smaller than the window and Fit To Window for images larger."))
                 hbox_openmode.pack_start(combobox, False, False, 5)
                 table_behavior.attach(hbox_openmode, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_behavior.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-                openallimages = gtk.CheckButton(label="Load all images in current directory", use_underline=False)
+                openallimages = gtk.CheckButton(label=_("Load all images in current directory", use_underline=False))
                 openallimages.set_active(self.open_all_images)
-                gtk.Tooltips().set_tip(openallimages, "If enabled, opening an image in Mirage will automatically load all images found in that image's directory.")
+                gtk.Tooltips().set_tip(openallimages, _("If enabled, opening an image in Mirage will automatically load all images found in that image's directory."))
                 table_behavior.attach(openallimages, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_behavior.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 openpref = gtk.RadioButton()
-                openpref1 = gtk.RadioButton(group=openpref, label="Use last chosen directory")
-                gtk.Tooltips().set_tip(openpref1, "The default 'Open' directory will be the last directory used.")
-                openpref2 = gtk.RadioButton(group=openpref, label="Use this fixed directory:")
+                openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
+                gtk.Tooltips().set_tip(openpref1, _("The default 'Open' directory will be the last directory used."))
+                openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory:"))
                 openpref2.connect('toggled', self.use_fixed_dir_clicked)
-                gtk.Tooltips().set_tip(openpref2, "The default 'Open' directory will be this specified directory.")
+                gtk.Tooltips().set_tip(openpref2, _("The default 'Open' directory will be this specified directory."))
                 table_behavior.attach(openpref1, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_behavior.attach(openpref2, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 self.defaultdir = gtk.Button()
@@ -1087,18 +1091,18 @@ class Base:
 		table_navigation = gtk.Table(13, 2, False)
                 table_navigation.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 navlabel = gtk.Label()
-                navlabel.set_markup("<b>Navigation</b>")
+                navlabel.set_markup("<b>_('Navigation')</b>")
                 navlabel.set_alignment(0, 1)
                 table_navigation.attach(navlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
-                mousewheelnav = gtk.CheckButton(label="Use mousewheel for imagelist navigation", use_underline=False)
+                mousewheelnav = gtk.CheckButton(label=_("Use mousewheel for imagelist navigation"), use_underline=False)
                 mousewheelnav.set_active(self.mousewheel_nav)
-                gtk.Tooltips().set_tip(mousewheelnav, "If enabled, mousewheel-down (up) will go to the next (previous) image.")
+                gtk.Tooltips().set_tip(mousewheelnav, _("If enabled, mousewheel-down (up) will go to the next (previous) image."))
                 hbox_listwrap = gtk.HBox()
-                hbox_listwrap.pack_start(gtk.Label("Wrap around imagelist:"), False, False, 0)
+                hbox_listwrap.pack_start(gtk.Label(_("Wrap around imagelist:")), False, False, 0)
                 combobox2 = gtk.combo_box_new_text()
-                combobox2.append_text("No")
-                combobox2.append_text("Yes")
-                combobox2.append_text("Prompt User")
+                combobox2.append_text(_("No"))
+                combobox2.append_text(_("Yes"))
+                combobox2.append_text(_("Prompt User"))
                 combobox2.set_active(self.listwrap_mode)
                 hbox_listwrap.pack_start(combobox2, False, False, 5)
                 table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1115,23 +1119,23 @@ class Base:
 		table_slideshow = gtk.Table(13, 2, False)
                 table_slideshow.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 slideshowlabel = gtk.Label()
-                slideshowlabel.set_markup("<b>Slideshow</b>")
+                slideshowlabel.set_markup("<b>_('Slideshow')</b>")
                 slideshowlabel.set_alignment(0, 1)
                 table_slideshow.attach(slideshowlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 hbox_delay = gtk.HBox()
-                hbox_delay.pack_start(gtk.Label("Delay between images:"), False, False, 0)
+                hbox_delay.pack_start(gtk.Label(_("Delay between images:")), False, False, 0)
                 delaycombo = gtk.combo_box_new_text()
-                delaycombo.append_text(str(self.delayoptions[0]) + " seconds")
-                delaycombo.append_text(str(self.delayoptions[1]) + " seconds")
-                delaycombo.append_text(str(self.delayoptions[2]) + " seconds")
-                delaycombo.append_text(str(self.delayoptions[3]) + " seconds")
-                delaycombo.append_text(str(self.delayoptions[4]) + " seconds")
-                delaycombo.append_text(str(self.delayoptions[5]) + " seconds")
+                delaycombo.append_text(str(self.delayoptions[0]) + " _('seconds')")
+                delaycombo.append_text(str(self.delayoptions[1]) + " _('seconds')")
+                delaycombo.append_text(str(self.delayoptions[2]) + " _('seconds')")
+                delaycombo.append_text(str(self.delayoptions[3]) + " _('seconds')")
+                delaycombo.append_text(str(self.delayoptions[4]) + " _('seconds')")
+                delaycombo.append_text(str(self.delayoptions[5]) + " _('seconds')")
                 delaycombo.set_active(self.slideshow_delay)
                 hbox_delay.pack_start(delaycombo, False, False, 5)
-                randomize = gtk.CheckButton("Randomize order of images")
+                randomize = gtk.CheckButton(_("Randomize order of images"))
                 randomize.set_active(self.slideshow_random)
-		disable_screensaver = gtk.CheckButton("Disable screensaver in slideshow mode")
+		disable_screensaver = gtk.CheckButton(_("Disable screensaver in slideshow mode"))
 		disable_screensaver.set_active(self.disable_screensaver)
                 table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1147,11 +1151,11 @@ class Base:
 		table_editor = gtk.Table(13, 2, False)
                 table_editor.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 editorlabel = gtk.Label()
-                editorlabel.set_markup("<b>External Image Editor</b>")
+                editorlabel.set_markup("<b>_('External Image Editor')</b>")
                 editorlabel.set_alignment(0, 1)
                 table_editor.attach(editorlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
                 table_editor.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-                editorlabel = gtk.Label("The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\").")
+                editorlabel = gtk.Label(_("The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\")."))
                 editorlabel.set_line_wrap(True)
                 editorlabel.set_size_request(275, -1)
                 table_editor.attach(editorlabel, 1, 3, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1165,11 +1169,11 @@ class Base:
                 table_editor.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 # Add tabs:
 		notebook = gtk.Notebook()
-                notebook.append_page(table_behavior, gtk.Label(str="Behavior"))
-                notebook.append_page(table_navigation, gtk.Label(str="Navigation"))
-                notebook.append_page(table_settings, gtk.Label(str="Interface"))
-                notebook.append_page(table_slideshow, gtk.Label(str="Slideshow"))
-                notebook.append_page(table_editor, gtk.Label(str="Editor"))
+                notebook.append_page(table_behavior, gtk.Label(str=_("Behavior")))
+                notebook.append_page(table_navigation, gtk.Label(str=_("Navigation")))
+                notebook.append_page(table_settings, gtk.Label(str=_("Interface")))
+                notebook.append_page(table_slideshow, gtk.Label(str=_("Slideshow")))
+                notebook.append_page(table_editor, gtk.Label(str=_("Editor")))
                 notebook.set_current_page(0)
                 hbox = gtk.HBox()
                 self.prefs_dialog.vbox.pack_start(hbox, False, False, 7)
@@ -1214,7 +1218,7 @@ class Base:
                         self.defaultdir.set_sensitive(False)
 
         def defaultdir_clicked(self, button):
-                getdir = gtk.FileChooserDialog(title="Choose directory",action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+                getdir = gtk.FileChooserDialog(title=_("Choose directory"),action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
                 getdir.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
                 getdir.set_filename(self.fixed_dir)
                 getdir.set_default_response(gtk.RESPONSE_OK)
@@ -1258,7 +1262,7 @@ class Base:
                 self.about_dialog = gtk.AboutDialog()
                 self.about_dialog.set_name('Mirage')
                 self.about_dialog.set_version(__version__)
-                self.about_dialog.set_comments('A fast GTK+ Image Viewer.')
+                self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
                 self.about_dialog.set_license(__license__)
                 self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
                 self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
@@ -1504,7 +1508,7 @@ class Base:
                                 else:
                                         if self.fullscreen_mode == True:
                                                 self.change_cursor(None)
-                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the first image in the list. Wrap around to the last image?")
+                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the first image in the list. Wrap around to the last image?"))
                                         dialog.set_default_response(gtk.RESPONSE_YES)
                                         self.user_prompt_visible = True
                                         response = dialog.run()
@@ -1555,7 +1559,7 @@ class Base:
                                 else:
                                         if self.fullscreen_mode == True:
                                                 self.change_cursor(None)
-                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "You are viewing the last image in the list. Wrap around to the first image?")
+                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the last image in the list. Wrap around to the first image?"))
                                         dialog.set_default_response(gtk.RESPONSE_YES)
                                         self.user_prompt_visible = True
                                         response = dialog.run()
@@ -1611,7 +1615,7 @@ class Base:
                                                 elif self.listwrap_mode == 2:
                                                         if self.fullscreen_mode == True:
                                                                 self.change_cursor(None)
-                                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, "All images have been viewed. Would you like to cycle through the images again?")
+                                                        dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("All images have been viewed. Would you like to cycle through the images again?"))
                                                         dialog.set_default_response(gtk.RESPONSE_YES)
                                                         self.user_prompt_visible = True
                                                         response = dialog.run()
@@ -1729,7 +1733,7 @@ class Base:
         def image_load_failed(self):
                 self.userimage = str(self.image_list[self.curr_img_in_list])
                 if self.verbose == True and self.userimage != "":
-                        print "Loading:", self.userimage
+                        print _("Loading:"), self.userimage
                 self.set_window_title()
                 self.put_error_image_to_window()
                 self.image_loaded = False
@@ -1742,7 +1746,7 @@ class Base:
                 self.zoomratio = 1
                 self.userimage = str(self.image_list[self.curr_img_in_list])
                 if self.verbose == True and self.userimage != "":
-                        print "Loading:", self.userimage
+                        print _("Loading:"), self.userimage
                 animtest = gtk.gdk.PixbufAnimation(self.userimage)
                 if animtest.is_static_image() == True:
                         self.image_is_animation = False
@@ -1822,7 +1826,7 @@ class Base:
                                 # Remove any duplicates in inputlist...
 				inputlist = list(set(inputlist))
                 # Note: If we want case insensitive sorts, use .sort(key=str.lower)
-		inputlist.sort()
+		inputlist.sort(locale.strcoll)
                 for item in inputlist:
 			if item[0] != '.':
 				item_fullpath = os.path.abspath(item)
@@ -1836,7 +1840,7 @@ class Base:
 						filelist.append(item)
 						if self.verbose == True:
 							self.images_found += 1
-	                                                print "Found:", item_fullpath, "[" + str(self.images_found) + "]"
+	                                                print _("Found:"), item_fullpath, "[" + str(self.images_found) + "]"
 				# If it's a directory that was explicitly selected or passed to
 				# the program, get all the files in the dir.
 				# Retrieve only images in the top directory specified by the user
@@ -1846,9 +1850,9 @@ class Base:
                 # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 		if len(filelist) > 0:
                         filelist = list(set(filelist))
-                        filelist.sort()
+                        filelist.sort(locale.strcoll)
                 if len(folderlist) > 0:
-                        folderlist.sort()
+                        folderlist.sort(locale.strcoll)
                         folderlist = list(set(folderlist))
                         for item in folderlist:
 				if item[0] != '.':
@@ -1869,7 +1873,7 @@ class Base:
                                         if first_image == self.image_list[itemnum]:
                                                 self.curr_img_in_list = itemnum
                         if self.verbose == True and self.userimage != "":
-                                print "Loading:", self.userimage
+                                print _("Loading:"), self.userimage
                         try:
                                 self.originalimg = gtk.gdk.pixbuf_new_from_file(str(self.image_list[self.curr_img_in_list]))
                                 self.load_new_image()
@@ -1902,15 +1906,15 @@ class Base:
 	                                                        stop_now = True
 							if self.verbose == True:
 								self.images_found += 1
-	                                                        print "Found:", item_fullpath2, "[" + str(self.images_found) + "]"
+	                                                        print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
 					elif os.path.isdir(item_fullpath2) and self.recursive == True:
 	                                        folderlist.append(item_fullpath2)
                         # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(filelist) > 0:
-                                filelist.sort()
+                                filelist.sort(locale.strcoll)
                                 inputlist = inputlist + filelist
                         if len(folderlist) > 0:
-                                folderlist.sort()
+                                folderlist.sort(locale.strcoll)
                                 for item2 in folderlist:
                                         inputlist = self.expand_directory(item2, inputlist, stop_when_image_found, stop_now)
                 return inputlist 
@@ -1988,9 +1992,9 @@ class Base:
                         self.window.set_title("Mirage")
                 else:
                         if self.slideshow_mode == True:
-                                self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage) + " - Slideshow Mode")
+                                self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " _('of') " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage) + " - _('Slideshow Mode')")
                         else:
-                                self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " of " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
+                                self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + " _('of') " + str(len(self.image_list)) + "] " + os.path.basename(self.userimage))
                                 
         def slideshow_controls_show(self):
                 if self.slideshow_controls_visible == False and self.controls_moving == False:
@@ -2046,7 +2050,7 @@ class Base:
                 if self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').get_property('sensitive') == True:
                         test = os.spawnlp(os.P_WAIT, self.editor, self.editor, self.userimage)
                         if test == 127:
-                                error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, "Unable to launch \"" + self.editor + "\". Please specify a valid application from Edit > Preferences.")
+                                error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, "_('Unable to launch') \"" + self.editor + "\". _('Please specify a valid application from Edit > Preferences.')")
                                 error_dialog.run()
                                 error_dialog.destroy()
 				
