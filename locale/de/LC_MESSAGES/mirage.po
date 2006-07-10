@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-10 14:08-0600\n"
-"PO-Revision-Date: 2006-07-10 22:23+0100\n"
+"POT-Creation-Date: 2006-07-10 14:47-0600\n"
+"PO-Revision-Date: 2006-07-10 23:06+0100\n"
 "Last-Translator: Björn Martensen <bjoern.martensen@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +143,21 @@ msgstr "_Statusleiste"
 msgid "_Toolbar"
 msgstr "_Werkzeugleiste"
 
+#: code/mirage/trunk/mirage.py:410
+#: code/mirage/trunk/mirage.py:411
+#: code/mirage/trunk/mirage.py:412
+#: code/mirage/trunk/mirage.py:413
+#: code/mirage/trunk/mirage.py:414
+#: code/mirage/trunk/mirage.py:415
+#: code/mirage/trunk/mirage.py:1138
+#: code/mirage/trunk/mirage.py:1139
+#: code/mirage/trunk/mirage.py:1140
+#: code/mirage/trunk/mirage.py:1141
+#: code/mirage/trunk/mirage.py:1142
+#: code/mirage/trunk/mirage.py:1143
+msgid "seconds"
+msgstr "Sekunden"
+
 #: code/mirage/trunk/mirage.py:616
 msgid "Version: Mirage"
 msgstr "Programmversion"
@@ -203,6 +218,35 @@ msgstr "Das Bild konnte nicht geladen werden"
 msgid "Mirage Preferences"
 msgstr "Einstellungen von Mirage"
 
+#: code/mirage/trunk/mirage.py:1017
+#: code/mirage/trunk/mirage.py:1184
+msgid "Interface"
+msgstr "Oberfläche"
+
+#: code/mirage/trunk/mirage.py:1022
+msgid "Background Color"
+msgstr "Hintergrundfarbe"
+
+#: code/mirage/trunk/mirage.py:1030
+msgid "Zoom Quality"
+msgstr "Zoom-Qualitätsstufe"
+
+#: code/mirage/trunk/mirage.py:1041
+msgid "Fastest"
+msgstr "Gering (am schnellsten)"
+
+#: code/mirage/trunk/mirage.py:1044
+msgid "Best"
+msgstr "Am besten"
+
+#: code/mirage/trunk/mirage.py:1057
+msgid "Open Behavior"
+msgstr "\"Öffnen\"-Einstellungen"
+
+#: code/mirage/trunk/mirage.py:1062
+msgid "Open new image in"
+msgstr "Zoom-Modus des nächsten Bildes"
+
 #: code/mirage/trunk/mirage.py:1064
 msgid "Smart Mode"
 msgstr "Intelligente Bildgröße"
@@ -247,6 +291,11 @@ msgstr "Dieses Verzeichnis verwenden"
 msgid "The default 'Open' directory will be this specified directory."
 msgstr "Das 'Öffnen'-Verzeichnis wird das angegebene sein."
 
+#: code/mirage/trunk/mirage.py:1104
+#: code/mirage/trunk/mirage.py:1183
+msgid "Navigation"
+msgstr "Navigation"
+
 #: code/mirage/trunk/mirage.py:1107
 msgid "Use mousewheel for imagelist navigation"
 msgstr "Das Mausrad zur Navigation zwischen den Bilder verwenden"
@@ -269,7 +318,12 @@ msgstr "Ja"
 
 #: code/mirage/trunk/mirage.py:1115
 msgid "Prompt User"
-msgstr "Den Benutzer fragen"
+msgstr "Nachfragen"
+
+#: code/mirage/trunk/mirage.py:1132
+#: code/mirage/trunk/mirage.py:1185
+msgid "Slideshow"
+msgstr "Diashow"
 
 #: code/mirage/trunk/mirage.py:1136
 msgid "Delay between images:"
@@ -283,6 +337,10 @@ msgstr "Zufällige Bildauswahl"
 msgid "Disable screensaver in slideshow mode"
 msgstr "Bildschirmschoner während der Diashow deaktivieren"
 
+#: code/mirage/trunk/mirage.py:1164
+msgid "External Image Editor"
+msgstr "Externes Bildbearbeitungsprogramm"
+
 #: code/mirage/trunk/mirage.py:1168
 msgid "The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\")."
 msgstr "Das angegebene Programm wird als Standard-Editor genutzt. Es wird angenommen, dass  es sich im PATH des Benutzers befindet, kann aber auch explizit angegeben werden (z.B. \"/usr/bin/gimp-remote\")"
@@ -290,18 +348,6 @@ msgstr "Das angegebene Programm wird als Standard-Editor genutzt. Es wird angeno
 #: code/mirage/trunk/mirage.py:1182
 msgid "Behavior"
 msgstr "Verhalten"
-
-#: code/mirage/trunk/mirage.py:1183
-msgid "Navigation"
-msgstr "Navigation"
-
-#: code/mirage/trunk/mirage.py:1184
-msgid "Interface"
-msgstr "Oberfläche"
-
-#: code/mirage/trunk/mirage.py:1185
-msgid "Slideshow"
-msgstr "Diashow"
 
 #: code/mirage/trunk/mirage.py:1186
 msgid "Editor"
@@ -337,4 +383,21 @@ msgstr "Lade..."
 #: code/mirage/trunk/mirage.py:1919
 msgid "Found:"
 msgstr "Gefunden:"
+
+#: code/mirage/trunk/mirage.py:2005
+#: code/mirage/trunk/mirage.py:2007
+msgid "of"
+msgstr "von"
+
+#: code/mirage/trunk/mirage.py:2005
+msgid "Slideshow Mode"
+msgstr "Diashow-Einstellungen"
+
+#: code/mirage/trunk/mirage.py:2063
+msgid "Unable to launch"
+msgstr "Konnte »%s« nicht ausführen"
+
+#: code/mirage/trunk/mirage.py:2063
+msgid "Please specify a valid application from Edit > Preferences."
+msgstr "Bitte ein gültiges Programm unter Edit > Preferences angeben."
 
