@@ -395,7 +395,7 @@ msgstr "Diashow-Einstellungen"
 
 #: code/mirage/trunk/mirage.py:2063
 msgid "Unable to launch"
-msgstr "Konnte »%s« nicht ausführen"
+msgstr "Folgendes Programm konnte nicht ausgeführt werden: "
 
 #: code/mirage/trunk/mirage.py:2063
 msgid "Please specify a valid application from Edit > Preferences."
