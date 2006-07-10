@@ -1,7 +1,11 @@
+v0.8
 + Load first image quicker by backgrounding search process? (Bjoern Martensen)
 + Try to make zooming smoother
 + In slideshow mode, pre-load next image so the user-specified delay is accurate
 + Documentation
++ Allow language translations
+
+Future
 + Remove gcc requirement when mirroring/rotating is included in pygtk
 + Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac? Wait until gcc requirement is gone.
