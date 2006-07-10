@@ -46,7 +46,10 @@ class Base:
 
         def __init__(self):
 	
-		gettext.install('mirage', './i18n', unicode=1)
+		try:
+			gettext.install('mirage', '/usr/share/locale', unicode=1)
+		except:
+			gettext.install('mirage', '/usr/local/share/locale', unicode=1)
         
                 # Constants
 		self.open_mode_smart = 0
