@@ -171,11 +171,11 @@ class Base:
 
                 # Define the main menubar and toolbar:
 		actions = (  
-                        ('FileMenu', None, '_File'),  
-                        ('EditMenu', None, '_Edit'),
-                        ('ViewMenu', None, '_View'),  
-                        ('GoMenu', None, '_Go'),  
-                        ('HelpMenu', None, '_Help'),  
+                        ('FileMenu', None, _('_File')),  
+                        ('EditMenu', None, _('_Edit')),
+                        ('ViewMenu', None, _('_View')),  
+                        ('GoMenu', None, _('_Go')),  
+                        ('HelpMenu', None, _('_Help')),  
                         ('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<control>O', 'Open Image', self.open_file),  
                         ('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<control>F', 'Open Folder', self.open_folder),  
                         ('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', 'Quit', self.exit_app),  
@@ -1070,7 +1070,7 @@ class Base:
                 hbox_openmode.pack_start(combobox, False, False, 5)
                 table_behavior.attach(hbox_openmode, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_behavior.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-                openallimages = gtk.CheckButton(label=_("Load all images in current directory", use_underline=False))
+                openallimages = gtk.CheckButton(label=_("Load all images in current directory"), use_underline=False)
                 openallimages.set_active(self.open_all_images)
                 gtk.Tooltips().set_tip(openallimages, _("If enabled, opening an image in Mirage will automatically load all images found in that image's directory."))
                 table_behavior.attach(openallimages, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
