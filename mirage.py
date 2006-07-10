@@ -491,7 +491,6 @@ class Base:
 				self.zoom_to_fit_window(None)
 			
         def topwindow_keypress(self, widget, event):
-		print event.keyval, event.state
                 if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
                         if event.keyval == 65361:    # Left arrow
 				self.prev_img_in_list(None)
@@ -507,7 +506,7 @@ class Base:
 				self.leave_fullscreen(None)
 			elif event.keyval == 45:     # - key
 				self.zoom_out(None)
-			elif event.keyval == 61:     # + key
+			elif event.keyval == 61 or event.keyval == 43:     # + key
 				self.zoom_in(None)
                 elif event.state == gtk.gdk.CONTROL_MASK or event.state == gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
                         if event.keyval == 65456:    # "0" key on numpad
@@ -515,7 +514,7 @@ class Base:
                         if event.keyval == 65457:    # "1" key on numpad
 				self.zoom_1_to_1(None)
                 elif event.state == gtk.gdk.SHIFT_MASK or event.state == gtk.gdk.SHIFT_MASK | gtk.gdk.MOD2_MASK:
-			if event.keyval == 43:     # + key
+			if event.keyval == 43 or event.keyval == 61:     # + key
 				self.zoom_in(None)
                                 
         def set_go_sensitivities(self, enable):
