@@ -1167,7 +1167,6 @@ class Base:
                 table_editor.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 editorlabel = gtk.Label(_("The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\")."))
                 editorlabel.set_line_wrap(True)
-                editorlabel.set_size_request(275, -1)
                 table_editor.attach(editorlabel, 1, 3, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 editortext = gtk.Entry()
                 editortext.set_text(self.editor)
@@ -1192,6 +1191,8 @@ class Base:
                 # Show prefs:
 		self.prefs_dialog.vbox.show_all()
                 self.close_button = self.prefs_dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+		self.prefs_dialog.realize()
+                editorlabel.set_size_request(self.prefs_dialog.get_allocation().width-85, -1)
                 self.close_button.grab_focus()
                 response = self.prefs_dialog.run()
                 if response == gtk.RESPONSE_CLOSE or response == -4:

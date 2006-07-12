@@ -22,5 +22,6 @@ setup(name='Mirage',
         data_files=[('share/mirage', ['README', 'COPYING', 'CHANGELOG', 'stock_shuffle.png']),
                     ('share/applications', ['mirage.desktop']),
                     ('share/pixmaps', ['mirage.png', 'mirage_large.png']),
+		    ('share/locale/es/LC_MESSAGES', ['locale/es/LC_MESSAGES/mirage.mo']),
 		    ('share/locale/de/LC_MESSAGES', ['locale/de/LC_MESSAGES/mirage.mo'])],
         )

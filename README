@@ -1,10 +1,11 @@
-Mirage, a fast GTK+ Image Viewer
+Mirage, a fast and simple GTK+ Image Viewer
 Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
 
 REQUIREMENTS:
-	The only requirement is PyGTK 2.6.0 or newer. GCC is also required if you are
-	building mirage yourself. Gnome-python is an optional requirement if you want 
-	Mirage's toolbar to follow your Gnome setting.
+	(Required) PyGTK 2.6.0 or newer
+	(Optional) Gnome-python if you want Mirage's toolbar to follow your Gnome setting
+	(Building) GCC
+	(Building) python-dev (on some distros)
 
 INSTALLATION:
 	Just run 'python setup.py install' as root.
@@ -21,3 +22,9 @@ FEATURES:
 	+ Edit in external editor
 	+ Command-line access
 	+ Configurable interface
+	
+THANKS
+	Huge thanks to Bjoern Martensen for all his suggestions and bug reports :P
+	Thanks to all translators:
+		de (Bjoern Martensen)
+		es (Isidro Arribas)
