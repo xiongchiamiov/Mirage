@@ -4,6 +4,9 @@ v0.8
 + In slideshow mode, pre-load next image so the user-specified delay is accurate
 + Documentation
 + Commandline arguments (open in slideshow mode, etc)
++ Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))
++ Preference - go fullscreen when you start slideshow
++ put slideshow button on toolbar?
 
 Future
 + Remove gcc requirement when mirroring/rotating is included in pygtk
