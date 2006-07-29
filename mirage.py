@@ -1826,11 +1826,14 @@ class Base:
                 while gtk.events_pending():
                         gtk.main_iteration()
                 first_image_found = False
+		first_image_loaded = False
                 self.randomlist = []
-                filelist = []
                 folderlist = []
                 self.image_list = []
-                self.curr_img_in_list = 0
+		first_image = ""
+		self.curr_img_in_list = 0
+		go_buttons_enabled = False
+		self.set_go_sensitivities(True)
                 # Clean up list (remove preceding "file://" or "file:" and trailing "/")
 		for itemnum in range(len(inputlist)):
                         # Strip off preceding file..
@@ -1842,94 +1845,103 @@ class Base:
 			if inputlist[itemnum][len(inputlist[itemnum])-1] == "/":
                                 inputlist[itemnum] = inputlist[itemnum][:(len(inputlist[itemnum])-1)]
                         inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
-                # If first argument is image, use for initial loading:
-		if os.path.isfile(inputlist[0]):
-                        item_fullpath = os.path.abspath(inputlist[0])
-                        if self.valid_image(item_fullpath) == True:
-                                first_image_found = True
-                                first_image = item_fullpath
                 # If first image is dir, expand:
 		if self.open_all_images == True:
-                        if os.path.isfile(inputlist[0]):
-                                for item in inputlist:
-                                        if os.path.isfile(item):
-                                                itempath = os.path.dirname(os.path.abspath(item))
-                                        else:
-                                                itempath = os.path.abspath(item)
-                                        temp = self.recursive
-                                        self.recursive = False
-                                        inputlist = self.expand_directory(itempath, inputlist, False, False)
-                                        self.recursive = temp
+			for item in inputlist:
+	                        if os.path.isfile(item):
+					itempath = os.path.dirname(os.path.abspath(item))
+				temp = self.recursive
+				self.recursive = False
+				self.stop_now = False
+				inputlist = self.expand_directory(itempath, inputlist, False)
+				self.recursive = temp
                                 # Remove any duplicates in inputlist...
 				inputlist = list(set(inputlist))
-                # Note: If we want case insensitive sorts, use .sort(key=str.lower)
-		inputlist.sort(locale.strcoll)
-                for item in inputlist:
+		for item in inputlist:
 			if item[0] != '.':
-				item_fullpath = os.path.abspath(item)
-				# If the item is a filename, test to see if it's a valid image
-				# that we can read; if not, discard it:
-				if os.path.isfile(item_fullpath):
-	                                if self.valid_image(item_fullpath) == True:
+				if os.path.isfile(item):
+					if self.valid_image(item):
 						if first_image_found == False:
-	                                                first_image_found = True
-							first_image = item_fullpath
-						filelist.append(item)
+							first_image_found = True
+							first_image = item
+							first_image_came_from_dir = False
+						self.image_list.append(item)
+						if go_buttons_enabled == False:
+							if len(self.image_list) > 1:
+								self.set_go_sensitivities(False)
+								go_buttons_enabled = True
 						if self.verbose == True:
 							self.images_found += 1
 	                                                print _("Found:"), item_fullpath, "[" + str(self.images_found) + "]"
-				# If it's a directory that was explicitly selected or passed to
-				# the program, get all the files in the dir.
-				# Retrieve only images in the top directory specified by the user
-				# only explicitly told to recurse (via -R or in Settings>Preferences)
-				elif os.path.isdir(item_fullpath):
-	                                folderlist.append(item)
-                # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
-		if len(filelist) > 0:
-                        filelist = list(set(filelist))
-                        filelist.sort(locale.strcoll)
-                if len(folderlist) > 0:
-                        folderlist.sort(locale.strcoll)
-                        folderlist = list(set(folderlist))
-                        for item in folderlist:
-				if item[0] != '.':
-					filelist = self.expand_directory(item, filelist, False, False)
-                # We now have the full list, update to full paths:
-		for item in filelist:
-                        self.image_list.append(os.path.abspath(item))
-                if len(self.image_list) <= 1:
-                        self.set_go_sensitivities(False)
-                else:
-                        self.set_go_sensitivities(True)
-                if len(self.image_list) > 0:
-                        if self.slideshow_mode == True:
-                                self.toggle_slideshow(None)
-                        # Find first specified image in list for updating Mirage title:
-			if first_image_found == True:
-                                for itemnum in range(len(self.image_list)):
-                                        if first_image == self.image_list[itemnum]:
-                                                self.curr_img_in_list = itemnum
-                        if self.verbose == True and self.userimage != "":
-                                print _("Loading:"), self.userimage
-                        try:
-                                self.originalimg = gtk.gdk.pixbuf_new_from_file(str(self.image_list[self.curr_img_in_list]))
-                                self.load_new_image()
-                                if self.image_is_animation == False:
-                                        self.previmg_width = self.currimg.get_width()
-                                else:
-                                        self.previmg_width = self.currimg.get_static_image().get_width()
-                                self.image_loaded = True
-                                while gtk.events_pending():
-                                        gtk.main_iteration(True)
-                        except:
-                                self.image_load_failed()
-                                pass
-                self.change_cursor(None)
+				else:
+					# If it's a directory that was explicitly selected or passed to
+					# the program, get all the files in the dir.
+					# Retrieve only images in the top directory specified by the user
+					# only explicitly told to recurse (via -R or in Settings>Preferences)
+					folderlist.append(item)
+					if first_image_found == False:
+						# See if we can find an image in this directory:
+						self.stop_now = False
+						self.expand_directory(item, True)
+						itemnum = 0
+						while itemnum < len(self.image_list) and first_image_found == False:
+							if os.path.isfile(self.image_list[itemnum]):
+								first_image_found = True
+								first_image = self.image_list[itemnum]
+								first_image_came_from_dir = True
+							itemnum += 1
+				if first_image_found == True and first_image_loaded == False:
+					first_image_loaded = True
+					if self.slideshow_mode == True:
+						self.toggle_slideshow(None)
+		                        if self.verbose == True and self.userimage != "":
+			                        print _("Loading:"), self.userimage
+			                try:
+			                        self.originalimg = gtk.gdk.pixbuf_new_from_file(str(self.image_list[self.curr_img_in_list]))
+			                        self.load_new_image()
+			                        if self.image_is_animation == False:
+			                                self.previmg_width = self.currimg.get_width()
+			                        else:
+			                                self.previmg_width = self.currimg.get_static_image().get_width()
+			                        self.image_loaded = True
+			                        while gtk.events_pending():
+			                                gtk.main_iteration(True)
+			                except:
+			                        self.image_load_failed()
+			                        pass
+					if first_image_came_from_dir == True:
+						self.image_list = []
+		if first_image_found == True:
+			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
+			if len(self.image_list) > 0:
+	                        self.image_list = list(set(self.image_list))
+				self.image_list.sort(locale.strcoll)
+				for itemnum in range(len(self.image_list)):
+					if first_image == self.image_list[itemnum]:
+						self.curr_img_in_list = itemnum
+				self.set_window_title()
+				while gtk.events_pending():
+					gtk.main_iteration(True)
+			if len(folderlist) > 0:
+	                        folderlist.sort(locale.strcoll)
+				folderlist = list(set(folderlist))
+				for item in folderlist:
+					if item[0] != '.':
+						self.stop_now = False
+						self.expand_directory(item, False)
+						if go_buttons_enabled == False:
+							if len(self.image_list) > 1:
+								self.set_go_sensitivities(False)
+								go_buttons_enabled = True
+			self.set_window_title()
+			while gtk.events_pending():
+				gtk.main_iteration(True)
+		self.change_cursor(None)
 
-        def expand_directory(self, item, inputlist, stop_when_image_found, stop_now):
-                if stop_now == False:
-                        filelist = []
+        def expand_directory(self, item, stop_when_image_found):
+                if self.stop_now == False:
                         folderlist = []
+			filelist = []
                         if os.access(item, os.R_OK) == False:
                                 return inputlist
                         for item2 in os.listdir(item):
@@ -1940,7 +1952,7 @@ class Base:
 	                                        if self.valid_image(item_fullpath2) == True:
 							filelist.append(item2)
 							if stop_when_image_found == True:
-	                                                        stop_now = True
+	                                                        self.stop_now = True
 							if self.verbose == True:
 								self.images_found += 1
 	                                                        print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
@@ -1949,12 +1961,15 @@ class Base:
                         # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(filelist) > 0:
                                 filelist.sort(locale.strcoll)
-                                inputlist = inputlist + filelist
+				for item2 in filelist:
+					self.image_list.append(item2)
                         if len(folderlist) > 0:
                                 folderlist.sort(locale.strcoll)
-                                for item2 in folderlist:
-                                        inputlist = self.expand_directory(item2, inputlist, stop_when_image_found, stop_now)
-                return inputlist 
+				for item2 in folderlist:
+					self.expand_directory(item2, stop_when_image_found)
+		self.set_window_title()
+		while gtk.events_pending():
+			gtk.main_iteration(True)
 
         def valid_image(self, file):
                 test = gtk.gdk.pixbuf_get_file_info(file)

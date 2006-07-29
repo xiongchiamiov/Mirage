@@ -1,5 +1,6 @@
-v0.8 - Pending
+v0.7.2 - Pending
 	+ Preference to automatically start the slideshow in fullscreen mode
+	+ Background image search process to load image faster (Bjoern Martensen)
 	+ Added cli argument: -s or --slideshow to start in slideshow mode
 	+ Added cli argument: -f or --fullscreen to start in fullscreen mode
 	+ Additional shortcuts: +/- for zooming in/out (Bjoern Martensen)
