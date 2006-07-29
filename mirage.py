@@ -101,12 +101,12 @@ class Base:
 
                 # Read any passed options/arguments:
 		try:
-                        opts, args = getopt.getopt(sys.argv[1:], "hRvV", ["help", "version", "recursive", "verbose"])
+                        opts, args = getopt.getopt(sys.argv[1:], "hRvVsf", ["help", "version", "recursive", "verbose", "slideshow", "fullscreen"])
                 except getopt.GetoptError:
                         # print help information and exit:
 			self.print_usage()
                         sys.exit(2)
-                # If options were passed, perform action on them:
+                # If options were passed, perform action on them.
 		if opts != []:
                         for o, a in opts:
                                 if o in ("-v", "--version"):
@@ -119,6 +119,9 @@ class Base:
                                         self.recursive = True
                                 elif o in ("-V", "--verbose"):
                                         self.verbose = True
+				elif o in ("-s", "--slideshow", "-f", "--fullscreen"):
+					#This will be handled later
+					None
                                 else:
                                         self.print_usage()
                                         sys.exit(2)
@@ -458,6 +461,13 @@ class Base:
                 # Show GUI:
 		self.hscroll.set_no_show_all(True)
                 self.vscroll.set_no_show_all(True)
+		if opts != []:
+                        for o, a in opts:
+                                if o in ("-f", "--fullscreen"):
+                                        self.enter_fullscreen(None)
+		                        self.statusbar.set_no_show_all(True)
+		                        self.toolbar.set_no_show_all(True)
+		                        self.menubar.set_no_show_all(True)
                 self.window.show_all()
                 self.layout.set_flags(gtk.CAN_FOCUS)
                 self.window.set_focus(self.layout)
@@ -475,6 +485,11 @@ class Base:
                 else:
                         self.set_go_sensitivities(False)
                         self.set_image_sensitivities(False)
+
+		if opts != []:
+                        for o, a in opts:
+                                if o in ("-s", "--slideshow"):
+                                        self.toggle_slideshow(None)
 			
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
 		if entry.value.type == gconf.VALUE_STRING:
@@ -627,6 +642,8 @@ class Base:
                 print _("  -V, --verbose                Show more detailed information")
                 print _("  -R, --recursive              Recursively include all images found in")
                 print _("                               subdirectories of FOLDERS")
+                print _("  -s, --slideshow              Start in slideshow mode")
+                print _("  -f, --fullscreen             Start in fullscreen mode")
 
         def delay_changed(self, action):
                 self.curr_slideshow_delay = self.ss_delaycombo.get_active()
@@ -698,11 +715,10 @@ class Base:
                 return
 
         def save_settings(self):
-                rect = self.window.get_allocation()
                 conf = ConfigParser.ConfigParser()
                 conf.add_section('window')
-                conf.set('window', 'w', rect.width)
-                conf.set('window', 'h', rect.height)
+                conf.set('window', 'w', self.window.get_allocation().width)
+                conf.set('window', 'h', self.window.get_allocation().height)
                 conf.set('window', 'toolbar', self.toolbar_show)
                 conf.set('window', 'statusbar', self.statusbar_show)
                 conf.add_section('prefs')

@@ -1,6 +1,8 @@
 v0.8 - Pending
+	+ Added cli argument: -s or --slideshow to start in slideshow mode
+	+ Added cli argument: -f or --fullscreen to start in fullscreen mode
 	+ Additional shortcuts: +/- for zooming in/out (Bjoern Martensen)
-	+ Fixed .desktop mimetypes
+	+ Fixed .desktop mimetypes (Eugenia Loli-Queru)
 	+ Added German translation (Bjoern Martensen)
 	+ Added Spanish translation (Isidro Arribas)
 
