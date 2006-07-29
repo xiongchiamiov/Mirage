@@ -98,6 +98,7 @@ class Base:
                 self.editor = "gimp-remote"
 		self.updating_adjustments = False
 		self.disable_screensaver = False
+		self.slideshow_in_fullscreen = False
 
                 # Read any passed options/arguments:
 		try:
@@ -164,6 +165,7 @@ class Base:
                                 self.zoom_quality = gtk.gdk.INTERP_HYPER
                         self.editor = conf.get('prefs', 'editor')
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
+			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
                 except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
                 # slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -463,7 +465,7 @@ class Base:
                 self.vscroll.set_no_show_all(True)
 		if opts != []:
                         for o, a in opts:
-                                if o in ("-f", "--fullscreen"):
+                                if (o in ("-f", "--fullscreen")) or ((o in ("-s", "--slideshow")) and self.slideshow_in_fullscreen == True):
                                         self.enter_fullscreen(None)
 		                        self.statusbar.set_no_show_all(True)
 		                        self.toolbar.set_no_show_all(True)
@@ -475,6 +477,10 @@ class Base:
                 self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
                 self.ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
                 self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
+		if opts != []:
+                        for o, a in opts:
+                                if o in ("-f", "--fullscreen"):
+					self.UIManager.get_widget('/Popup/Exit Full Screen').show()
 
                 # If arguments (filenames) were passed, try to open them:
 		self.image_list = []
@@ -738,6 +744,7 @@ class Base:
                 conf.set('prefs', 'zoomvalue', self.zoomvalue)
                 conf.set('prefs', 'editor', self.editor)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
+		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/'))
                 if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
@@ -1163,12 +1170,14 @@ class Base:
                 randomize.set_active(self.slideshow_random)
 		disable_screensaver = gtk.CheckButton(_("Disable screensaver in slideshow mode"))
 		disable_screensaver.set_active(self.disable_screensaver)
+		ss_in_fs = gtk.CheckButton(_("Always start slideshow in fullscreen mode"))
+		ss_in_fs.set_active(self.slideshow_in_fullscreen)
                 table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-                table_slideshow.attach(disable_screensaver, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-                table_slideshow.attach(randomize, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-                table_slideshow.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+                table_slideshow.attach(ss_in_fs, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+                table_slideshow.attach(disable_screensaver, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+                table_slideshow.attach(randomize, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1236,6 +1245,7 @@ class Base:
                         self.curr_slideshow_random = self.slideshow_random
                         self.editor = editortext.get_text()
 			self.disable_screensaver = disable_screensaver.get_active()
+			self.slideshow_in_fullscreen = ss_in_fs.get_active()
                         self.prefs_dialog.destroy()
                         
         def use_fixed_dir_clicked(self, button):
@@ -1994,6 +2004,8 @@ class Base:
         def toggle_slideshow(self, action):
                 if len(self.image_list) > 1:
                         if self.slideshow_mode == False:
+				if self.slideshow_in_fullscreen == True and self.fullscreen_mode == False:
+					self.enter_fullscreen(None)
                                 self.slideshow_mode = True
                                 self.set_window_title()
                                 self.set_slideshow_sensitivities()
