@@ -1170,7 +1170,7 @@ class Base:
                 randomize.set_active(self.slideshow_random)
 		disable_screensaver = gtk.CheckButton(_("Disable screensaver in slideshow mode"))
 		disable_screensaver.set_active(self.disable_screensaver)
-		ss_in_fs = gtk.CheckButton(_("Always start slideshow in fullscreen mode"))
+		ss_in_fs = gtk.CheckButton(_("Always start in fullscreen mode"))
 		ss_in_fs.set_active(self.slideshow_in_fullscreen)
                 table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
                 table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
