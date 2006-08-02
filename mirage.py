@@ -1924,34 +1924,39 @@ class Base:
 						self.image_list = []
 		if first_image_found == True:
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
-			if len(self.image_list) > 0:
-				self.set_go_navigation_sensitivities()
-	                        self.image_list = list(set(self.image_list))
-				self.image_list.sort(locale.strcoll)
-				for itemnum in range(len(self.image_list)):
-					if first_image == self.image_list[itemnum]:
-						self.curr_img_in_list = itemnum
-				self.set_window_title()
-				if not self.closing_app:
-					while gtk.events_pending():
-						gtk.main_iteration(True)
-			if len(folderlist) > 0:
-	                        folderlist.sort(locale.strcoll)
-				folderlist = list(set(folderlist))
-				for item in folderlist:
-					if item[0] != '.' and not self.closing_app:
-						self.stop_now = False
-						self.expand_directory(item, False)
-						if go_buttons_enabled == False:
-							if len(self.image_list) > 1:
-								self.set_go_navigation_sensitivities()
-								go_buttons_enabled = True
+			if first_image_came_from_dir == True:
+				self.add_folderlist_images(folderlist, go_buttons_enabled)
+				self.do_image_list_stuff(first_image)
+			else:
+				self.do_image_list_stuff(first_image)
+				self.add_folderlist_images(folderlist, go_buttons_enabled)
 			self.set_window_title()
 			if not self.closing_app:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
 		if not self.closing_app:
 			self.change_cursor(None)
+			
+	def add_folderlist_images(self, folderlist, go_buttons_enabled):
+		if len(folderlist) > 0:
+			folderlist.sort(locale.strcoll)
+			folderlist = list(set(folderlist))
+			for item in folderlist:
+				if item[0] != '.' and not self.closing_app:
+					self.stop_now = False
+					self.expand_directory(item, False)
+					if go_buttons_enabled == False:
+						if len(self.image_list) > 1:
+							self.set_go_navigation_sensitivities()
+							
+	def do_image_list_stuff(self, first_image):
+		if len(self.image_list) > 0:
+			self.set_go_navigation_sensitivities()
+                        self.image_list = list(set(self.image_list))
+			self.image_list.sort(locale.strcoll)
+			for itemnum in range(len(self.image_list)):
+				if first_image == self.image_list[itemnum]:
+					self.curr_img_in_list = itemnum
 
         def expand_directory(self, item, stop_when_image_found):
                 if self.stop_now == False and self.closing_app == False:
