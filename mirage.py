@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -99,6 +99,7 @@ class Base:
 		self.updating_adjustments = False
 		self.disable_screensaver = False
 		self.slideshow_in_fullscreen = False
+		self.closing_app = False
 
                 # Read any passed options/arguments:
 		try:
@@ -753,13 +754,23 @@ class Base:
                 return
 
         def delete_event(self, widget, event, data=None):
+		self.stop_now = True
+		self.closing_app = True
                 self.save_settings()
-                gtk.main_quit()
+                sys.exit(0)
                 return False
 
         def destroy(self, event, data=None):
+		self.stop_now = True
+		self.closing_app = True
                 self.save_settings()
                 return False
+
+        def exit_app(self, action):
+		self.stop_now = True
+		self.closing_app = True
+		self.save_settings()
+                sys.exit(0)
 
         def put_zoom_image_to_window(self):
 		self.window.window.freeze_updates()
@@ -949,10 +960,6 @@ class Base:
                         dialog.destroy()
                 return
 
-        def exit_app(self, action):
-                self.save_settings()
-                gtk.main_quit()
-                
         def hide_cursor(self):
                 if self.fullscreen_mode == True and self.user_prompt_visible == False and self.slideshow_controls_visible == False:
                         pix_data = """/* XPM */
@@ -1356,8 +1363,9 @@ class Base:
 			self.change_cursor(None)
                         if self.slideshow_controls_visible == False:
                                 gobject.source_remove(self.timer_id)
-                                while gtk.events_pending():
-                                        gtk.main_iteration()
+				if not self.closing_app:
+					while gtk.events_pending():
+	                                        gtk.main_iteration()
                                 self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
                         if y > 0.9*self.available_image_height():
                                 self.slideshow_controls_show()
@@ -1820,11 +1828,13 @@ class Base:
                 
         def expand_filelist_and_load_image(self, inputlist):
 		self.images_found = 0
+		self.stop_now = True # Make sure that any previous search process is stopped
                 # Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found; returns new list
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-                while gtk.events_pending():
-                        gtk.main_iteration()
+		if not self.closing_app:
+			while gtk.events_pending():
+	                        gtk.main_iteration()
                 first_image_found = False
 		first_image_loaded = False
                 self.randomlist = []
@@ -1833,7 +1843,7 @@ class Base:
 		first_image = ""
 		self.curr_img_in_list = 0
 		go_buttons_enabled = False
-		self.set_go_sensitivities(True)
+		self.set_go_sensitivities(False)
                 # Clean up list (remove preceding "file://" or "file:" and trailing "/")
 		for itemnum in range(len(inputlist)):
                         # Strip off preceding file..
@@ -1853,12 +1863,12 @@ class Base:
 				temp = self.recursive
 				self.recursive = False
 				self.stop_now = False
-				inputlist = self.expand_directory(itempath, inputlist, False)
+				inputlist = self.expand_directory(itempath, False)
 				self.recursive = temp
                                 # Remove any duplicates in inputlist...
 				inputlist = list(set(inputlist))
 		for item in inputlist:
-			if item[0] != '.':
+			if item[0] != '.' and self.closing_app == False:
 				if os.path.isfile(item):
 					if self.valid_image(item):
 						if first_image_found == False:
@@ -1868,7 +1878,7 @@ class Base:
 						self.image_list.append(item)
 						if go_buttons_enabled == False:
 							if len(self.image_list) > 1:
-								self.set_go_sensitivities(False)
+								self.set_go_navigation_sensitivities()
 								go_buttons_enabled = True
 						if self.verbose == True:
 							self.images_found += 1
@@ -1904,8 +1914,9 @@ class Base:
 			                        else:
 			                                self.previmg_width = self.currimg.get_static_image().get_width()
 			                        self.image_loaded = True
-			                        while gtk.events_pending():
-			                                gtk.main_iteration(True)
+						if not self.closing_app:
+							while gtk.events_pending():
+				                                gtk.main_iteration(True)
 			                except:
 			                        self.image_load_failed()
 			                        pass
@@ -1914,38 +1925,42 @@ class Base:
 		if first_image_found == True:
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(self.image_list) > 0:
+				self.set_go_navigation_sensitivities()
 	                        self.image_list = list(set(self.image_list))
 				self.image_list.sort(locale.strcoll)
 				for itemnum in range(len(self.image_list)):
 					if first_image == self.image_list[itemnum]:
 						self.curr_img_in_list = itemnum
 				self.set_window_title()
-				while gtk.events_pending():
-					gtk.main_iteration(True)
+				if not self.closing_app:
+					while gtk.events_pending():
+						gtk.main_iteration(True)
 			if len(folderlist) > 0:
 	                        folderlist.sort(locale.strcoll)
 				folderlist = list(set(folderlist))
 				for item in folderlist:
-					if item[0] != '.':
+					if item[0] != '.' and not self.closing_app:
 						self.stop_now = False
 						self.expand_directory(item, False)
 						if go_buttons_enabled == False:
 							if len(self.image_list) > 1:
-								self.set_go_sensitivities(False)
+								self.set_go_navigation_sensitivities()
 								go_buttons_enabled = True
 			self.set_window_title()
-			while gtk.events_pending():
-				gtk.main_iteration(True)
-		self.change_cursor(None)
+			if not self.closing_app:
+				while gtk.events_pending():
+					gtk.main_iteration(True)
+		if not self.closing_app:
+			self.change_cursor(None)
 
         def expand_directory(self, item, stop_when_image_found):
-                if self.stop_now == False:
+                if self.stop_now == False and self.closing_app == False:
                         folderlist = []
 			filelist = []
                         if os.access(item, os.R_OK) == False:
-                                return inputlist
+                                return False
                         for item2 in os.listdir(item):
-				if item2[0] != '.':
+				if item2[0] != '.' and self.closing_app == False:
 					item2 = item + "/" + item2
 					item_fullpath2 = os.path.abspath(item2)
 					if os.path.isfile(item_fullpath2):
@@ -1968,8 +1983,9 @@ class Base:
 				for item2 in folderlist:
 					self.expand_directory(item2, stop_when_image_found)
 		self.set_window_title()
-		while gtk.events_pending():
-			gtk.main_iteration(True)
+		if not self.closing_app:
+			while gtk.events_pending():
+				gtk.main_iteration(True)
 
         def valid_image(self, file):
                 test = gtk.gdk.pixbuf_get_file_info(file)
@@ -2065,8 +2081,9 @@ class Base:
                                 self.ss_stop.set_no_show_all(True)
                         self.slideshow_window.show_all()
                         self.slideshow_window2.show_all()
-                        while gtk.events_pending():
-                                gtk.main_iteration()
+			if not self.closing_app:
+				while gtk.events_pending():
+	                                gtk.main_iteration()
                         
                         ss_winheight = self.slideshow_window.allocation.height
                         ss_win2width = self.slideshow_window2.allocation.width
@@ -2078,8 +2095,9 @@ class Base:
                                 self.slideshow_window.move(2, int(winheight-y-2))
                                 self.slideshow_window2.move(winwidth-ss_win2width-2, int(winheight-y-2))
                                 y += 0.05
-                                while gtk.events_pending():
-                                        gtk.main_iteration()
+				if not self.closing_app:
+					while gtk.events_pending():
+	                                        gtk.main_iteration()
                         self.controls_moving = False
 
         def slideshow_controls_hide(self):
@@ -2096,8 +2114,9 @@ class Base:
                                 self.slideshow_window.move(2, int(winheight-y-2))
                                 self.slideshow_window2.move(winwidth-ss_win2width-2, int(winheight-y-2))
                                 y -= 0.05
-                                while gtk.events_pending():
-                                        gtk.main_iteration()
+				if not self.closing_app:
+					while gtk.events_pending():
+	                                        gtk.main_iteration()
                         self.controls_moving = False
                         
         def load_editor(self, action):

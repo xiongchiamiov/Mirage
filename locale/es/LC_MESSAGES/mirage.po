@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Mirage\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-07-29 18:00-0600\n"
-"PO-Revision-Date: 2006-07-11 22:33-0500\n"
+"PO-Revision-Date: 2006-07-29 17:32-0800\n"
 "Last-Translator: Isidro Arribas <cdhotfire@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -144,9 +144,18 @@ msgstr "Barra de _Estado"
 msgid "_Toolbar"
 msgstr "Barra de _Herramientas"
 
-#: mirage.py:415 mirage.py:416 mirage.py:417 mirage.py:418 mirage.py:419
-#: mirage.py:420 mirage.py:1161 mirage.py:1162 mirage.py:1163 mirage.py:1164
-#: mirage.py:1165 mirage.py:1166
+#: mirage.py:415
+#: mirage.py:416
+#: mirage.py:417
+#: mirage.py:418
+#: mirage.py:419
+#: mirage.py:420
+#: mirage.py:1161
+#: mirage.py:1162
+#: mirage.py:1163
+#: mirage.py:1164
+#: mirage.py:1165
+#: mirage.py:1166
 msgid "seconds"
 msgstr "segundos"
 
@@ -172,8 +181,7 @@ msgstr "-h ,--help                Ensenar ayuda y cerrar"
 
 #: mirage.py:647
 msgid "  -v, --version                Show version information and exit"
-msgstr ""
-"-v,--version                 Ensenar la informacion de la version y cerrar"
+msgstr "-v,--version                 Ensenar la informacion de la version y cerrar"
 
 #: mirage.py:648
 msgid "  -V, --verbose                Show more detailed information"
@@ -181,9 +189,7 @@ msgstr "-V, --verbose                Ensenar informacion más detallada"
 
 #: mirage.py:649
 msgid "  -R, --recursive              Recursively include all images found in"
-msgstr ""
-"-R, --recursive                 Recursivamente incluir todas las imágenes "
-"encontradas en"
+msgstr "-R, --recursive                 Recursivamente incluir todas las imágenes encontradas en"
 
 #: mirage.py:650
 msgid "                               subdirectories of FOLDERS"
@@ -191,11 +197,11 @@ msgstr "                               subdirectorios de ARCHIVOS"
 
 #: mirage.py:651
 msgid "  -s, --slideshow              Start in slideshow mode"
-msgstr ""
+msgstr " -s, --slideshow            Empezar Exposición de Imágenes"
 
 #: mirage.py:652
 msgid "  -f, --fullscreen             Start in fullscreen mode"
-msgstr ""
+msgstr " -f, --fullscreen           Empezar en modo pantalla completa"
 
 #: mirage.py:911
 msgid "Open"
@@ -221,7 +227,8 @@ msgstr "No se puede cargar la imagen"
 msgid "Mirage Preferences"
 msgstr "Preferencias de Mirage"
 
-#: mirage.py:1040 mirage.py:1208
+#: mirage.py:1040
+#: mirage.py:1208
 msgid "Interface"
 msgstr "Interfaz"
 
@@ -266,24 +273,16 @@ msgid "Last Active Mode"
 msgstr "Ultimo Modo Activo"
 
 #: mirage.py:1092
-msgid ""
-"Smart mode uses 1:1 for images smaller than the window and Fit To Window for "
-"images larger."
-msgstr ""
-"Modo Inteligente usa 1:1 para imagenes mas pequeñas que la ventana y Ajustar "
-"a la Ventana  para imagenes más grande."
+msgid "Smart mode uses 1:1 for images smaller than the window and Fit To Window for images larger."
+msgstr "Modo Inteligente usa 1:1 para imagenes mas pequeñas que la ventana y Ajustar a la Ventana  para imagenes más grande."
 
 #: mirage.py:1096
 msgid "Load all images in current directory"
 msgstr "Abrir todas las imagenes en el directorio actual"
 
 #: mirage.py:1098
-msgid ""
-"If enabled, opening an image in Mirage will automatically load all images "
-"found in that image's directory."
-msgstr ""
-"Si activado, abriendo una imagen en Mirage causa que todas las imágenes en "
-"el directorio se cargen automaticamente."
+msgid "If enabled, opening an image in Mirage will automatically load all images found in that image's directory."
+msgstr "Si activado, abriendo una imagen en Mirage causa que todas las imágenes en el directorio se cargen automaticamente."
 
 #: mirage.py:1102
 msgid "Use last chosen directory"
@@ -301,7 +300,8 @@ msgstr "Usar este directorio fijo:"
 msgid "The default 'Open' directory will be this specified directory."
 msgstr "El directorio abierto por 'Abrir' va a ser el directorio especificado."
 
-#: mirage.py:1127 mirage.py:1207
+#: mirage.py:1127
+#: mirage.py:1207
 msgid "Navigation"
 msgstr "Navegación"
 
@@ -311,9 +311,7 @@ msgstr "Usar la rueda del ratón para navegar la lista de imágenes"
 
 #: mirage.py:1132
 msgid "If enabled, mousewheel-down (up) will go to the next (previous) image."
-msgstr ""
-"Si activado, moviendo la rueda del ratón para abajo (arriba) irá a la "
-"siguiente (anterior) imagen."
+msgstr "Si activado, moviendo la rueda del ratón para abajo (arriba) irá a la siguiente (anterior) imagen."
 
 #: mirage.py:1134
 msgid "Wrap around imagelist:"
@@ -331,7 +329,8 @@ msgstr "Sí"
 msgid "Prompt User"
 msgstr "Aviso al Usario"
 
-#: mirage.py:1155 mirage.py:1209
+#: mirage.py:1155
+#: mirage.py:1209
 msgid "Slideshow"
 msgstr "Exposición"
 
@@ -349,21 +348,15 @@ msgstr "Quitar el salvapantallas en la exposición de imágenes"
 
 #: mirage.py:1173
 msgid "Always start in fullscreen mode"
-msgstr ""
+msgstr "Siempre empezar en modo pantalla completa"
 
 #: mirage.py:1189
 msgid "External Image Editor"
 msgstr "Editor de Imágenes Externo "
 
 #: mirage.py:1193
-msgid ""
-"The application specified below is used as the default editor. It is assumed "
-"to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-"
-"remote\")."
-msgstr ""
-"La aplicación especificada abajo va a ser usada como el editor de imágenes.  "
-"Se supone que esté en la dirección del usario, pero puede ser puesto "
-"explícitamente (\"/usr/bin/gimp-remote\")."
+msgid "The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\")."
+msgstr "La aplicación especificada abajo va a ser usada como el editor de imágenes.  Se supone que esté en la dirección del usario, pero puede ser puesto explícitamente (\"/usr/bin/gimp-remote\")."
 
 #: mirage.py:1206
 msgid "Behavior"
@@ -382,34 +375,30 @@ msgid "A fast GTK+ Image Viewer."
 msgstr "Un mostrador de imágenes rapido en GTK+."
 
 #: mirage.py:1548
-msgid ""
-"You are viewing the first image in the list. Wrap around to the last image?"
-msgstr ""
-"Estas viendo la primera imagen en la lista.  Envolver alrededor de la ultima "
-"imagen?"
+msgid "You are viewing the first image in the list. Wrap around to the last image?"
+msgstr "Estas viendo la primera imagen en la lista.  Envolver alrededor de la ultima imagen?"
 
 #: mirage.py:1599
-msgid ""
-"You are viewing the last image in the list. Wrap around to the first image?"
-msgstr ""
-"Estas viendo la ultima imagen en la lista.  Envolver alrededor de la primera "
-"imagen?"
+msgid "You are viewing the last image in the list. Wrap around to the first image?"
+msgstr "Estas viendo la ultima imagen en la lista.  Envolver alrededor de la primera imagen?"
 
 #: mirage.py:1655
-msgid ""
-"All images have been viewed. Would you like to cycle through the images "
-"again?"
+msgid "All images have been viewed. Would you like to cycle through the images again?"
 msgstr "Todas las imágenes han sido vista.  Quisiera verlas otra ves?"
 
-#: mirage.py:1773 mirage.py:1786 mirage.py:1898
+#: mirage.py:1773
+#: mirage.py:1786
+#: mirage.py:1898
 msgid "Loading:"
 msgstr "Cargando:"
 
-#: mirage.py:1875 mirage.py:1958
+#: mirage.py:1875
+#: mirage.py:1958
 msgid "Found:"
 msgstr "Econtrado:"
 
-#: mirage.py:2049 mirage.py:2051
+#: mirage.py:2049
+#: mirage.py:2051
 msgid "of"
 msgstr "de"
 
@@ -424,3 +413,4 @@ msgstr "Incapaz de cargar"
 #: mirage.py:2107
 msgid "Please specify a valid application from Edit > Preferences."
 msgstr "Por favor especifique una aplicación valida en Editar > Preferencias"
+
