@@ -1,13 +1,17 @@
-Future
+0.8
 + Try to make zooming smoother (argh..)
 + Documentation
++ Delete images? (Bjoern Martensen/luzi)
++ Resize, rotate, and save? (luzi)
++ Side/bottom panel for thumbnails of all images in list (use .thumbnails?)
++ Fading image transition..? (William Rea)
+
+Future
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
 + Remove gcc requirement when mirroring/rotating is included in pygtk
 + Allow image manipulations (rotate, zoom) on animated images
 + Test on Windows/Mac? Wait until gcc requirement is gone.
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
-+ Fading image transition? Hackish..
 + Add side treeview for browsing? (Bjoern Martensen)
-+ Delete/Save images? (Bjoern Martensen)
-+ Recent files in file menu
++ Recent files in file menu (requires new pygtk and gtk 2.10)
