@@ -2,280 +2,397 @@
 # Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Tomasz Dominikowski <dominikowski@gmail.com>, 2006.
-# , fuzzy
 # 
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-07-29 18:00-0600\n"
+"POT-Creation-Date: 2006-08-03 13:46-0600\n"
 "PO-Revision-Date: 2006-08-03 14:14+0200\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
-#: mirage.py:179
+#: code/mirage/trunk/mirage.py:182
 msgid "_File"
 msgstr "_Plik"
 
-#: mirage.py:180
+#: code/mirage/trunk/mirage.py:183
 msgid "_Edit"
 msgstr "_Modyfikuj"
 
-#: mirage.py:181
+#: code/mirage/trunk/mirage.py:184
 msgid "_View"
 msgstr "_Widok"
 
-#: mirage.py:182
+#: code/mirage/trunk/mirage.py:185
 msgid "_Go"
 msgstr "_Idź"
 
-#: mirage.py:183
+#: code/mirage/trunk/mirage.py:186
 msgid "_Help"
 msgstr "Pomo_c"
 
-#: mirage.py:184
+#: code/mirage/trunk/mirage.py:187
 msgid "_Open Image..."
 msgstr "_Otwórz obraz..."
 
-#: mirage.py:185
+#: code/mirage/trunk/mirage.py:187
+msgid "Open Image"
+msgstr "Otwórz obraz..."
+
+#: code/mirage/trunk/mirage.py:188
 msgid "Open _Folder..."
 msgstr "Otwórz _folder..."
 
-#: mirage.py:186
+#: code/mirage/trunk/mirage.py:188
+msgid "Open Folder"
+msgstr "Otwórz folder..."
+
+#: code/mirage/trunk/mirage.py:189
 msgid "_Quit"
 msgstr "_Zakończ"
 
-#: mirage.py:187
+#: code/mirage/trunk/mirage.py:189
+msgid "Quit"
+msgstr "Zakończ"
+
+#: code/mirage/trunk/mirage.py:190
 msgid "_Previous Image"
 msgstr "P_oprzedni obraz"
 
-#: mirage.py:188
+#: code/mirage/trunk/mirage.py:190
+msgid "Previous Image"
+msgstr "Poprzedni obraz"
+
+#: code/mirage/trunk/mirage.py:191
 msgid "_Next Image"
 msgstr "_Następny obraz"
 
-#: mirage.py:189
+#: code/mirage/trunk/mirage.py:191
+msgid "Next Image"
+msgstr "Następny obraz"
+
+#: code/mirage/trunk/mirage.py:192
 msgid "_Previous"
 msgstr "P_oprzedni"
 
-#: mirage.py:190
+#: code/mirage/trunk/mirage.py:192
+msgid "Previous"
+msgstr "Poprzedni"
+
+#: code/mirage/trunk/mirage.py:193
 msgid "_Next"
 msgstr "_Następny"
 
-#: mirage.py:191
+#: code/mirage/trunk/mirage.py:193
+msgid "Next"
+msgstr "Następny"
+
+#: code/mirage/trunk/mirage.py:194
 msgid "_Random Image"
 msgstr "_Losowy obraz"
 
-#: mirage.py:192
+#: code/mirage/trunk/mirage.py:194
+msgid "Random Image"
+msgstr "Losowy obraz"
+
+#: code/mirage/trunk/mirage.py:195
 msgid "_First Image"
 msgstr "P_ierwszy obraz"
 
-#: mirage.py:193
+#: code/mirage/trunk/mirage.py:195
+msgid "First Image"
+msgstr "Pierwszy obraz"
+
+#: code/mirage/trunk/mirage.py:196
 msgid "_Last Image"
 msgstr "_Ostatni obraz"
 
-#: mirage.py:194
+#: code/mirage/trunk/mirage.py:196
+msgid "Last Image"
+msgstr "Ostatni obraz"
+
+#: code/mirage/trunk/mirage.py:197
 msgid "Zoom _In"
 msgstr "P_rzybliż"
 
-#: mirage.py:195
+#: code/mirage/trunk/mirage.py:197
+msgid "Zoom In"
+msgstr "Przybliż"
+
+#: code/mirage/trunk/mirage.py:198
 msgid "Zoom _Out"
 msgstr "O_ddal"
 
-#: mirage.py:196
+#: code/mirage/trunk/mirage.py:198
+msgid "Zoom Out"
+msgstr "Oddal"
+
+#: code/mirage/trunk/mirage.py:199
 msgid "Zoom To _Fit"
 msgstr "_Dopasuj do okna"
 
-#: mirage.py:197
+#: code/mirage/trunk/mirage.py:199
+msgid "Fit"
+msgstr ""
+
+#: code/mirage/trunk/mirage.py:200
 msgid "_1:1"
 msgstr "_1:1"
 
-#: mirage.py:198
+#: code/mirage/trunk/mirage.py:200
+msgid "1:1"
+msgstr "1:1"
+
+#: code/mirage/trunk/mirage.py:201
 msgid "Rotate _Left"
 msgstr "Obróć w _lewo"
 
-#: mirage.py:199
+#: code/mirage/trunk/mirage.py:201
+msgid "Rotate Left"
+msgstr "Obróć w_lewo"
+
+#: code/mirage/trunk/mirage.py:202
 msgid "Rotate _Right"
 msgstr "Obróć w p_rawo"
 
-#: mirage.py:200
+#: code/mirage/trunk/mirage.py:202
+msgid "Rotate Right"
+msgstr "Obróć w prawo"
+
+#: code/mirage/trunk/mirage.py:203
 msgid "Flip _Vertically"
 msgstr "Odbij w p_ionie"
 
-#: mirage.py:201
+#: code/mirage/trunk/mirage.py:203
+msgid "Flip Vertically"
+msgstr "Odbij w pionie"
+
+#: code/mirage/trunk/mirage.py:204
 msgid "Flip _Horizontally"
 msgstr "Odbij w p_oziomie"
 
-#: mirage.py:202
+#: code/mirage/trunk/mirage.py:204
+msgid "Flip Horizontally"
+msgstr "Odbij w poziomie"
+
+#: code/mirage/trunk/mirage.py:205
 msgid "_About"
 msgstr "_O programie"
 
-#: mirage.py:203
+#: code/mirage/trunk/mirage.py:205
+msgid "About"
+msgstr "O programie"
+
+#: code/mirage/trunk/mirage.py:206
 msgid "_Preferences"
 msgstr "P_referencje"
 
-#: mirage.py:204
+#: code/mirage/trunk/mirage.py:206
+msgid "Preferences"
+msgstr "Preferencje"
+
+#: code/mirage/trunk/mirage.py:207
 msgid "_Full Screen"
 msgstr "_Pełny ekran"
 
-#: mirage.py:205
+#: code/mirage/trunk/mirage.py:207
+msgid "Full Screen"
+msgstr "Pełny ekran"
+
+#: code/mirage/trunk/mirage.py:208
 msgid "E_xit Full Screen"
 msgstr "_Opuść pełny ekran"
 
-#: mirage.py:206
+#: code/mirage/trunk/mirage.py:208
+msgid "Exit Full Screen"
+msgstr "Opuść pełny ekran"
+
+#: code/mirage/trunk/mirage.py:209
 msgid "_Start Slideshow"
 msgstr "_Rozpocznij pokaz slajdów"
 
-#: mirage.py:207
+#: code/mirage/trunk/mirage.py:209
+msgid "Start Slideshow"
+msgstr "Rozpocznij pokaz slajdów"
+
+#: code/mirage/trunk/mirage.py:210
 msgid "_Stop Slideshow"
 msgstr "_Zatrzymaj pokaz slajdów"
 
-#: mirage.py:208
+#: code/mirage/trunk/mirage.py:210
+msgid "Stop Slideshow"
+msgstr "Zatrzymaj pokaz slajdów"
+
+#: code/mirage/trunk/mirage.py:211
 msgid "Open in _Editor"
 msgstr "Otwórz w _edytorze"
 
-#: mirage.py:211
+#: code/mirage/trunk/mirage.py:211
+msgid "Open in Editor"
+msgstr "Otwórz w edytorze"
+
+#: code/mirage/trunk/mirage.py:212 code/mirage/trunk/mirage.py:1276
+msgid "Delete Image"
+msgstr "Następny obraz"
+
+#: code/mirage/trunk/mirage.py:215
 msgid "_Status Bar"
 msgstr "Pasek _stanu"
 
-#: mirage.py:212
+#: code/mirage/trunk/mirage.py:215
+msgid "Status Bar"
+msgstr "Pasek stanu"
+
+#: code/mirage/trunk/mirage.py:216
 msgid "_Toolbar"
 msgstr "Pasek _narzędzi"
 
-#: mirage.py:415 mirage.py:416 mirage.py:417 mirage.py:418 mirage.py:419
-#: mirage.py:420 mirage.py:1161 mirage.py:1162 mirage.py:1163 mirage.py:1164
-#: mirage.py:1165 mirage.py:1166
+#: code/mirage/trunk/mirage.py:216
+msgid "Toolbar"
+msgstr "Pasek narzędzi"
+
+#: code/mirage/trunk/mirage.py:421 code/mirage/trunk/mirage.py:422
+#: code/mirage/trunk/mirage.py:423 code/mirage/trunk/mirage.py:424
+#: code/mirage/trunk/mirage.py:425 code/mirage/trunk/mirage.py:426
+#: code/mirage/trunk/mirage.py:1175 code/mirage/trunk/mirage.py:1176
+#: code/mirage/trunk/mirage.py:1177 code/mirage/trunk/mirage.py:1178
+#: code/mirage/trunk/mirage.py:1179 code/mirage/trunk/mirage.py:1180
 msgid "seconds"
 msgstr "sekund"
 
-#: mirage.py:637
+#: code/mirage/trunk/mirage.py:644
 msgid "Version: Mirage"
 msgstr "Wersja: Mirage"
 
-#: mirage.py:638
+#: code/mirage/trunk/mirage.py:645
 msgid "Website: http://mirageiv.berlios.de"
 msgstr "Strona WWW: http://mirageiv.berlios.de"
 
-#: mirage.py:643
+#: code/mirage/trunk/mirage.py:650
 msgid "Usage: mirage [OPTION]... FILES|FOLDERS..."
 msgstr "Użytkowanie: mirage [OPCJE]... PLIKI|FOLDERY..."
 
-#: mirage.py:645
+#: code/mirage/trunk/mirage.py:652
 msgid "Options:"
 msgstr "Opcje:"
 
-#: mirage.py:646
+#: code/mirage/trunk/mirage.py:653
 msgid "  -h, --help                   Show this help and exit"
 msgstr "  -h, --help                   Wyświetlenie tej pomocy i zakończenie"
 
-#: mirage.py:647
+#: code/mirage/trunk/mirage.py:654
 msgid "  -v, --version                Show version information and exit"
-msgstr "  -v, --version                Wyświetlenie informacji o wersji i zakończenie"
+msgstr ""
+"  -v, --version                Wyświetlenie informacji o wersji i zakończenie"
 
-#: mirage.py:648
+#: code/mirage/trunk/mirage.py:655
 msgid "  -V, --verbose                Show more detailed information"
 msgstr "  -V, --verbose                Wyświetlenie większej ilości informacji"
 
-#: mirage.py:649
+#: code/mirage/trunk/mirage.py:656
 msgid "  -R, --recursive              Recursively include all images found in"
-msgstr "  -R, --recursive              Dołącz rekursywnie wszystkie obrazy znalezione w"
+msgstr ""
+"  -R, --recursive              Dołącz rekursywnie wszystkie obrazy "
+"znalezione w"
 
-#: mirage.py:650
+#: code/mirage/trunk/mirage.py:657
 msgid "                               subdirectories of FOLDERS"
 msgstr "                               podkatalogach FOLDERÓW"
 
-#: mirage.py:651
+#: code/mirage/trunk/mirage.py:658
 msgid "  -s, --slideshow              Start in slideshow mode"
 msgstr "  -s, --slideshow              Uruchom w trybie pokazu slajdów"
 
-#: mirage.py:652
+#: code/mirage/trunk/mirage.py:659
 msgid "  -f, --fullscreen             Start in fullscreen mode"
 msgstr "  -f, --fullscreen             Uruchom w trybie pełnoekranowym"
 
-#: mirage.py:911
+#: code/mirage/trunk/mirage.py:929
 msgid "Open"
 msgstr "Otwórz"
 
-#: mirage.py:914
+#: code/mirage/trunk/mirage.py:932
 msgid "Images"
 msgstr "Obrazy"
 
-#: mirage.py:918
+#: code/mirage/trunk/mirage.py:936
 msgid "All files"
 msgstr "Wszystkie pliki"
 
-#: mirage.py:927
+#: code/mirage/trunk/mirage.py:945
 msgid "Include images in subdirectories"
 msgstr "Dołączaj obrazy w podkatalogach"
 
-#: mirage.py:1028
+#: code/mirage/trunk/mirage.py:1042
 msgid "Cannot load image."
 msgstr "Nie można wczytać obrazu."
 
-#: mirage.py:1033
+#: code/mirage/trunk/mirage.py:1047
 msgid "Mirage Preferences"
 msgstr "Preferencje Mirage"
 
-#: mirage.py:1040 mirage.py:1208
+#: code/mirage/trunk/mirage.py:1054 code/mirage/trunk/mirage.py:1222
 msgid "Interface"
 msgstr "Interfejs"
 
-#: mirage.py:1045
+#: code/mirage/trunk/mirage.py:1059
 msgid "Background Color"
 msgstr "Kolor tła"
 
-#: mirage.py:1053
+#: code/mirage/trunk/mirage.py:1067
 msgid "Zoom Quality"
 msgstr "Jakość przybliżenia"
 
-#: mirage.py:1064
+#: code/mirage/trunk/mirage.py:1078
 msgid "Fastest"
 msgstr "Najszybsza"
 
-#: mirage.py:1067
+#: code/mirage/trunk/mirage.py:1081
 msgid "Best"
 msgstr "Najlepsza"
 
-#: mirage.py:1080
+#: code/mirage/trunk/mirage.py:1094
 msgid "Open Behavior"
 msgstr "Zachowanie podczas otwarcia"
 
-#: mirage.py:1085
+#: code/mirage/trunk/mirage.py:1099
 msgid "Open new image in"
 msgstr "Tryb przy otwarciu nowego obrazu"
 
-#: mirage.py:1087
+#: code/mirage/trunk/mirage.py:1101
 msgid "Smart Mode"
 msgstr "Tryb inteligentny"
 
-#: mirage.py:1088
+#: code/mirage/trunk/mirage.py:1102
 msgid "Zoom To Fit Mode"
 msgstr "Tryb przybliżenia, aby dopasować"
 
-#: mirage.py:1089
+#: code/mirage/trunk/mirage.py:1103
 msgid "1:1 Mode"
 msgstr "Tryb 1:1"
 
-#: mirage.py:1090
+#: code/mirage/trunk/mirage.py:1104
 msgid "Last Active Mode"
 msgstr "Ostatnio aktywny tryb"
 
-#: mirage.py:1092
+#: code/mirage/trunk/mirage.py:1106
 msgid ""
 "Smart mode uses 1:1 for images smaller than the window and Fit To Window for "
 "images larger."
 msgstr ""
-"Tryb inteligentny wyświetla obrazy 1:1, jeśli są mniejsze od okna, a obrazy większe "
-"dopasowuje do jego rozmiaru."
+"Tryb inteligentny wyświetla obrazy 1:1, jeśli są mniejsze od okna, a obrazy "
+"większe dopasowuje do jego rozmiaru."
 
-#: mirage.py:1096
+#: code/mirage/trunk/mirage.py:1110
 msgid "Load all images in current directory"
 msgstr "Wczytaj wszystkie obrazy w bieżącym katalogu"
 
-#: mirage.py:1098
+#: code/mirage/trunk/mirage.py:1112
 msgid ""
 "If enabled, opening an image in Mirage will automatically load all images "
 "found in that image's directory."
@@ -283,140 +400,157 @@ msgstr ""
 "Określa, czy otworzenie obrazu w Mirage automatycznie wczyta wszystkie "
 "obrazy znalezione w katalogu z tym obrazem."
 
-#: mirage.py:1102
+#: code/mirage/trunk/mirage.py:1116
 msgid "Use last chosen directory"
 msgstr "Użyj ostatnio wybranego katalogu"
 
-#: mirage.py:1103
+#: code/mirage/trunk/mirage.py:1117
 msgid "The default 'Open' directory will be the last directory used."
 msgstr "Domyślnym katalogiem \"Otwórz\" będzie ostatnio otwarty katalog."
 
-#: mirage.py:1104
+#: code/mirage/trunk/mirage.py:1118
 msgid "Use this fixed directory:"
 msgstr "Użyj tego katalogu stałego:"
 
-#: mirage.py:1106
+#: code/mirage/trunk/mirage.py:1120
 msgid "The default 'Open' directory will be this specified directory."
 msgstr "Domyślny katalog \"Otwórz\" będzie tym określonym katalogiem."
 
-#: mirage.py:1127 mirage.py:1207
+#: code/mirage/trunk/mirage.py:1141 code/mirage/trunk/mirage.py:1221
 msgid "Navigation"
 msgstr "Nawigacja"
 
-#: mirage.py:1130
+#: code/mirage/trunk/mirage.py:1144
 msgid "Use mousewheel for imagelist navigation"
 msgstr "Użyj kółka myszy do nawigacji na liście obrazów"
 
-#: mirage.py:1132
+#: code/mirage/trunk/mirage.py:1146
 msgid "If enabled, mousewheel-down (up) will go to the next (previous) image."
-msgstr "Określa, czy ruch w górę (dół) kółkiem myszy zmieni obraz na następny (poprzedni)."
+msgstr ""
+"Określa, czy ruch w górę (dół) kółkiem myszy zmieni obraz na następny "
+"(poprzedni)."
 
-#: mirage.py:1134
+#: code/mirage/trunk/mirage.py:1148
 msgid "Wrap around imagelist:"
 msgstr "Zawijaj listę obrazów:"
 
-#: mirage.py:1136
+#: code/mirage/trunk/mirage.py:1150
 msgid "No"
 msgstr "Nie"
 
-#: mirage.py:1137
+#: code/mirage/trunk/mirage.py:1151
 msgid "Yes"
 msgstr "Tak"
 
-#: mirage.py:1138
+#: code/mirage/trunk/mirage.py:1152
 msgid "Prompt User"
 msgstr "Pytaj użytkownika"
 
-#: mirage.py:1155 mirage.py:1209
+#: code/mirage/trunk/mirage.py:1169 code/mirage/trunk/mirage.py:1223
 msgid "Slideshow"
 msgstr "Pokaz slajdów"
 
-#: mirage.py:1159
+#: code/mirage/trunk/mirage.py:1173
 msgid "Delay between images:"
 msgstr "Opóźnienie przed zmianą obrazu:"
 
-#: mirage.py:1169
+#: code/mirage/trunk/mirage.py:1183
 msgid "Randomize order of images"
 msgstr "Losuj kolejność obrazów"
 
-#: mirage.py:1171
+#: code/mirage/trunk/mirage.py:1185
 msgid "Disable screensaver in slideshow mode"
 msgstr "Wyłącz wygaszacz ekranu w trybie pokazu slajdów"
 
-#: mirage.py:1173
+#: code/mirage/trunk/mirage.py:1187
 msgid "Always start in fullscreen mode"
 msgstr "Zawsze uruchamiaj w trybie pełnoekranowym"
 
-#: mirage.py:1189
+#: code/mirage/trunk/mirage.py:1203
 msgid "External Image Editor"
 msgstr "Zewnętrzny edytor obrazów"
 
-#: mirage.py:1193
+#: code/mirage/trunk/mirage.py:1207
 msgid ""
 "The application specified below is used as the default editor. It is assumed "
 "to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-"
 "remote\")."
 msgstr ""
-"Aplikacja określona poniżej jest używana jako domyślny edytor. Zakładana jest "
-"jej obecność w PATH użytkownika, może być też określana pełną ścieżką "
+"Aplikacja określona poniżej jest używana jako domyślny edytor. Zakładana "
+"jest jej obecność w PATH użytkownika, może być też określana pełną ścieżką "
 "(np. \"/usr/bin/gimp-remote\")."
 
-#: mirage.py:1206
+#: code/mirage/trunk/mirage.py:1220
 msgid "Behavior"
 msgstr "Zachowanie"
 
-#: mirage.py:1210
+#: code/mirage/trunk/mirage.py:1224
 msgid "Editor"
 msgstr "Edytor"
 
-#: mirage.py:1258
+#: code/mirage/trunk/mirage.py:1280
+msgid "Are you sure you wish to permanently delete "
+msgstr ""
+
+#: code/mirage/trunk/mirage.py:1280
+msgid "?"
+msgstr ""
+
+#: code/mirage/trunk/mirage.py:1287
+msgid "Do not ask again"
+msgstr ""
+
+#: code/mirage/trunk/mirage.py:1332
+msgid "Unable to delete "
+msgstr "Uruchomienie niemożliwe"
+
+#: code/mirage/trunk/mirage.py:1340
 msgid "Choose directory"
 msgstr "Wybierz katalog"
 
-#: mirage.py:1302
+#: code/mirage/trunk/mirage.py:1384
 msgid "A fast GTK+ Image Viewer."
 msgstr "Szybka przeglądarka obrazów GTK+."
 
-#: mirage.py:1548
+#: code/mirage/trunk/mirage.py:1631
 msgid ""
 "You are viewing the first image in the list. Wrap around to the last image?"
 msgstr ""
 "Wyświetlasz pierwszy obraz na liście. Czy zawijać do ostatniego obrazu?"
 
-#: mirage.py:1599
+#: code/mirage/trunk/mirage.py:1682
 msgid ""
 "You are viewing the last image in the list. Wrap around to the first image?"
-msgstr ""
-"Wyświetlasz ostatni obraz na liście. Czy zawijać do pierwszego obrazu?"
+msgstr "Wyświetlasz ostatni obraz na liście. Czy zawijać do pierwszego obrazu?"
 
-#: mirage.py:1655
+#: code/mirage/trunk/mirage.py:1738
 msgid ""
 "All images have been viewed. Would you like to cycle through the images "
 "again?"
 msgstr ""
 "Wszystkie obrazy zostały wyświetlone. Czy chcesz rozpocząć pokaz od nowa?"
 
-#: mirage.py:1773 mirage.py:1786 mirage.py:1898
+#: code/mirage/trunk/mirage.py:1856 code/mirage/trunk/mirage.py:1869
+#: code/mirage/trunk/mirage.py:1990
 msgid "Loading:"
 msgstr "Wczytywanie:"
 
-#: mirage.py:1875 mirage.py:1958
+#: code/mirage/trunk/mirage.py:1967 code/mirage/trunk/mirage.py:2059
 msgid "Found:"
 msgstr "Znaleziono:"
 
-#: mirage.py:2049 mirage.py:2051
+#: code/mirage/trunk/mirage.py:2159 code/mirage/trunk/mirage.py:2161
 msgid "of"
 msgstr "z"
 
-#: mirage.py:2049
+#: code/mirage/trunk/mirage.py:2159
 msgid "Slideshow Mode"
 msgstr "Tryb pokazu slajdów"
 
-#: mirage.py:2107
+#: code/mirage/trunk/mirage.py:2220
 msgid "Unable to launch"
 msgstr "Uruchomienie niemożliwe"
 
-#: mirage.py:2107
+#: code/mirage/trunk/mirage.py:2220
 msgid "Please specify a valid application from Edit > Preferences."
 msgstr "Proszę wybrać odpowiednią aplikację z Modyfikuj > Preferencje."
-
