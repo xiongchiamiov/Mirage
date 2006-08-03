@@ -100,6 +100,7 @@ class Base:
 		self.disable_screensaver = False
 		self.slideshow_in_fullscreen = False
 		self.closing_app = False
+		self.delete_without_prompt = False
 
                 # Read any passed options/arguments:
 		try:
@@ -167,6 +168,7 @@ class Base:
                         self.editor = conf.get('prefs', 'editor')
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
 			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
+			self.delete_without_prompt = conf.getboolean('prefs', 'delete_without_prompt')
                 except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
                         pass
                 # slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -206,7 +208,8 @@ class Base:
                         ('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, 'Full Screen', self.leave_fullscreen),
                         ('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', 'Start Slideshow', self.toggle_slideshow),
                         ('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', 'Stop Slideshow', self.toggle_slideshow),
-                        ('Open in Editor', gtk.STOCK_EXECUTE, _('Open in _Editor'), '<Ctrl>E', 'Open in Editor', self.load_editor)
+                        ('Open in Editor', gtk.STOCK_EXECUTE, _('Open in _Editor'), '<Ctrl>E', 'Open in Editor', self.load_editor),
+			('Delete Image', gtk.STOCK_DELETE, _('Delete Image'), 'Delete', 'Delete Image', self.delete_image)
                         )
                 toggle_actions = (
                         ('Status Bar', None, _('_Status Bar'), None, 'Status Bar', self.toggle_status_bar, self.statusbar_show),  
@@ -245,6 +248,8 @@ class Base:
                               <separator name="FM1"/>  
                               <menuitem action="Flip Vertically"/>
                               <menuitem action="Flip Horizontally"/>
+                              <separator name="FM4"/>
+                              <menuitem action="Delete Image"/>
                               <separator name="FM3"/>
                               <menuitem action="Open in Editor"/>
                               <separator name="FM2"/>  
@@ -559,6 +564,7 @@ class Base:
                 self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').set_sensitive(enable)
                 self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
                 self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Delete Image').set_sensitive(enable)
                 self.UIManager.get_widget('/MainToolbar/1:1').set_sensitive(enable)
                 self.UIManager.get_widget('/MainToolbar/Fit').set_sensitive(enable)
                 self.UIManager.get_widget('/Popup/1:1').set_sensitive(enable)
@@ -746,6 +752,7 @@ class Base:
                 conf.set('prefs', 'editor', self.editor)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
+		conf.set('prefs', 'delete_without_prompt', self.delete_without_prompt)
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/'))
                 if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
@@ -1227,7 +1234,7 @@ class Base:
                 editorlabel.set_size_request(self.prefs_dialog.get_allocation().width-85, -1)
                 self.close_button.grab_focus()
                 response = self.prefs_dialog.run()
-                if response == gtk.RESPONSE_CLOSE or response == -4:
+                if response == gtk.RESPONSE_CLOSE or response == gtk.RESPONSE_DELETE_EVENT:
                         self.zoomvalue = float(zoompref.get_value())
                         if int(round(self.zoomvalue, 0)) == 1:
                                 self.zoom_quality = gtk.gdk.INTERP_NEAREST
@@ -1260,6 +1267,74 @@ class Base:
                         self.defaultdir.set_sensitive(True)
                 else:
                         self.defaultdir.set_sensitive(False)
+	
+	def delete_image(self, action):
+		if len(self.image_list) > 0:
+			temp_slideshow_mode = self.slideshow_mode
+			if self.slideshow_mode == True:
+				self.toggle_slideshow(None)
+			delete_dialog = gtk.Dialog(_('Delete Image'), self.window, gtk.DIALOG_MODAL)
+			if self.delete_without_prompt == False:
+				delete_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+				deletebutton = delete_dialog.add_button(gtk.STOCK_DELETE, gtk.RESPONSE_YES)
+				permlabel = gtk.Label(_('Are you sure you wish to permanently delete ') + os.path.split(self.userimage)[1] + _('?'))
+				permlabel.set_line_wrap(True)
+				warningicon = gtk.Image()
+				warningicon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_DIALOG)
+				hbox = gtk.HBox()
+				hbox.pack_start(warningicon, False, False, 10)
+				hbox.pack_start(permlabel, False, False, 10)
+				delete_prompt = gtk.CheckButton(_('Do not ask again'))
+				hbox2 = gtk.HBox()
+				hbox2.pack_start(delete_prompt, False, False, 10)
+				delete_dialog.vbox.pack_start(gtk.Label(), False, False, 0)
+				delete_dialog.vbox.pack_start(hbox, False, False, 0)
+				delete_dialog.vbox.pack_start(gtk.Label(), False, False, 0)
+				delete_dialog.vbox.pack_start(hbox2, False, False, 10)
+				delete_dialog.set_has_separator(False)
+				deletebutton.set_property('has-focus', True)
+				delete_dialog.set_default_response(gtk.RESPONSE_YES)
+				delete_dialog.vbox.show_all()
+				response = delete_dialog.run()
+			else:
+				response = gtk.RESPONSE_YES
+			if response  == gtk.RESPONSE_YES:
+				if self.delete_without_prompt == False:
+					self.delete_without_prompt = delete_prompt.get_active()
+				try:
+					os.remove(self.userimage)
+					templist = self.image_list
+					self.image_list = []
+					for item in templist:
+						if item != self.userimage:
+							self.image_list.append(item)
+					if len(self.image_list) >= 1:
+						if len(self.image_list) == 1:
+							self.curr_img_in_list = 0
+						elif self.curr_img_in_list == len(self.image_list):
+							self.curr_img_in_list -= 1
+						self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+						gtk.main_iteration()
+						try:
+							self.load_new_image()
+						except:
+							self.image_load_failed()
+						self.set_go_navigation_sensitivities()
+						self.change_cursor(None)
+					else:
+						self.imageview.clear()
+						self.set_window_title()
+						self.statusbar.push(self.statusbar.get_context_id(""), "")
+						self.image_loaded = False
+						self.set_slideshow_sensitivities()
+						self.set_image_sensitivities(False)
+				except:
+	                                error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete ') + self.userimage)
+					error_dialog.run()
+					error_dialog.destroy()
+			delete_dialog.destroy()
+			if temp_slideshow_mode == True:
+				self.toggle_slideshow(None)
 
         def defaultdir_clicked(self, button):
                 getdir = gtk.FileChooserDialog(title=_("Choose directory"),action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
@@ -1625,10 +1700,10 @@ class Base:
                         if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
                                 self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
                         gtk.main_iteration()
-                        #try:
-			self.load_new_image()
-                        #except:
-			#	self.image_load_failed()
+                        try:
+				self.load_new_image()
+                        except:
+				self.image_load_failed()
 			if self.fullscreen_mode == False:
                                 self.change_cursor(None)
                         self.set_go_navigation_sensitivities()
