@@ -1839,7 +1839,7 @@ class Base:
 		first_image_loaded = False
                 self.randomlist = []
                 folderlist = []
-                self.image_list = []
+		self.image_list = []
 		first_image = ""
 		self.curr_img_in_list = 0
 		go_buttons_enabled = False
@@ -1855,18 +1855,25 @@ class Base:
 			if inputlist[itemnum][len(inputlist[itemnum])-1] == "/":
                                 inputlist[itemnum] = inputlist[itemnum][:(len(inputlist[itemnum])-1)]
                         inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
-                # If first image is dir, expand:
+		# If open all images in dir...
 		if self.open_all_images == True:
 			for item in inputlist:
 	                        if os.path.isfile(item):
 					itempath = os.path.dirname(os.path.abspath(item))
-				temp = self.recursive
-				self.recursive = False
-				self.stop_now = False
-				inputlist = self.expand_directory(itempath, False)
-				self.recursive = temp
-                                # Remove any duplicates in inputlist...
-				inputlist = list(set(inputlist))
+					temp = self.recursive
+					self.recursive = False
+					self.stop_now = False
+					self.expand_directory(itempath, False)
+					self.recursive = temp
+			for item in self.image_list:
+				# Make sure item is not already in list:
+				duplicate_image = False
+				for item2 in inputlist:
+					if item == item2:
+						duplicate_image = True
+				if duplicate_image == False:
+					inputlist.append(item)
+		self.image_list = []
 		for item in inputlist:
 			if item[0] != '.' and self.closing_app == False:
 				if os.path.isfile(item):
@@ -1956,7 +1963,9 @@ class Base:
 			self.image_list.sort(locale.strcoll)
 			for itemnum in range(len(self.image_list)):
 				if first_image == self.image_list[itemnum]:
-					self.curr_img_in_list = itemnum
+					temp = self.image_list[0]
+					self.image_list[0] = self.image_list[itemnum]
+					self.image_list[itemnum] = temp
 
         def expand_directory(self, item, stop_when_image_found):
                 if self.stop_now == False and self.closing_app == False:
