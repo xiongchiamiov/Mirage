@@ -3,7 +3,7 @@
 from distutils.core import setup, Extension
 
 setup(name='Mirage',
-        version='0.7.2',
+        version='0.7.3',
         description='A fast GTK+ image viewer',
         author='Scott Horowitz',
         author_email='stonecrest@gmail.com',

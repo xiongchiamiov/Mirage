@@ -1,3 +1,6 @@
+v0.7.3 - August 2, 2006
+	+ Fix crash when loading images in certain circumstances (Bjoern Martensen)
+
 v0.7.2 - August 1, 2006
 	+ Preference to automatically start the slideshow in fullscreen mode
 	+ Background image search process to load image faster (Bjoern Martensen)
