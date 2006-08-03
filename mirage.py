@@ -1863,7 +1863,7 @@ class Base:
 					temp = self.recursive
 					self.recursive = False
 					self.stop_now = False
-					self.expand_directory(itempath, False)
+					self.expand_directory(itempath, False, go_buttons_enabled)
 					self.recursive = temp
 			for item in self.image_list:
 				# Make sure item is not already in list:
@@ -1899,7 +1899,7 @@ class Base:
 					if first_image_found == False:
 						# See if we can find an image in this directory:
 						self.stop_now = False
-						self.expand_directory(item, True)
+						self.expand_directory(item, True, go_buttons_enabled)
 						itemnum = 0
 						while itemnum < len(self.image_list) and first_image_found == False:
 							if os.path.isfile(self.image_list[itemnum]):
@@ -1951,10 +1951,7 @@ class Base:
 			for item in folderlist:
 				if item[0] != '.' and not self.closing_app:
 					self.stop_now = False
-					self.expand_directory(item, False)
-					if go_buttons_enabled == False:
-						if len(self.image_list) > 1:
-							self.set_go_navigation_sensitivities()
+					self.expand_directory(item, False, go_buttons_enabled)
 							
 	def do_image_list_stuff(self, first_image):
 		if len(self.image_list) > 0:
@@ -1967,7 +1964,7 @@ class Base:
 					self.image_list[0] = self.image_list[itemnum]
 					self.image_list[itemnum] = temp
 
-        def expand_directory(self, item, stop_when_image_found):
+        def expand_directory(self, item, stop_when_image_found, go_buttons_enabled):
                 if self.stop_now == False and self.closing_app == False:
                         folderlist = []
 			filelist = []
@@ -1985,6 +1982,10 @@ class Base:
 							if self.verbose == True:
 								self.images_found += 1
 	                                                        print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
+							if go_buttons_enabled == False:
+								if len(self.image_list) > 1:
+									self.set_go_navigation_sensitivities()
+									go_buttons_enabled = True
 					elif os.path.isdir(item_fullpath2) and self.recursive == True:
 	                                        folderlist.append(item_fullpath2)
                         # Sort the filelist and folderlist alphabetically, and recurse into folderlist:
@@ -1995,7 +1996,11 @@ class Base:
                         if len(folderlist) > 0:
                                 folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
-					self.expand_directory(item2, stop_when_image_found)
+					self.expand_directory(item2, stop_when_image_found, go_buttons_enabled)
+					if go_buttons_enabled == False:
+						if len(self.image_list) > 1:
+							self.set_go_navigation_sensitivities()
+							go_buttons_enabled = True
 		self.set_window_title()
 		if not self.closing_app:
 			while gtk.events_pending():
