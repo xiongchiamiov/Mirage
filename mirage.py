@@ -908,6 +908,7 @@ class Base:
                 self.open_file_or_folder(action, True)
 
         def open_folder(self, action):
+		print "hi"
                 self.open_file_or_folder(action, False)
 
         def update_preview(self, file_chooser, preview):
@@ -960,6 +961,8 @@ class Base:
                                 self.recursive = True
                         filenames = dialog.get_filenames()
                         dialog.destroy()
+			while gtk.events_pending():
+				gtk.main_iteration()
                         self.expand_filelist_and_load_image(filenames)
                         self.set_go_navigation_sensitivities()
                         self.recursive = False
