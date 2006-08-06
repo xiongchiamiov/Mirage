@@ -113,7 +113,7 @@ class Base:
 		self.slideshow_in_fullscreen = False
 		self.closing_app = False
 		self.delete_without_prompt = False
-		self.preloading = False
+		self.preloading = True
 		self.loading_image = False
 
                 # Read any passed options/arguments:
