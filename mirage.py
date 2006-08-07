@@ -1961,6 +1961,10 @@ class Base:
 				self.currimg_zoomratio = self.preloadimg_zoomratio
 				self.currimg_is_animation = self.preloadimg_is_animation
 				self.put_zoom_image_to_window(True)
+				if self.currimg_is_animation == False:
+					self.set_image_sensitivities(True)
+				else:
+					self.set_image_sensitivities(False)
 			else:
 				self.currimg_pixbuf = None
 				self.first_image_load = True
@@ -2045,14 +2049,15 @@ class Base:
 		if not self.closing_app:
 			while gtk.events_pending():
 	                        gtk.main_iteration()
+		first_image = ""
                 first_image_found = False
 		first_image_loaded = False
+		second_image = ""
 		second_image_found = False
 		second_image_preloaded = False
                 self.randomlist = []
                 folderlist = []
 		self.image_list = []
-		first_image = ""
 		self.curr_img_in_list = 0
 		go_buttons_enabled = False
 		self.set_go_sensitivities(False)
@@ -2093,6 +2098,7 @@ class Base:
 						if second_image_found == False:
 							if first_image_found == True:
 								second_image_found = True
+								second_image = item
 						if first_image_found == False:
 							first_image_found = True
 							first_image = item
@@ -2121,6 +2127,7 @@ class Base:
 								if second_image_found == False:
 									if first_image_found == True:
 										second_image_found = True
+										second_image = self.image_list[itemnum]
 								if first_image_found == False:
 									first_image_found = True
 									first_image = self.image_list[itemnum]
@@ -2159,9 +2166,9 @@ class Base:
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if first_image_came_from_dir == True:
 				self.add_folderlist_images(folderlist, go_buttons_enabled)
-				self.do_image_list_stuff(first_image)
+				self.do_image_list_stuff(first_image, second_image)
 			else:
-				self.do_image_list_stuff(first_image)
+				self.do_image_list_stuff(first_image, second_image)
 				self.add_folderlist_images(folderlist, go_buttons_enabled)
 			self.set_window_title()
 			if not self.closing_app:
@@ -2179,7 +2186,7 @@ class Base:
 					self.stop_now = False
 					self.expand_directory(item, False, go_buttons_enabled)
 							
-	def do_image_list_stuff(self, first_image):
+	def do_image_list_stuff(self, first_image, second_image):
 		if len(self.image_list) > 0:
 			self.set_go_navigation_sensitivities()
                         self.image_list = list(set(self.image_list))
@@ -2188,6 +2195,10 @@ class Base:
 				if first_image == self.image_list[itemnum]:
 					temp = self.image_list[0]
 					self.image_list[0] = self.image_list[itemnum]
+					self.image_list[itemnum] = temp
+				elif second_image == self.image_list[itemnum]:
+					temp = self.image_list[1]
+					self.image_list[1] = self.image_list[itemnum]
 					self.image_list[itemnum] = temp
 
         def expand_directory(self, item, stop_when_image_found, go_buttons_enabled):
