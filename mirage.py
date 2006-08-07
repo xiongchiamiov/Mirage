@@ -211,8 +211,8 @@ class Base:
                         ('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', _('Last Image'), self.last_img_in_list),  
                         ('In', gtk.STOCK_ZOOM_IN, _('Zoom _In'), '<Ctrl>Up', _('Zoom In'), self.zoom_in),  
                         ('Out', gtk.STOCK_ZOOM_OUT, _('Zoom _Out'), '<Ctrl>Down', _('Zoom Out'), self.zoom_out),  
-                        ('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', _('Fit'), self.zoom_to_fit_window(None, False)),  
-                        ('1:1', gtk.STOCK_ZOOM_100, _('_1:1'), '<Ctrl>1', _('1:1'), self.zoom_1_to_1(None, False)),  
+                        ('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', _('Fit'), self.zoom_to_fit_window_action),  
+                        ('1:1', gtk.STOCK_ZOOM_100, _('_1:1'), '<Ctrl>1', _('1:1'), self.zoom_1_to_1_action),  
                         ('Rotate Left', None, _('Rotate _Left'), '<Ctrl>Left', _('Rotate Left'), self.rotate_left),  
                         ('Rotate Right', None, _('Rotate _Right'), '<Ctrl>Right', _('Rotate Right'), self.rotate_right),  
                         ('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', _('Flip Vertically'), self.image_flip_vert),  
@@ -1521,6 +1521,9 @@ class Base:
                         self.last_image_action_was_fit = False
                         self.put_zoom_image_to_window(False)
                         self.update_statusbar()
+			
+	def zoom_to_fit_window_action(self, action):
+		self.zoom_to_fit_window(action, False)
 
         def zoom_to_fit_window(self, action, is_preloadimg):
 		if is_preloadimg == True:
@@ -1558,7 +1561,7 @@ class Base:
 				self.set_zoom_sensitivities()
 				self.put_zoom_image_to_window(False)
 				self.update_statusbar()
-
+				
         def zoom_to_fit_or_1_to_1(self, action, is_preloadimg):
 		if is_preloadimg == True:
 			if self.preloading == True and self.preloadimg_pixbuf_original != None:
@@ -1602,6 +1605,9 @@ class Base:
 	                                self.put_zoom_image_to_window(False)
 					self.update_statusbar()
 
+	def zoom_1_to_1_action(self, action):
+		self.zoom_1_to_1(action, False)
+					
         def zoom_1_to_1(self, action, is_preloadimg):
 		if is_preloadimg == True:
 			if self.preloading == True:
