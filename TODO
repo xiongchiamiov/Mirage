@@ -1,7 +1,7 @@
 0.8
 + Try to make zooming smoother (argh..)
 + Documentation
-+ Resize, rotate, and save? (luzi)
++ Resize, rotate, crop, and save (luzi)
 + Side/bottom panel for thumbnails of all images in list (use .thumbnails?)
 + Fading image transition..? (William Rea)
 + Cannot 'open folder' while still searching for images

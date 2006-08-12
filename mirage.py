@@ -45,12 +45,12 @@ except:
 class Base:
 
 	def __init__(self):
-	
+
 		try:
 			gettext.install('mirage', '/usr/share/locale', unicode=1)
 		except:
 			gettext.install('mirage', '/usr/local/share/locale', unicode=1)
-	
+
 		# Constants
 		self.open_mode_smart = 0
 		self.open_mode_fit = 1
@@ -193,32 +193,32 @@ class Base:
 		self.curr_slideshow_random = self.slideshow_random
 
 		# Define the main menubar and toolbar:
-		actions = (  
-			('FileMenu', None, _('_File')),  
+		actions = (
+			('FileMenu', None, _('_File')),
 			('EditMenu', None, _('_Edit')),
-			('ViewMenu', None, _('_View')),  
-			('GoMenu', None, _('_Go')),  
-			('HelpMenu', None, _('_Help')),  
-			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<control>O', _('Open Image'), self.open_file),  
-			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<control>F', _('Open Folder'), self.open_folder),  
-			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', _('Quit'), self.exit_app),  
-			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.prev_img_in_list),  
-			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.next_img_in_list),  
-			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.prev_img_in_list),  
-			('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', _('Next'), self.next_img_in_list),  
-			('Random Image', None, _('_Random Image'), 'R', _('Random Image'), self.random_img_in_list),  
-			('First Image', gtk.STOCK_GOTO_FIRST, _('_First Image'), 'Home', _('First Image'), self.first_img_in_list),  
-			('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', _('Last Image'), self.last_img_in_list),  
-			('In', gtk.STOCK_ZOOM_IN, _('Zoom _In'), '<Ctrl>Up', _('Zoom In'), self.zoom_in),  
-			('Out', gtk.STOCK_ZOOM_OUT, _('Zoom _Out'), '<Ctrl>Down', _('Zoom Out'), self.zoom_out),  
-			('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', _('Fit'), self.zoom_to_fit_window_action),  
-			('1:1', gtk.STOCK_ZOOM_100, _('_1:1'), '<Ctrl>1', _('1:1'), self.zoom_1_to_1_action),  
-			('Rotate Left', None, _('Rotate _Left'), '<Ctrl>Left', _('Rotate Left'), self.rotate_left),  
-			('Rotate Right', None, _('Rotate _Right'), '<Ctrl>Right', _('Rotate Right'), self.rotate_right),  
-			('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', _('Flip Vertically'), self.image_flip_vert),  
-			('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', _('Flip Horizontally'), self.image_flip_horiz),  
-			('About', gtk.STOCK_ABOUT, _('_About'), 'F1', _('About'), self.show_about),  
-			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences'), None, _('Preferences'), self.show_prefs),  
+			('ViewMenu', None, _('_View')),
+			('GoMenu', None, _('_Go')),
+			('HelpMenu', None, _('_Help')),
+			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<control>O', _('Open Image'), self.open_file),
+			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<control>F', _('Open Folder'), self.open_folder),
+			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', _('Quit'), self.exit_app),
+			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.prev_img_in_list),
+			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.next_img_in_list),
+			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.prev_img_in_list),
+			('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', _('Next'), self.next_img_in_list),
+			('Random Image', None, _('_Random Image'), 'R', _('Random Image'), self.random_img_in_list),
+			('First Image', gtk.STOCK_GOTO_FIRST, _('_First Image'), 'Home', _('First Image'), self.first_img_in_list),
+			('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', _('Last Image'), self.last_img_in_list),
+			('In', gtk.STOCK_ZOOM_IN, _('Zoom _In'), '<Ctrl>Up', _('Zoom In'), self.zoom_in),
+			('Out', gtk.STOCK_ZOOM_OUT, _('Zoom _Out'), '<Ctrl>Down', _('Zoom Out'), self.zoom_out),
+			('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', _('Fit'), self.zoom_to_fit_window_action),
+			('1:1', gtk.STOCK_ZOOM_100, _('_1:1'), '<Ctrl>1', _('1:1'), self.zoom_1_to_1_action),
+			('Rotate Left', None, _('Rotate _Left'), '<Ctrl>Left', _('Rotate Left'), self.rotate_left),
+			('Rotate Right', None, _('Rotate _Right'), '<Ctrl>Right', _('Rotate Right'), self.rotate_right),
+			('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', _('Flip Vertically'), self.image_flip_vert),
+			('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', _('Flip Horizontally'), self.image_flip_horiz),
+			('About', gtk.STOCK_ABOUT, _('_About'), 'F1', _('About'), self.show_about),
+			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences'), None, _('Preferences'), self.show_prefs),
 			('Full Screen', gtk.STOCK_FULLSCREEN, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
 			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
@@ -227,11 +227,11 @@ class Base:
 			('Delete Image', gtk.STOCK_DELETE, _('Delete Image'), 'Delete', _('Delete Image'), self.delete_image)
 			)
 		toggle_actions = (
-			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),  
-			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),  
+			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
+			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),
 				)
-		uiDescription = """  
-			<ui>  
+		uiDescription = """
+			<ui>
 			  <popup name="Popup">
 			    <menuitem action="Next Image"/>
 			    <menuitem action="Previous Image"/>
@@ -240,45 +240,45 @@ class Base:
 			    <menuitem action="In"/>
 			    <menuitem action="1:1"/>
 			    <menuitem action="Fit"/>
-			    <separator name="FM2"/>  
+			    <separator name="FM2"/>
 			    <menuitem action="Rotate Left"/>
 			    <menuitem action="Rotate Right"/>
 			    <separator name="FM4"/>
 			    <menuitem action="Start Slideshow"/>
-			    <menuitem action="Stop Slideshow"/> 
-			    <separator name="FM3"/>  
+			    <menuitem action="Stop Slideshow"/>
+			    <separator name="FM3"/>
 			    <menuitem action="Exit Full Screen"/>
 			    <menuitem action="Full Screen"/>
 			  </popup>
 			  <menubar name="MainMenu">
-			    <menu action="FileMenu">  
-			      <menuitem action="Open Image"/>  
-			      <menuitem action="Open Folder"/>  
-			      <separator name="FM1"/>  
-			      <menuitem action="Quit"/>  
+			    <menu action="FileMenu">
+			      <menuitem action="Open Image"/>
+			      <menuitem action="Open Folder"/>
+			      <separator name="FM1"/>
+			      <menuitem action="Quit"/>
 			    </menu>
 			    <menu action="EditMenu">
 			      <menuitem action="Rotate Left"/>
 			      <menuitem action="Rotate Right"/>
-			      <separator name="FM1"/>  
+			      <separator name="FM1"/>
 			      <menuitem action="Flip Vertically"/>
 			      <menuitem action="Flip Horizontally"/>
 			      <separator name="FM4"/>
 			      <menuitem action="Delete Image"/>
 			      <separator name="FM3"/>
 			      <menuitem action="Open in Editor"/>
-			      <separator name="FM2"/>  
-			      <menuitem action="Preferences"/>  
+			      <separator name="FM2"/>
+			      <menuitem action="Preferences"/>
 			    </menu>
 			    <menu action="ViewMenu">
 			      <menuitem action="Out"/>
 			      <menuitem action="In"/>
 			      <menuitem action="1:1"/>
 			      <menuitem action="Fit"/>
-			      <separator name="FM2"/> 
+			      <separator name="FM2"/>
 			      <menuitem action="Toolbar"/>
 			      <menuitem action="Status Bar"/>
-			      <separator name="FM1"/>  
+			      <separator name="FM1"/>
 			      <menuitem action="Full Screen"/>
 			   </menu>
 			    <menu action="GoMenu">
@@ -292,22 +292,22 @@ class Base:
 			      <menuitem action="Start Slideshow"/>
 			      <menuitem action="Stop Slideshow"/>
 			    </menu>
-			    <menu action="HelpMenu">  
-			      <menuitem action="About"/>  
-			    </menu>  
-			  </menubar>  
-			  <toolbar name="MainToolbar">  
-			    <toolitem action="Open Image"/>  
-			    <separator name="FM1"/> 
+			    <menu action="HelpMenu">
+			      <menuitem action="About"/>
+			    </menu>
+			  </menubar>
+			  <toolbar name="MainToolbar">
+			    <toolitem action="Open Image"/>
+			    <separator name="FM1"/>
 			    <toolitem action="Out"/>
 			    <toolitem action="In"/>
 			    <toolitem action="1:1"/>
 			    <toolitem action="Fit"/>
-			    <separator name="FM2"/> 
+			    <separator name="FM2"/>
 			    <toolitem action="Previous2"/>
 			    <toolitem action="Next2"/>
 			  </toolbar>
-			</ui>  
+			</ui>
 			"""
 
 
@@ -477,7 +477,7 @@ class Base:
 			elif style == "text":
 				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
 			client.add_dir("/desktop/gnome/interface", gconf.CLIENT_PRELOAD_NONE)
-			client.notify_add("/desktop/gnome/interface/toolbar_style", self.gconf_key_changed) 
+			client.notify_add("/desktop/gnome/interface/toolbar_style", self.gconf_key_changed)
 		except:
 			pass
 
@@ -517,7 +517,7 @@ class Base:
 			for o, a in opts:
 				if o in ("-s", "--slideshow"):
 					self.toggle_slideshow(None)
-			
+
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
 		if entry.value.type == gconf.VALUE_STRING:
 			style = entry.value.to_string()
@@ -531,7 +531,7 @@ class Base:
 				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
 			if self.image_loaded == True and self.last_image_action_was_fit == True:
 				self.zoom_to_fit_window(None, False)
-			
+
 	def topwindow_keypress(self, widget, event):
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
 			if event.keyval == 65361:    # Left arrow
@@ -558,7 +558,7 @@ class Base:
 		elif event.state == gtk.gdk.SHIFT_MASK or event.state == gtk.gdk.SHIFT_MASK | gtk.gdk.MOD2_MASK:
 			if event.keyval == 43 or event.keyval == 61:     # + key
 				self.zoom_in(None)
-				
+
 	def set_go_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Next Image').set_sensitive(enable)
@@ -587,17 +587,17 @@ class Base:
 		self.UIManager.get_widget('/Popup/Rotate Left').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').set_sensitive(enable)
-		
+
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
-		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)		
+		self.UIManager.get_widget('/MainToolbar/In').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/In').set_sensitive(enable)
 
 	def set_zoom_out_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/Out').set_sensitive(enable)
-		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)		
+		self.UIManager.get_widget('/MainToolbar/Out').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Out').set_sensitive(enable)
-		
+
 	def set_next_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Next Image').set_sensitive(enable)
@@ -607,13 +607,13 @@ class Base:
 		self.UIManager.get_widget('/MainToolbar/Previous2').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Previous Image').set_sensitive(enable)
-		
+
 	def set_first_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/First Image').set_sensitive(enable)
-		
+
 	def set_last_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Last Image').set_sensitive(enable)
-		
+
 	def set_slideshow_sensitivities(self):
 		if len(self.image_list) <=1:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').show()
@@ -682,7 +682,7 @@ class Base:
 			else:
 				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.next_img_in_list, "ss")
 		self.window.set_focus(self.layout)
-		
+
 	def random_changed(self, action):
 		self.curr_slideshow_random = self.ss_randomize.get_active()
 
@@ -695,7 +695,7 @@ class Base:
 		path = urllib.url2pathname(uri)
 		paths = path.rsplit('\n')
 		for i, path in enumerate(paths):
-			paths[i] = path.rstrip('\r')		
+			paths[i] = path.rstrip('\r')
 		self.expand_filelist_and_load_image(paths)
 
 	def put_error_image_to_window(self):
@@ -890,7 +890,7 @@ class Base:
 		gc.collect()
 		self.window.window.thaw_updates()
 		return
-		
+
 	def preload_next_image(self):
 		# Always start with the original image to preserve quality!
 		# Calculate image size:
@@ -908,7 +908,7 @@ class Base:
 		else:
 			self.preloadimg_pixbuf = self.preloadimg_pixbuf_original
 		gc.collect()
-		
+
 	def show_scrollbars_if_needed(self):
 		if self.currimg_width > self.available_image_width():
 			self.hscroll.show()
@@ -927,17 +927,17 @@ class Base:
 		if y_shift < 0:
 			y_shift = 0
 		self.layout.move(self.imageview, x_shift, y_shift)
-		
+
 	def available_image_width(self):
 		width = self.window.get_size()[0]
 		return width
-	
+
 	def available_image_height(self):
 		height = self.window.get_size()[1]
 		if self.fullscreen_mode == False:
 			height -= self.menubar.size_request()[1]
 			if self.toolbar_show == True:
-				height -= self.toolbar.size_request()[1] 
+				height -= self.toolbar.size_request()[1]
 			if self.statusbar_show == True:
 				height -= self.statusbar.size_request()[1]
 		return height
@@ -1033,7 +1033,7 @@ class Base:
 			self.set_slideshow_sensitivities()
 		else:
 			self.leave_fullscreen(action)
-		
+
 	def leave_fullscreen(self, action):
 		if self.fullscreen_mode == True:
 			self.slideshow_controls_visible = False
@@ -1301,13 +1301,13 @@ class Base:
 			self.disable_screensaver = disable_screensaver.get_active()
 			self.slideshow_in_fullscreen = ss_in_fs.get_active()
 			self.prefs_dialog.destroy()
-			
+
 	def use_fixed_dir_clicked(self, button):
 		if button.get_active() == True:
 			self.defaultdir.set_sensitive(True)
 		else:
 			self.defaultdir.set_sensitive(False)
-	
+
 	def delete_image(self, action):
 		if len(self.image_list) > 0:
 			temp_slideshow_mode = self.slideshow_mode
@@ -1405,6 +1405,14 @@ class Base:
 
 	def show_about(self, action):
 		# Help > About
+		self.about_dialog = gtk.AboutDialog()
+		self.about_dialog.set_name('Mirage')
+		self.about_dialog.set_version(__version__)
+		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
+		self.about_dialog.set_license(__license__)
+		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
+		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
+		self.about_dialog.set_website('http://mirageiv.berlios.de')
 		iconname = 'mirage_large.png'
 		if os.path.exists(iconname):
 			icon_path = iconname
@@ -1416,17 +1424,9 @@ class Base:
 			icon_path = '/usr/share/pixmaps/' + iconname
 		try:
 			icon_pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
+			self.about_dialog.set_logo(icon_pixbuf)
 		except:
 			pass
-		self.about_dialog = gtk.AboutDialog()
-		self.about_dialog.set_name('Mirage')
-		self.about_dialog.set_version(__version__)
-		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
-		self.about_dialog.set_license(__license__)
-		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
-		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
-		self.about_dialog.set_website('http://mirageiv.berlios.de')
-		self.about_dialog.set_logo(icon_pixbuf)
 		self.about_dialog.connect('response', self.close_about)
 		self.about_dialog.connect('delete_event', self.close_about)
 		self.about_dialog.show_all()
@@ -1521,7 +1521,7 @@ class Base:
 			self.last_image_action_was_fit = False
 			self.put_zoom_image_to_window(False)
 			self.update_statusbar()
-			
+
 	def zoom_to_fit_window_action(self, action):
 		self.zoom_to_fit_window(action, False)
 
@@ -1561,7 +1561,7 @@ class Base:
 				self.set_zoom_sensitivities()
 				self.put_zoom_image_to_window(False)
 				self.update_statusbar()
-				
+
 	def zoom_to_fit_or_1_to_1(self, action, is_preloadimg):
 		if is_preloadimg == True:
 			if self.preloading == True and self.preloadimg_pixbuf_original != None:
@@ -1607,7 +1607,7 @@ class Base:
 
 	def zoom_1_to_1_action(self, action):
 		self.zoom_1_to_1(action, False)
-					
+
 	def zoom_1_to_1(self, action, is_preloadimg):
 		if is_preloadimg == True:
 			if self.preloading == True:
@@ -1700,6 +1700,7 @@ class Base:
 				self.curr_img_in_list -= 1
 			else:
 				if self.listwrap_mode == 0:
+					self.loading_image = False
 					return
 				elif self.listwrap_mode == 1:
 					self.curr_img_in_list = len(self.image_list) - 1
@@ -1723,6 +1724,7 @@ class Base:
 							self.hide_cursor
 						if self.slideshow_mode == True:
 							self.toggle_slideshow(None)
+						self.loading_image = False
 						return
 			if self.fullscreen_mode == False:
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1753,6 +1755,7 @@ class Base:
 				if self.listwrap_mode == 0:
 					if self.slideshow_mode == True:
 						self.toggle_slideshow(None)
+					self.loading_image = False
 					return
 				elif self.listwrap_mode == 1:
 					self.curr_img_in_list = 0
@@ -1776,6 +1779,7 @@ class Base:
 							self.hide_cursor
 						if self.slideshow_mode == True:
 							self.toggle_slideshow(None)
+						self.loading_image = False
 						return
 			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1813,6 +1817,7 @@ class Base:
 					else:
 						if self.listwrap_mode == 0:
 							self.toggle_slideshow(None)
+							self.loading_image = False
 							return
 						elif self.listwrap_mode == 2:
 							if self.fullscreen_mode == True:
@@ -1834,6 +1839,7 @@ class Base:
 									self.hide_cursor
 								if self.slideshow_mode == True:
 									self.toggle_slideshow(None)
+								self.loading_image = False
 								return
 			# Find random image that hasn't already been chosen:
 			j = random.randint(0, len(self.image_list)-1)
@@ -1936,7 +1942,7 @@ class Base:
 		for i in range(len(self.image_list)):
 			self.randomlist.append(False)
 		self.randomlist[self.curr_img_in_list] = True
-		
+
 	def image_load_failed(self, reset_cursor):
 		self.currimg_name = str(self.image_list[self.curr_img_in_list])
 		if self.verbose == True and self.currimg_name != "":
@@ -1947,7 +1953,7 @@ class Base:
 		if reset_cursor == True:
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
-			
+
 	def load_new_image(self, use_preloadimg, generate_preloadimg_only, reset_cursor, use_existing_preloadimg):
 		if generate_preloadimg_only == False:
 			# If there is a preloaded image available, use that instead of generating
@@ -2033,13 +2039,13 @@ class Base:
 				elif self.last_mode == self.open_mode_1to1:
 					self.zoom_1_to_1(None, True)
 			self.preload_next_image()
-		
+
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
 			if i.get_window_type() != gtk.gdk.WINDOW_TEMP and i.get_window_type() != gtk.gdk.WINDOW_CHILD:
 				i.set_cursor(type)
 		self.layout.window.set_cursor(type)
-		
+
 	def expand_filelist_and_load_image(self, inputlist):
 		self.images_found = 0
 		self.stop_now = True # Make sure that any previous search process is stopped
@@ -2080,7 +2086,7 @@ class Base:
 					temp = self.recursive
 					self.recursive = False
 					self.stop_now = False
-					self.expand_directory(itempath, False, go_buttons_enabled)
+					self.expand_directory(itempath, False, go_buttons_enabled, False)
 					self.recursive = temp
 			for item in self.image_list:
 				# Make sure item is not already in list:
@@ -2120,7 +2126,7 @@ class Base:
 					if second_image_found == False:
 						# See if we can find an image in this directory:
 						self.stop_now = False
-						self.expand_directory(item, True, go_buttons_enabled)
+						self.expand_directory(item, True, go_buttons_enabled, False)
 						itemnum = 0
 						while itemnum < len(self.image_list) and second_image_found == False:
 							if os.path.isfile(self.image_list[itemnum]):
@@ -2176,7 +2182,7 @@ class Base:
 					gtk.main_iteration(True)
 		if not self.closing_app:
 			self.change_cursor(None)
-			
+
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
 			folderlist.sort(locale.strcoll)
@@ -2184,8 +2190,8 @@ class Base:
 			for item in folderlist:
 				if item[0] != '.' and not self.closing_app:
 					self.stop_now = False
-					self.expand_directory(item, False, go_buttons_enabled)
-							
+					self.expand_directory(item, False, go_buttons_enabled, True)
+
 	def do_image_list_stuff(self, first_image, second_image):
 		if len(self.image_list) > 0:
 			self.set_go_navigation_sensitivities()
@@ -2201,7 +2207,7 @@ class Base:
 					self.image_list[1] = self.image_list[itemnum]
 					self.image_list[itemnum] = temp
 
-	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled):
+	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled, update_title):
 		if self.stop_now == False and self.closing_app == False:
 			folderlist = []
 			filelist = []
@@ -2233,11 +2239,12 @@ class Base:
 			if len(folderlist) > 0:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
-					self.expand_directory(item2, stop_when_image_found, go_buttons_enabled)
-		self.set_window_title()
-		if not self.closing_app:
-			while gtk.events_pending():
-				gtk.main_iteration(True)
+					self.expand_directory(item2, stop_when_image_found, go_buttons_enabled, update_title)
+		if update_title == True:
+			self.set_window_title()
+			if not self.closing_app:
+				while gtk.events_pending():
+					gtk.main_iteration(True)
 
 	def valid_image(self, file):
 		test = gtk.gdk.pixbuf_get_file_info(file)
@@ -2265,7 +2272,7 @@ class Base:
 		if d:
 			new_pix = gtk.gdk.pixbuf_new_from_data(d, old_pix.get_colorspace(), old_pix.get_has_alpha(), old_pix.get_bits_per_sample(), w, h, rws)
 			return new_pix
-		return old_pix	
+		return old_pix
 
 	def image_rotate(self, old_pix, full_angle):
 		width = old_pix.get_width()
@@ -2283,7 +2290,7 @@ class Base:
 				new_pix = gtk.gdk.pixbuf_new_from_data(d, old_pix.get_colorspace(), old_pix.get_has_alpha(), old_pix.get_bits_per_sample(), w, h, rws)
 				return new_pix
 		return old_pix
-		
+
 	def toggle_slideshow(self, action):
 		if len(self.image_list) > 1:
 			if self.slideshow_mode == False:
@@ -2308,7 +2315,7 @@ class Base:
 				self.set_zoom_sensitivities()
 				self.ss_stop.hide()
 				self.ss_start.show()
-			
+
 	def set_window_title(self):
 		if len(self.image_list) == 0:
 			self.window.set_title("Mirage")
@@ -2317,11 +2324,11 @@ class Base:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name) + ' - ' + _('Slideshow Mode'))
 			else:
 				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name))
-				
+
 	def slideshow_controls_show(self):
 		if self.slideshow_controls_visible == False and self.controls_moving == False:
 			self.slideshow_controls_visible = True
-			
+
 			self.ss_delaycombo.set_active(self.curr_slideshow_delay)
 			self.ss_randomize.set_active(self.curr_slideshow_random)
 
@@ -2336,7 +2343,7 @@ class Base:
 			if not self.closing_app:
 				while gtk.events_pending():
 					gtk.main_iteration()
-			
+
 			ss_winheight = self.slideshow_window.allocation.height
 			ss_win2width = self.slideshow_window2.allocation.width
 			winheight = self.window.allocation.height
@@ -2355,7 +2362,7 @@ class Base:
 	def slideshow_controls_hide(self):
 		if self.slideshow_controls_visible == True and self.controls_moving == False:
 			self.slideshow_controls_visible = False
-			
+
 			ss_winheight = self.slideshow_window.allocation.height
 			ss_win2width = self.slideshow_window2.allocation.width
 			winheight = self.window.allocation.height
@@ -2370,7 +2377,7 @@ class Base:
 					while gtk.events_pending():
 						gtk.main_iteration()
 			self.controls_moving = False
-			
+
 	def load_editor(self, action):
 		if self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').get_property('sensitive') == True:
 			test = os.spawnlp(os.P_WAIT, self.editor, self.editor, self.currimg_name)
@@ -2378,13 +2385,13 @@ class Base:
 				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' \"' + self.editor + '\". ' + _('Please specify a valid application from Edit > Preferences.'))
 				error_dialog.run()
 				error_dialog.destroy()
-				
+
 	def disable_screensaver_in_slideshow_mode(self):
 		if self.slideshow_mode == True and self.disable_screensaver == True:
 			test = os.spawnlp(os.P_WAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
 			if test <> 127:
 				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
-	
+
 	def main(self):
 		gtk.main()
 
