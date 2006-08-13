@@ -329,10 +329,12 @@ class Base:
 			icon_path = iconname
 		elif os.path.exists('../share/pixmaps/' + iconname):
 			icon_path = '../share/pixmaps/' + iconname
-		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
-			icon_path = '/usr/local/share/pixmaps/' + iconname
 		elif os.path.exists('/usr/share/pixmaps/' + iconname):
 			icon_path = '/usr/share/pixmaps/' + iconname
+		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
+			icon_path = '/usr/local/share/pixmaps/' + iconname
+		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + iconname):
+			icon_path = os.path.dirname(__file__) + '/share/pixmaps/' + iconname
 		try:
 			gtk.window_set_default_icon_from_file(icon_path)
 		except:
@@ -426,10 +428,12 @@ class Base:
 			icon_path = iconname
 		elif os.path.exists('../share/mirage/' + iconname):
 			icon_path = '../share/mirage/' + iconname
-		elif os.path.exists('/usr/local/share/mirage/' + iconname):
-			icon_path = '/usr/local/share/mirage/' + iconname
 		elif os.path.exists('/usr/share/mirage/' + iconname):
 			icon_path = '/usr/share/mirage/' + iconname
+		elif os.path.exists('/usr/local/share/mirage/' + iconname):
+			icon_path = '/usr/local/share/mirage/' + iconname
+		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + iconname):
+			icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname
 		else:
 			icon_path = ''
 		try:
@@ -1434,10 +1438,12 @@ class Base:
 			icon_path = iconname
 		elif os.path.exists('../share/pixmaps/' + iconname):
 			icon_path = '../share/pixmaps/' + iconname
-		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
-			icon_path = '/usr/local/share/pixmaps/' + iconname
 		elif os.path.exists('/usr/share/pixmaps/' + iconname):
 			icon_path = '/usr/share/pixmaps/' + iconname
+		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
+			icon_path = '/usr/local/share/pixmaps/' + iconname
+		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + iconname):
+			icon_path = os.path.dirname(__file__) + '/share/pixmaps/' + iconname
 		try:
 			icon_pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
 			self.about_dialog.set_logo(icon_pixbuf)

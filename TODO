@@ -4,7 +4,11 @@
 + Resize, rotate, crop, and save (luzi)
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 + Cannot 'open folder' while still searching for images
-+ Add custom actions framework -> put 'open in editor' (and 'delete image'?) there
++ Add custom actions framework
+	- default: open in external editor
+	- default: create thumbnail
+	- REFRESH, IMAGE, PREV, NEXT (IMAGELIST)
+	- cli arguments (Thomas patch)
 + expand_imagelist...() - problem with multiple cli arguments and sorting
 
 Future
