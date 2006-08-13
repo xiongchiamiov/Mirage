@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+
 # $HeadURL$
+# $Id$
 
 __version__ = "0.7.3"
 
