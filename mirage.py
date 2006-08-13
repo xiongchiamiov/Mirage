@@ -2228,6 +2228,7 @@ class Base:
 		if not self.closing_app:
 			while gtk.events_pending():
 				gtk.main_iteration()
+		init_image = os.path.abspath(inputlist[0])
 		first_image = ""
 		first_image_found = False
 		first_image_loaded = False
@@ -2253,7 +2254,9 @@ class Base:
 			inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
 		# If open all images in dir...
 		if self.open_all_images == True:
-			for item in inputlist:
+			temp = inputlist
+			inputlist = []
+			for item in temp:
 				if os.path.isfile(item):
 					itempath = os.path.dirname(os.path.abspath(item))
 					temp = self.recursive
@@ -2261,14 +2264,19 @@ class Base:
 					self.stop_now = False
 					self.expand_directory(itempath, False, go_buttons_enabled, False, False)
 					self.recursive = temp
-			for item in self.image_list:
-				# Make sure item is not already in list:
-				duplicate_image = False
-				for item2 in inputlist:
-					if item == item2:
-						duplicate_image = True
-				if duplicate_image == False:
+				else:
 					inputlist.append(item)
+			for item in self.image_list:
+				inputlist.append(item)
+				if first_image_found == True and second_image_found == False:
+					second_image_found = True
+					second_image = item
+					second_image_came_from_dir = False
+				if item == init_image:
+					first_image_found = True
+					first_image = item
+					first_image_came_from_dir = False
+					self.curr_img_in_list = len(inputlist)-1
 		self.image_list = []
 		for item in inputlist:
 			if item[0] != '.' and self.closing_app == False:
@@ -2278,6 +2286,7 @@ class Base:
 							if first_image_found == True:
 								second_image_found = True
 								second_image = item
+								second_image_came_from_dir = False
 						if first_image_found == False:
 							first_image_found = True
 							first_image = item
@@ -2285,7 +2294,7 @@ class Base:
 						self.image_list.append(item)
 						if self.verbose == True:
 							self.images_found += 1
-							print _("Found:"), item_fullpath, "[" + str(self.images_found) + "]"
+							print _("Found:"), item, "[" + str(self.images_found) + "]"
 				else:
 					# If it's a directory that was explicitly selected or passed to
 					# the program, get all the files in the dir.
@@ -2302,6 +2311,7 @@ class Base:
 								if second_image_found == False:
 									if first_image_found == True:
 										second_image_found = True
+										second_image_came_from_dir = True
 										second_image = self.image_list[itemnum]
 										self.set_go_navigation_sensitivities(True)
 										go_buttons_enabled = True
@@ -2313,7 +2323,7 @@ class Base:
 									first_image_came_from_dir = True
 							itemnum += 1
 				# Load first image and display:
-				if first_image_found == True and first_image_loaded == False:
+				if first_image_found == True and first_image_loaded == False and self.curr_img_in_list <= len(self.image_list)-1:
 					first_image_loaded = True
 					if self.slideshow_mode == True:
 						self.toggle_slideshow(None)
@@ -2335,11 +2345,12 @@ class Base:
 					if first_image_came_from_dir == True:
 						self.image_list = []
 				# Pre-load second image:
-				if second_image_found == True and second_image_preloaded == False:
+				if second_image_found == True and second_image_preloaded == False and ((second_image_came_from_dir == False and self.curr_img_in_list+1 <= len(self.image_list)-1) or second_image_came_from_dir == True):
 					second_image_preloaded = True
 					temp = self.image_list
 					self.image_list = []
-					self.image_list.append(first_image)
+					while len(self.image_list) < self.curr_img_in_list+1:
+						self.image_list.append(first_image)
 					self.image_list.append(second_image)
 					self.preload_next_image(False)
 					self.preloadimg_prev_pixbuf_original = None
@@ -2373,15 +2384,6 @@ class Base:
 			self.set_go_navigation_sensitivities(True)
 			self.image_list = list(set(self.image_list))
 			self.image_list.sort(locale.strcoll)
-			for itemnum in range(len(self.image_list)):
-				if first_image == self.image_list[itemnum]:
-					temp = self.image_list[0]
-					self.image_list[0] = self.image_list[itemnum]
-					self.image_list[itemnum] = temp
-				elif second_image == self.image_list[itemnum]:
-					temp = self.image_list[1]
-					self.image_list[1] = self.image_list[itemnum]
-					self.image_list[itemnum] = temp
 
 	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled, update_title, print_found_msg):
 		if self.stop_now == False and self.closing_app == False:

@@ -1,6 +1,7 @@
 v0.8 - Pending
 	+ Preference to preload images for speeding up navigation (Mike Massonnet)
 	+ Ability to delete an image (Bjoern Martensen/Luzi)
+	+ Opening with 'load all images in dir' now gives expected result (Bjoern Martensen)
 	+ Added French translation (Mike Massonnet)
 	+ Added Polish translation (Tomasz Dominikowski)
 

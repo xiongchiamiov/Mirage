@@ -6,7 +6,6 @@
 + Cannot 'open folder' while still searching for images
 + Add tooltips wherever they are missing
 + Add custom actions framework -> put 'open in editor' (and 'delete image'?) there
-+ Fix open image behavior with 'load all images in dir' checked (Bjoern Martensen)
 
 Future
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
