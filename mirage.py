@@ -1092,6 +1092,7 @@ class Base:
 		colortext = gtk.Label(_('Background Color') + ':  ')
 		colorbutton = gtk.ColorButton(self.bgcolor)
 		colorbutton.connect('color-set', self.bgcolor_selected)
+		gtk.Tooltips().set_tip(colorbutton, _("Sets the background color for the application."))
 		color_hbox.pack_start(colortext, False, False, 0)
 		color_hbox.pack_start(colorbutton, True, True, 0)
 		table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1106,6 +1107,7 @@ class Base:
 		zoompref.set_increments(1,4)
 		zoompref.set_draw_value(False)
 		zoompref.set_value(self.zoomvalue)
+		gtk.Tooltips().set_tip(zoompref, _("Sets the quality of zooming for the images. Ranges from fastest (but worst quality) to the best quality (but slowest)."))
 		zoom_hbox = gtk.HBox(False, 0)
 		zoom_label1 = gtk.Label()
 		zoom_label1.set_markup('<i>' + _('Fastest') + '</i>')
@@ -1136,7 +1138,6 @@ class Base:
 		combobox.append_text(_("1:1 Mode"))
 		combobox.append_text(_("Last Active Mode"))
 		combobox.set_active(self.open_mode)
-		gtk.Tooltips().set_tip(combobox, _("Smart mode uses 1:1 for images smaller than the window and Fit To Window for images larger."))
 		hbox_openmode.pack_start(combobox, False, False, 5)
 		table_behavior.attach(hbox_openmode, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_behavior.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1218,9 +1219,12 @@ class Base:
 		hbox_delay.pack_start(delaycombo, False, False, 5)
 		randomize = gtk.CheckButton(_("Randomize order of images"))
 		randomize.set_active(self.slideshow_random)
+		gtk.Tooltips().set_tip(randomize, _("If enabled, a random image will be chosen during slideshow mode (without loading any image twice)."))
 		disable_screensaver = gtk.CheckButton(_("Disable screensaver in slideshow mode"))
 		disable_screensaver.set_active(self.disable_screensaver)
+		gtk.Tooltips().set_tip(disable_screensaver, _("If enabled, Mirage will attempt to temporarily disable xscreensaver during slideshow mode."))
 		ss_in_fs = gtk.CheckButton(_("Always start in fullscreen mode"))
+		gtk.Tooltips().set_tip(ss_in_fs, _("If enabled, Mirage will switch to fullscreen when a slideshow is started."))
 		ss_in_fs.set_active(self.slideshow_in_fullscreen)
 		table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -2110,8 +2114,10 @@ class Base:
 			if use_existing_image == False:
 				if self.curr_img_in_list + 1 <= len(self.image_list)-1:
 					temp_name = str(self.image_list[self.curr_img_in_list+1])
-				else:
+				elif self.listwrap_mode > 0:
 					temp_name = str(self.image_list[0])
+				else: # No need to preload..
+					return
 				if temp_name == self.preloadimg_next_name:
 					# No need to preload the same next image twice..
 					return
@@ -2164,8 +2170,10 @@ class Base:
 			if use_existing_image == False:
 				if self.curr_img_in_list - 1 >= 0:
 					temp_name = str(self.image_list[self.curr_img_in_list-1])
-				else:
+				elif self.listwrap_mode > 0:
 					temp_name = str(self.image_list[len(self.image_list)-1])
+				else: # No need to preload..
+					return
 				if temp_name == self.preloadimg_prev_name:
 					# No need to preload the same next image twice..
 					return
@@ -2228,7 +2236,6 @@ class Base:
 		if not self.closing_app:
 			while gtk.events_pending():
 				gtk.main_iteration()
-		init_image = os.path.abspath(inputlist[0])
 		first_image = ""
 		first_image_found = False
 		first_image_loaded = False
@@ -2252,6 +2259,7 @@ class Base:
 			if inputlist[itemnum][len(inputlist[itemnum])-1] == "/":
 				inputlist[itemnum] = inputlist[itemnum][:(len(inputlist[itemnum])-1)]
 			inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
+		init_image = os.path.abspath(inputlist[0])
 		# If open all images in dir...
 		if self.open_all_images == True:
 			temp = inputlist
