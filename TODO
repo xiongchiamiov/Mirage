@@ -4,9 +4,8 @@
 + Resize, rotate, crop, and save (luzi)
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 + Cannot 'open folder' while still searching for images
-+ Add tooltips wherever they are missing
 + Add custom actions framework -> put 'open in editor' (and 'delete image'?) there
-+ expand_imagelist...() - problem with multiple cli arguments
++ expand_imagelist...() - problem with multiple cli arguments and sorting
 
 Future
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
