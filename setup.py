@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# $HeadURL$
+# $Id$
+
 import gtk
 
 try:
