@@ -1,5 +1,5 @@
 v0.8 - Pending
-	+ Preload next image to speed up navigation (Mike Massonnet)
+	+ Preference to preload images for speeding up navigation (Mike Massonnet)
 	+ Ability to delete an image (Bjoern Martensen/Luzi)
 	+ Added French translation (Mike Massonnet)
 	+ Added Polish translation (Tomasz Dominikowski)
