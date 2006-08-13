@@ -783,7 +783,7 @@ class Base:
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
 		conf.set('prefs', 'delete_without_prompt', self.delete_without_prompt)
-		conf.set('prefs', 'preloading', self.preloading_images)
+		conf.set('prefs', 'preloading_images', self.preloading_images)
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/'))
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
