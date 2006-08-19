@@ -118,17 +118,21 @@ class Base:
 		self.slideshow_controls_visible = False	# fullscreen slideshow controls
 		self.controls_moving = False
 		self.zoomvalue = 3.0
-		self.editor = "gimp-remote"
 		self.updating_adjustments = False
 		self.disable_screensaver = False
 		self.slideshow_in_fullscreen = False
 		self.closing_app = False
 		self.delete_without_prompt = False
 		self.preloading_images = False
+		self.action_names = ["Open in GIMP", "Create Thumbnail", "Create Thumbnails", "Move to Favorites"]
+		self.action_shortcuts = ["<Control>e", "<Alt>t", "<Ctrl><Alt>t", "<Control><Alt>f"]
+		self.action_commands = ["gimp-remote %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXTIMG]"]
+		self.action_batch = [False, False, True, False]
+		self.onload_cmd = None
 
 		# Read any passed options/arguments:
 		try:
-			opts, args = getopt.getopt(sys.argv[1:], "hRvVsf", ["help", "version", "recursive", "verbose", "slideshow", "fullscreen"])
+			opts, args = getopt.getopt(sys.argv[1:], "hRvVsfo:", ["help", "version", "recursive", "verbose", "slideshow", "fullscreen", "onload="])
 		except getopt.GetoptError:
 			# print help information and exit:
 			self.print_usage()
@@ -149,6 +153,8 @@ class Base:
 				elif o in ("-s", "--slideshow", "-f", "--fullscreen"):
 					#This will be handled later
 					None
+				elif o in ("-o", "--onload"):
+					self.onload_cmd = a
 				else:
 					self.print_usage()
 					sys.exit(2)
@@ -189,11 +195,20 @@ class Base:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
 			elif int(round(self.zoomvalue, 0)) == 4:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
-			self.editor = conf.get('prefs', 'editor')
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
 			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
 			self.delete_without_prompt = conf.getboolean('prefs', 'delete_without_prompt')
 			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
+			num_actions = conf.getint('actions', 'num_actions')
+			self.action_names = []
+			self.action_commands = []
+			self.action_shortcuts = []
+			self.action_batch = []
+			for i in range(num_actions):
+				self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
+				self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
+				self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
+				self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
 			pass
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -209,9 +224,9 @@ class Base:
 			('ViewMenu', None, _('_View')),
 			('GoMenu', None, _('_Go')),
 			('HelpMenu', None, _('_Help')),
-			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<control>O', _('Open Image'), self.open_file),
-			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<control>F', _('Open Folder'), self.open_folder),
-			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<control>Q', _('Quit'), self.exit_app),
+			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
+			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
+			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
 			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.prev_img_in_list),
 			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.next_img_in_list),
 			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.prev_img_in_list),
@@ -228,18 +243,36 @@ class Base:
 			('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', _('Flip Vertically'), self.image_flip_vert),
 			('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', _('Flip Horizontally'), self.image_flip_horiz),
 			('About', gtk.STOCK_ABOUT, _('_About'), 'F1', _('About'), self.show_about),
-			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences'), None, _('Preferences'), self.prefs_show),
+			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), None, _('Preferences'), self.prefs_show),
 			('Full Screen', gtk.STOCK_FULLSCREEN, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
 			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
-			('Open in Editor', gtk.STOCK_EXECUTE, _('Open in _Editor'), '<Ctrl>E', _('Open in Editor'), self.load_editor),
-			('Delete Image', gtk.STOCK_DELETE, _('Delete Image'), 'Delete', _('Delete Image'), self.delete_image)
+			('Delete Image', gtk.STOCK_DELETE, _('_Delete Image'), 'Delete', _('Delete Image'), self.delete_image),
+			('Custom Actions', None, _('Custom _Actions...'), None, _('Custom Actions'), self.custom_actions_show),
+			('MiscKeysMenuHidden', None, 'Keys'),
+			('Escape', None, '', 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
+			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
+			('Plus', None, '', 'plus', _('Zoom In'), self.zoom_in),
+			('Equal', None, '', 'equal', _('Zoom In'), self.zoom_in),
+			('Space', None, '', 'space', _('Next'), self.next_img_in_list),
+			('Ctrl-KP_Insert', None, '', '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
+			('Ctrl-KP_End', None, '', '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
+			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
+			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
 			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),
 				)
+
+		# Populate keys[]:
+		self.keys=[]
+		for i in range(len(actions)):
+			if len(actions[i]) > 3:
+				if actions[i][3] != None:
+					self.keys.append([actions[i][4], actions[i][3]])
+
 		uiDescription = """
 			<ui>
 			  <popup name="Popup">
@@ -276,8 +309,7 @@ class Base:
 			      <separator name="FM4"/>
 			      <menuitem action="Delete Image"/>
 			      <separator name="FM3"/>
-			      <menuitem action="Open in Editor"/>
-			      <separator name="FM2"/>
+			      <menuitem action="Custom Actions"/>
 			      <menuitem action="Preferences"/>
 			    </menu>
 			    <menu action="ViewMenu">
@@ -305,6 +337,17 @@ class Base:
 			    <menu action="HelpMenu">
 			      <menuitem action="About"/>
 			    </menu>
+			    <menu action="MiscKeysMenuHidden">
+			      <menuitem action="Minus"/>
+			      <menuitem action="Escape"/>
+			      <menuitem action="Plus"/>
+			      <menuitem action="Equal"/>
+			      <menuitem action="Space"/>
+			      <menuitem action="Ctrl-KP_Insert"/>
+			      <menuitem action="Ctrl-KP_End"/>
+			      <menuitem action="Ctrl-KP_Subtract"/>
+			      <menuitem action="Ctrl-KP_Add"/>
+			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
 			    <toolitem action="Open Image"/>
@@ -319,7 +362,6 @@ class Base:
 			  </toolbar>
 			</ui>
 			"""
-
 
 		# Create interface
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -496,6 +538,7 @@ class Base:
 			pass
 
 		# Show GUI:
+		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 		self.hscroll.set_no_show_all(True)
 		self.vscroll.set_no_show_all(True)
 		if opts != []:
@@ -547,31 +590,74 @@ class Base:
 				self.zoom_to_fit_window(None, False, False)
 
 	def topwindow_keypress(self, widget, event):
+		# For whatever reason, 'Left' and 'Right' cannot be used as menu
+		# accelerators so we will manually check for them here:
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
-			if event.keyval == 65361:    # Left arrow
+			if event.keyval == gtk.gdk.keyval_from_name('Left'):
 				self.prev_img_in_list(None)
-			elif event.keyval == 65363 or event.keyval == 32:  # Right arrow or spacebar
+				return
+			elif event.keyval == gtk.gdk.keyval_from_name('Right'):
 				self.next_img_in_list(None)
-			elif event.keyval == 65360:  # Home key
-				self.first_img_in_list(None)
-			elif event.keyval == 65367:  # End key
-				self.last_img_in_list(None)
-			#elif event.keyval == 114:    # "R" key
-			#	self.random_img_in_list(None)
-			elif event.keyval == 65307:  # Escape key
-				self.leave_fullscreen(None)
-			elif event.keyval == 45:     # - key
-				self.zoom_out(None)
-			elif event.keyval == 61 or event.keyval == 43:     # + key
-				self.zoom_in(None)
-		elif event.state == gtk.gdk.CONTROL_MASK or event.state == gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK:
-			if event.keyval == 65456:    # "0" key on numpad
-				self.zoom_to_fit_window(None, False, False)
-			if event.keyval == 65457:    # "1" key on numpad
-				self.zoom_1_to_1(None, False, False)
-		elif event.state == gtk.gdk.SHIFT_MASK or event.state == gtk.gdk.SHIFT_MASK | gtk.gdk.MOD2_MASK:
-			if event.keyval == 43 or event.keyval == 61:     # + key
-				self.zoom_in(None)
+				return
+		# Check if a custom action's shortcut was pressed:
+		shortcut = gtk.accelerator_name(event.keyval, event.state)
+		if "<Mod2>" in shortcut:
+			shortcut = shortcut.replace("<Mod2>", "")
+		for i in range(len(self.action_shortcuts)):
+			try:
+				if shortcut == self.action_shortcuts[i]:
+					self.parse_action_command(self.action_commands[i], self.action_batch[i])
+			except:
+				pass
+
+	def parse_action_command(self, command, batchmode):
+		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+		while gtk.events_pending():
+			gtk.main_iteration()
+		if batchmode == True:
+			for i in range(len(self.image_list)):
+				imagename = self.image_list[i]
+				self.parse_action_command2(command, imagename)
+		else:
+			self.parse_action_command2(command, self.currimg_name)
+		gc.collect()
+		self.change_cursor(None)
+
+	def parse_action_command2(self, command, imagename):
+		# First, replace any property keywords with their flags:
+		if "%F" in command:
+			command = command.replace("%F", imagename)
+		if "%N" in command:
+			command = command.replace("%N", os.path.splitext(os.path.basename(imagename))[0])
+		if "%P" in command:
+			command = command.replace("%P", os.path.dirname(imagename) + "/")
+		if "%E" in command:
+			command = command.replace("%E", os.path.splitext(os.path.basename(imagename))[1])
+		commands = string.split(command, ";")
+		for i in range(len(commands)):
+			commands[i] = string.lstrip(commands[i])
+			if self.verbose == True:
+				print _("Action:"), commands[i]
+			if commands[i] == "[REFRESH]":
+				self.load_new_image(False, False, True)
+			elif commands[i] == "[NEXTIMG]":
+				self.next_img_in_list(None)
+			elif commands[i] == "[PREVIMG]":
+				self.prev_img_in_list(None)
+			else:
+				temp = os.system(commands[i])
+				if temp == 32512:
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' \"' + commands[i] + '\". ' + _('Please specify a valid command from Edit > Preferences.'))
+					error_dialog.run()
+					error_dialog.destroy()
+					return
+		if os.path.exists(self.currimg_name) == False:
+			self.currimg_pixbuf_original = None
+			self.image_load_failed(False)
+		if os.path.exists(self.preloadimg_prev_name) == False:
+			self.preloadimg_prev_pixbuf_original = None
+		if os.path.exists(self.preloadimg_next_name) == False:
+			self.preloadimg_next_pixbuf_original = None
 
 	def set_go_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
@@ -600,7 +686,6 @@ class Base:
 		self.UIManager.get_widget('/Popup/Fit').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Rotate Left').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').set_sensitive(enable)
 
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
@@ -679,13 +764,16 @@ class Base:
 		print _("Usage: mirage [OPTION]... FILES|FOLDERS...")
 		print ""
 		print _("Options:")
-		print _("  -h, --help		   Show this help and exit")
-		print _("  -v, --version		Show version information and exit")
-		print _("  -V, --verbose		Show more detailed information")
-		print _("  -R, --recursive	      Recursively include all images found in")
-		print _("			       subdirectories of FOLDERS")
-		print _("  -s, --slideshow	      Start in slideshow mode")
-		print _("  -f, --fullscreen	     Start in fullscreen mode")
+		print _("  -h, --help           Show this help and exit")
+		print _("  -v, --version        Show version information and exit")
+		print _("  -V, --verbose        Show more detailed information")
+		print _("  -R, --recursive      Recursively include all images found in")
+		print _("                       subdirectories of FOLDERS")
+		print _("  -s, --slideshow      Start in slideshow mode")
+		print _("  -f, --fullscreen     Start in fullscreen mode")
+		print _("  -o, --onload 'cmd'   Execute 'cmd' when an image is loaded")
+		print _("                       (uses same syntax as custom actions,")
+		print _("                       i.e. mirage -o 'echo file is %F')")
 
 	def delay_changed(self, action):
 		self.curr_slideshow_delay = self.ss_delaycombo.get_active()
@@ -786,11 +874,17 @@ class Base:
 		conf.set('prefs', 'slideshow_delay', self.slideshow_delay)
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
 		conf.set('prefs', 'zoomvalue', self.zoomvalue)
-		conf.set('prefs', 'editor', self.editor)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
 		conf.set('prefs', 'delete_without_prompt', self.delete_without_prompt)
 		conf.set('prefs', 'preloading_images', self.preloading_images)
+		conf.add_section('actions')
+		conf.set('actions', 'num_actions', len(self.action_names))
+		for i in range(len(self.action_names)):
+			conf.set('actions', 'names[' + str(i) + ']', self.action_names[i])
+			conf.set('actions', 'commands[' + str(i) + ']', self.action_commands[i])
+			conf.set('actions', 'shortcuts[' + str(i) + ']', self.action_shortcuts[i])
+			conf.set('actions', 'batch[' + str(i) + ']', self.action_batch[i])
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/'))
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
@@ -1083,6 +1177,219 @@ class Base:
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
 		return
 
+	def custom_actions_show(self, action):
+		self.actions_dialog = gtk.Dialog(title=_("Configure Custom Actions"), parent=self.window)
+		self.actions_dialog.set_has_separator(False)
+		self.actions_dialog.set_resizable(False)
+		table_actions = gtk.Table(13, 2, False)
+		table_actions.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		actionscrollwindow = gtk.ScrolledWindow()
+		self.actionstore = gtk.ListStore(str, str)
+		self.actionwidget = gtk.TreeView()
+		self.actionwidget.set_enable_search(False)
+		self.actionwidget.set_rules_hint(True)
+		#self.actionwidget.set_headers_visible(False)
+		actionscrollwindow.add(self.actionwidget)
+		actionscrollwindow.set_shadow_type(gtk.SHADOW_IN)
+		actionscrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		actionscrollwindow.set_size_request(400, 200)
+		self.actionwidget.set_model(self.actionstore)
+		self.cell = gtk.CellRendererText()
+		self.tvcolumn1 = gtk.TreeViewColumn("Action", self.cell, markup=0)
+		self.tvcolumn2 = gtk.TreeViewColumn("Shortcut")
+		self.actionwidget.append_column(self.tvcolumn1)
+		self.actionwidget.append_column(self.tvcolumn2)
+		self.populate_treeview()
+		vbox_actions = gtk.VBox()
+		addbutton = gtk.Button("", gtk.STOCK_ADD)
+		alignment = addbutton.get_children()[0]
+		hbox_temp = alignment.get_children()[0]
+		image, label = hbox_temp.get_children()
+		label.set_text('')
+		addbutton.connect('clicked', self.add_custom_action)
+		gtk.Tooltips().set_tip(addbutton, _("Add a custom action."))
+		editbutton = gtk.Button("", gtk.STOCK_EDIT)
+		alignment = editbutton.get_children()[0]
+		hbox_temp = alignment.get_children()[0]
+		image, label = hbox_temp.get_children()
+		label.set_text('')
+		editbutton.connect('clicked', self.edit_custom_action)
+		gtk.Tooltips().set_tip(editbutton, _("Edit the selected custom action."))
+		removebutton = gtk.Button("", gtk.STOCK_REMOVE)
+		alignment = removebutton.get_children()[0]
+		hbox_temp = alignment.get_children()[0]
+		image, label = hbox_temp.get_children()
+		label.set_text('')
+		removebutton.connect('clicked', self.remove_custom_action)
+		gtk.Tooltips().set_tip(removebutton, _("Remove the selected custom action."))
+		vbox_buttons = gtk.VBox()
+		propertyinfo = gtk.Label()
+		propertyinfo.set_markup('<small>' + _("Parameters:") + '\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
+		propertyinfo.set_alignment(0, 0)
+		actioninfo = gtk.Label()
+		actioninfo.set_markup('<small>' + _("Operations:") + '\n<span font_family="Monospace">[REFRESH]</span> - ' + _("Refresh current image") + '\n<span font_family="Monospace">[NEXTIMG]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREVIMG]</span> - ' + _("Go to previous image") +'</small>')
+		actioninfo.set_alignment(0, 0)
+		hbox_info = gtk.HBox()
+		hbox_info.pack_start(propertyinfo, False, False, 15)
+		hbox_info.pack_start(actioninfo, False, False, 15)
+		vbox_buttons.pack_start(addbutton, False, False, 5)
+		vbox_buttons.pack_start(editbutton, False, False, 5)
+		vbox_buttons.pack_start(removebutton, False, False, 0)
+		hbox_top = gtk.HBox()
+		hbox_top.pack_start(actionscrollwindow, True, True, 5)
+		hbox_top.pack_start(vbox_buttons, False, False, 5)
+		vbox_actions.pack_start(hbox_top, True, True, 5)
+		vbox_actions.pack_start(hbox_info, False, False, 5)
+		hbox_instructions = gtk.HBox()
+		info_image = gtk.Image()
+		info_image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_BUTTON)
+		hbox_instructions.pack_start(info_image, False, False, 5)
+		instructions = gtk.Label(_("You can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon."))
+		instructions.set_line_wrap(True)
+		instructions.set_size_request(480, -1)
+		instructions.set_alignment(0, 0.5)
+		hbox_instructions.pack_start(instructions, False, False, 5)
+		table_actions.attach(hbox_instructions, 1, 3, 2, 3,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 5, 0)
+		table_actions.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table_actions.attach(vbox_actions, 1, 3, 4, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table_actions.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		self.actions_dialog.vbox.pack_start(table_actions, False, False, 0)
+		# Show dialog:
+		self.actions_dialog.vbox.show_all()
+		close_button = self.actions_dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+		close_button.grab_focus()
+		self.actions_dialog.run()
+		self.actions_dialog.destroy()
+
+	def add_custom_action(self, button):
+		(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog('', '', 'None', False)
+		if name !='' or command != '' or shortcut != '':
+			self.action_names.append(name)
+			self.action_commands.append(command)
+			self.action_shortcuts.append(shortcut)
+			self.action_batch.append(batch)
+			self.populate_treeview()
+		elif canceled == False:
+			error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
+			error_dialog.run()
+			error_dialog.destroy()
+
+	def edit_custom_action(self, button):
+		(model, iter) = self.actionwidget.get_selection().get_selected()
+		if iter != None:
+			(row, ) = self.actionstore.get_path(iter)
+			(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row])
+			if name != '' or command != '' or shortcut != '':
+				self.action_names[row] = name
+				self.action_commands[row] = command
+				self.action_shortcuts[row] = shortcut
+				self.action_batch[row] = batch
+				self.populate_treeview()
+			elif canceled == False:
+				error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
+				error_dialog.run()
+				error_dialog.destroy()
+
+	def open_custom_action_dialog(self, name, command, shortcut, batch):
+		self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		table = gtk.Table(2, 4, False)
+		action_name_label = gtk.Label(_("Action Name:"))
+		action_name_label.set_alignment(0, 0.5)
+		action_command_label = gtk.Label(_("Command:"))
+		action_command_label.set_alignment(0, 0.5)
+		shortcut_label = gtk.Label(_("Shortcut:"))
+		shortcut_label.set_alignment(0, 0.5)
+		table.attach(action_name_label, 0, 1, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(action_command_label, 0, 1, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(shortcut_label, 0, 1, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		action_name = gtk.Entry()
+		action_name.set_text(name)
+		action_command = gtk.Entry()
+		action_command.set_text(command)
+		table.attach(action_name, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(action_command, 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		self.shortcut = gtk.Button(shortcut)
+		self.shortcut.connect('clicked', self.shortcut_clicked)
+		table.attach(self.shortcut, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		batchmode = gtk.CheckButton(_("Perform action on all images in list"))
+		batchmode.set_active(batch)
+		table.attach(batchmode, 0, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		self.dialog_name.vbox.pack_start(table, False, False, 5)
+		self.dialog_name.vbox.show_all()
+		response = self.dialog_name.run()
+		if response == gtk.RESPONSE_ACCEPT:
+			if not (action_command.get_text() == "" or action_name.get_text() == "" or self.shortcut.get_label() == "None"):
+				name = action_name.get_text()
+				command = action_command.get_text()
+				shortcut = self.shortcut.get_label()
+				batch = batchmode.get_active()
+				self.dialog_name.destroy()
+				return (name, command, shortcut, batch, False)
+			else:
+				self.dialog_name.destroy()
+				return ('', '', '', False, False)
+		self.dialog_name.destroy()
+		return ('', '', '', False, True)
+
+	def shortcut_clicked(self, widget):
+		self.dialog_shortcut = gtk.Dialog(_("Action Shortcut"), self.dialog_name, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		self.shortcut_label = gtk.Label(_("Press the desired shortcut for the action."))
+		hbox = gtk.HBox()
+		hbox.pack_start(self.shortcut_label, False, False, 15)
+		self.dialog_shortcut.vbox.pack_start(hbox, False, False, 5)
+		self.dialog_shortcut.vbox.show_all()
+		self.dialog_shortcut.connect('key-press-event', self.shortcut_keypress)
+		self.dialog_shortcut.run()
+		self.dialog_shortcut.destroy()
+
+	def shortcut_keypress(self, widget, event):
+		shortcut = gtk.accelerator_name(event.keyval, event.state)
+		if "<Mod2>" in shortcut:
+			shortcut = shortcut.replace("<Mod2>", "")
+		if shortcut[(len(shortcut)-2):len(shortcut)] != "_L" and shortcut[(len(shortcut)-2):len(shortcut)] != "_R":
+			# Validate to make sure the shortcut hasn't already been used:
+			for i in range(len(self.keys)):
+				if shortcut == self.keys[i][1]:
+					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.keys[i][0] + '\'.')
+					error_dialog.run()
+					error_dialog.destroy()
+					return
+			for i in range(len(self.action_shortcuts)):
+				if shortcut == self.action_shortcuts[i]:
+					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.action_names[i] + '\'.')
+					error_dialog.run()
+					error_dialog.destroy()
+					return
+			self.shortcut.set_label(shortcut)
+			widget.destroy()
+
+	def remove_custom_action(self, button):
+		(model, iter) = self.actionwidget.get_selection().get_selected()
+		if iter != None:
+			(row, ) = self.actionstore.get_path(iter)
+			self.action_names.pop(row)
+			self.action_shortcuts.pop(row)
+			self.action_commands.pop(row)
+			self.action_batch.pop(row)
+			self.populate_treeview()
+			self.actionwidget.grab_focus()
+
+	def populate_treeview(self):
+		self.actionstore.clear()
+		for i in range(len(self.action_names)):
+			if self.action_batch[i] == True:
+				batchstring = "ALL: "
+			else:
+				batchstring = ""
+			self.actionstore.append(['<big><b>' + batchstring + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
+		self.tvcolumn1.clear()
+		self.tvcolumn2.clear()
+		self.tvcolumn1.pack_start(self.cell)
+		self.tvcolumn2.pack_start(self.cell)
+		self.tvcolumn1.set_attributes(self.cell, markup=0)
+		self.tvcolumn2.set_attributes(self.cell, text=1)
+		self.tvcolumn1.set_expand(True)
+
 	def prefs_show(self, action):
 		self.prefs_dialog = gtk.Dialog(title=_("Mirage Preferences"), parent=self.window)
 		self.prefs_dialog.set_has_separator(False)
@@ -1229,9 +1536,9 @@ class Base:
 		gtk.Tooltips().set_tip(randomize, _("If enabled, a random image will be chosen during slideshow mode (without loading any image twice)."))
 		disable_screensaver = gtk.CheckButton(_("Disable screensaver in slideshow mode"))
 		disable_screensaver.set_active(self.disable_screensaver)
-		gtk.Tooltips().set_tip(disable_screensaver, _("If enabled, Mirage will attempt to temporarily disable xscreensaver during slideshow mode."))
+		gtk.Tooltips().set_tip(disable_screensaver, _("If enabled, xscreensaver will be temporarily disabled during slideshow mode."))
 		ss_in_fs = gtk.CheckButton(_("Always start in fullscreen mode"))
-		gtk.Tooltips().set_tip(ss_in_fs, _("If enabled, Mirage will switch to fullscreen when a slideshow is started."))
+		gtk.Tooltips().set_tip(ss_in_fs, _("If enabled, starting a slideshow will put the application in fullscreen mode."))
 		ss_in_fs.set_active(self.slideshow_in_fullscreen)
 		table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1243,32 +1550,12 @@ class Base:
 		table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		# Add "Editor" tab:
-		table_editor = gtk.Table(13, 2, False)
-		table_editor.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		editorlabel = gtk.Label()
-		editorlabel.set_markup('<b>' + _('External Image Editor') + '</b>')
-		editorlabel.set_alignment(0, 1)
-		table_editor.attach(editorlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
-		table_editor.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		editorlabel = gtk.Label(_("The application specified below is used as the default editor. It is assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/bin/gimp-remote\")."))
-		editorlabel.set_line_wrap(True)
-		table_editor.attach(editorlabel, 1, 3, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		editortext = gtk.Entry()
-		editortext.set_text(self.editor)
-		table_editor.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_editor.attach(editortext, 1, 3, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_editor.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_editor.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_editor.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_editor.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
 		notebook.append_page(table_behavior, gtk.Label(str=_("Behavior")))
 		notebook.append_page(table_navigation, gtk.Label(str=_("Navigation")))
 		notebook.append_page(table_settings, gtk.Label(str=_("Interface")))
 		notebook.append_page(table_slideshow, gtk.Label(str=_("Slideshow")))
-		notebook.append_page(table_editor, gtk.Label(str=_("Editor")))
 		notebook.set_current_page(0)
 		hbox = gtk.HBox()
 		self.prefs_dialog.vbox.pack_start(hbox, False, False, 7)
@@ -1277,8 +1564,6 @@ class Base:
 		# Show prefs:
 		self.prefs_dialog.vbox.show_all()
 		self.close_button = self.prefs_dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
-		self.prefs_dialog.realize()
-		editorlabel.set_size_request(self.prefs_dialog.get_allocation().width-85, -1)
 		self.close_button.grab_focus()
 		response = self.prefs_dialog.run()
 		if response == gtk.RESPONSE_CLOSE or response == gtk.RESPONSE_DELETE_EVENT:
@@ -1310,7 +1595,6 @@ class Base:
 			self.curr_slideshow_delay = self.slideshow_delay
 			self.slideshow_random = randomize.get_active()
 			self.curr_slideshow_random = self.slideshow_random
-			self.editor = editortext.get_text()
 			self.disable_screensaver = disable_screensaver.get_active()
 			self.slideshow_in_fullscreen = ss_in_fs.get_active()
 			self.prefs_dialog.destroy()
@@ -1545,7 +1829,7 @@ class Base:
 			self.update_statusbar()
 
 	def zoom_to_fit_window_action(self, action):
-		self.zoom_to_fit_window(action, False)
+		self.zoom_to_fit_window(action, False, False)
 
 	def zoom_to_fit_window(self, action, is_preloadimg_next, is_preloadimg_prev):
 		if is_preloadimg_next == True:
@@ -1656,7 +1940,7 @@ class Base:
 					self.update_statusbar()
 
 	def zoom_1_to_1_action(self, action):
-		self.zoom_1_to_1(action, False)
+		self.zoom_1_to_1(action, False, False)
 
 	def zoom_1_to_1(self, action, is_preloadimg_next, is_preloadimg_prev):
 		if is_preloadimg_next == True:
@@ -2021,6 +2305,7 @@ class Base:
 		self.set_window_title()
 		self.put_error_image_to_window()
 		self.image_loaded = False
+		self.currimg_pixbuf_original = None
 		if reset_cursor == True:
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
@@ -2110,6 +2395,8 @@ class Base:
 				self.currimg_pixbuf_original = animtest
 				self.zoom_1_to_1(None, False, False)
 				self.set_image_sensitivities(False)
+		if self.onload_cmd != None:
+			self.parse_action_command(self.onload_cmd, False)
 		self.update_statusbar()
 		self.set_window_title()
 		self.image_loaded = True
@@ -2119,116 +2406,122 @@ class Base:
 				self.change_cursor(None)
 
 	def preload_next_image(self, use_existing_image):
-		if self.preloading_images == True and len(self.image_list) > 1:
-			if use_existing_image == False:
-				if self.curr_img_in_list + 1 <= len(self.image_list)-1:
-					temp_name = str(self.image_list[self.curr_img_in_list+1])
-				elif self.listwrap_mode > 0:
-					temp_name = str(self.image_list[0])
-				else: # No need to preload..
+		try:
+			if self.preloading_images == True and len(self.image_list) > 1:
+				if use_existing_image == False:
+					if self.curr_img_in_list + 1 <= len(self.image_list)-1:
+						temp_name = str(self.image_list[self.curr_img_in_list+1])
+					elif self.listwrap_mode > 0:
+						temp_name = str(self.image_list[0])
+					else: # No need to preload..
+						return
+					if temp_name == self.preloadimg_next_name:
+						# No need to preload the same next image twice..
+						return
+					else:
+						self.preloadimg_next_name = temp_name
+					pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
+					if pre_animtest.is_static_image() == True:
+						self.preloadimg_next_is_animation = False
+						self.preloadimg_next_pixbuf_original = pre_animtest.get_static_image()
+					else:
+						self.preloadimg_next_is_animation = True
+						self.preloadimg_next_pixbuf_original = pre_animtest
+				if self.preloadimg_next_pixbuf_original == None:
 					return
-				if temp_name == self.preloadimg_next_name:
-					# No need to preload the same next image twice..
-					return
-				else:
-					self.preloadimg_next_name = temp_name
-				pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
-				if pre_animtest.is_static_image() == True:
-					self.preloadimg_next_is_animation = False
-					self.preloadimg_next_pixbuf_original = pre_animtest.get_static_image()
-				else:
-					self.preloadimg_next_is_animation = True
-					self.preloadimg_next_pixbuf_original = pre_animtest
-			if self.preloadimg_next_pixbuf_original == None:
-				return
-			# Determine self.preloadimg_next_zoomratio
-			if self.open_mode == self.open_mode_smart:
-				self.zoom_to_fit_or_1_to_1(None, True, False)
-			elif self.open_mode == self.open_mode_fit:
-				self.zoom_to_fit_window(None, True, False)
-			elif self.open_mode == self.open_mode_1to1:
-				self.zoom_1_to_1(None, True, False)
-			elif self.open_mode == self.open_mode_last:
-				if self.last_mode == self.open_mode_smart:
+				# Determine self.preloadimg_next_zoomratio
+				if self.open_mode == self.open_mode_smart:
 					self.zoom_to_fit_or_1_to_1(None, True, False)
-				elif self.last_mode == self.open_mode_fit:
+				elif self.open_mode == self.open_mode_fit:
 					self.zoom_to_fit_window(None, True, False)
-				elif self.last_mode == self.open_mode_1to1:
+				elif self.open_mode == self.open_mode_1to1:
 					self.zoom_1_to_1(None, True, False)
-			# Always start with the original image to preserve quality!
-			# Calculate image size:
-			self.preloadimg_next_width = int(self.preloadimg_next_pixbuf_original.get_width() * self.preloadimg_next_zoomratio)
-			self.preloadimg_next_height = int(self.preloadimg_next_pixbuf_original.get_height() * self.preloadimg_next_zoomratio)
-			if self.preloadimg_next_is_animation == False:
-				# Scale image:
-				if self.preloadimg_next_pixbuf_original.get_has_alpha() == False:
-					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original.scale_simple(self.preloadimg_next_width, self.preloadimg_next_height, self.zoom_quality)
+				elif self.open_mode == self.open_mode_last:
+					if self.last_mode == self.open_mode_smart:
+						self.zoom_to_fit_or_1_to_1(None, True, False)
+					elif self.last_mode == self.open_mode_fit:
+						self.zoom_to_fit_window(None, True, False)
+					elif self.last_mode == self.open_mode_1to1:
+						self.zoom_1_to_1(None, True, False)
+				# Always start with the original image to preserve quality!
+				# Calculate image size:
+				self.preloadimg_next_width = int(self.preloadimg_next_pixbuf_original.get_width() * self.preloadimg_next_zoomratio)
+				self.preloadimg_next_height = int(self.preloadimg_next_pixbuf_original.get_height() * self.preloadimg_next_zoomratio)
+				if self.preloadimg_next_is_animation == False:
+					# Scale image:
+					if self.preloadimg_next_pixbuf_original.get_has_alpha() == False:
+						self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original.scale_simple(self.preloadimg_next_width, self.preloadimg_next_height, self.zoom_quality)
+					else:
+						colormap = self.imageview.get_colormap()
+						light_grey = colormap.alloc_color('#666666', True, True)
+						dark_grey = colormap.alloc_color('#999999', True, True)
+						self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original.composite_color_simple(self.preloadimg_next_width, self.preloadimg_next_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
 				else:
-					colormap = self.imageview.get_colormap()
-					light_grey = colormap.alloc_color('#666666', True, True)
-					dark_grey = colormap.alloc_color('#999999', True, True)
-					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original.composite_color_simple(self.preloadimg_next_width, self.preloadimg_next_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
-			else:
-				self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original
-			gc.collect()
-			if self.verbose == True:
-				print "Preloaded next:", self.preloadimg_next_name
+					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original
+				gc.collect()
+				if self.verbose == True:
+					print _("Preloading:"), self.preloadimg_next_name
+		except:
+			self.preloadimg_next_pixbuf_original = None
 
 	def preload_prev_image(self, use_existing_image):
-		if self.preloading_images == True and len(self.image_list) > 1:
-			if use_existing_image == False:
-				if self.curr_img_in_list - 1 >= 0:
-					temp_name = str(self.image_list[self.curr_img_in_list-1])
-				elif self.listwrap_mode > 0:
-					temp_name = str(self.image_list[len(self.image_list)-1])
-				else: # No need to preload..
+		try:
+			if self.preloading_images == True and len(self.image_list) > 1:
+				if use_existing_image == False:
+					if self.curr_img_in_list - 1 >= 0:
+						temp_name = str(self.image_list[self.curr_img_in_list-1])
+					elif self.listwrap_mode > 0:
+						temp_name = str(self.image_list[len(self.image_list)-1])
+					else: # No need to preload..
+						return
+					if temp_name == self.preloadimg_prev_name:
+						# No need to preload the same next image twice..
+						return
+					else:
+						self.preloadimg_prev_name = temp_name
+					pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
+					if pre_animtest.is_static_image() == True:
+						self.preloadimg_prev_is_animation = False
+						self.preloadimg_prev_pixbuf_original = pre_animtest.get_static_image()
+					else:
+						self.preloadimg_prev_is_animation = True
+						self.preloadimg_prev_pixbuf_original = pre_animtest
+				if self.preloadimg_prev_pixbuf_original == None:
 					return
-				if temp_name == self.preloadimg_prev_name:
-					# No need to preload the same next image twice..
-					return
-				else:
-					self.preloadimg_prev_name = temp_name
-				pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
-				if pre_animtest.is_static_image() == True:
-					self.preloadimg_prev_is_animation = False
-					self.preloadimg_prev_pixbuf_original = pre_animtest.get_static_image()
-				else:
-					self.preloadimg_prev_is_animation = True
-					self.preloadimg_prev_pixbuf_original = pre_animtest
-			if self.preloadimg_prev_pixbuf_original == None:
-				return
-			# Determine self.preloadimg_prev_zoomratio
-			if self.open_mode == self.open_mode_smart:
-				self.zoom_to_fit_or_1_to_1(None, False, True)
-			elif self.open_mode == self.open_mode_fit:
-				self.zoom_to_fit_window(None, False, True)
-			elif self.open_mode == self.open_mode_1to1:
-				self.zoom_1_to_1(None, False, True)
-			elif self.open_mode == self.open_mode_last:
-				if self.last_mode == self.open_mode_smart:
+				# Determine self.preloadimg_prev_zoomratio
+				if self.open_mode == self.open_mode_smart:
 					self.zoom_to_fit_or_1_to_1(None, False, True)
-				elif self.last_mode == self.open_mode_fit:
+				elif self.open_mode == self.open_mode_fit:
 					self.zoom_to_fit_window(None, False, True)
-				elif self.last_mode == self.open_mode_1to1:
+				elif self.open_mode == self.open_mode_1to1:
 					self.zoom_1_to_1(None, False, True)
-			# Always start with the original image to preserve quality!
-			# Calculate image size:
-			self.preloadimg_prev_width = int(self.preloadimg_prev_pixbuf_original.get_width() * self.preloadimg_prev_zoomratio)
-			self.preloadimg_prev_height = int(self.preloadimg_prev_pixbuf_original.get_height() * self.preloadimg_prev_zoomratio)
-			if self.preloadimg_prev_is_animation == False:
-				# Scale image:
-				if self.preloadimg_prev_pixbuf_original.get_has_alpha() == False:
-					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original.scale_simple(self.preloadimg_prev_width, self.preloadimg_prev_height, self.zoom_quality)
+				elif self.open_mode == self.open_mode_last:
+					if self.last_mode == self.open_mode_smart:
+						self.zoom_to_fit_or_1_to_1(None, False, True)
+					elif self.last_mode == self.open_mode_fit:
+						self.zoom_to_fit_window(None, False, True)
+					elif self.last_mode == self.open_mode_1to1:
+						self.zoom_1_to_1(None, False, True)
+				# Always start with the original image to preserve quality!
+				# Calculate image size:
+				self.preloadimg_prev_width = int(self.preloadimg_prev_pixbuf_original.get_width() * self.preloadimg_prev_zoomratio)
+				self.preloadimg_prev_height = int(self.preloadimg_prev_pixbuf_original.get_height() * self.preloadimg_prev_zoomratio)
+				if self.preloadimg_prev_is_animation == False:
+					# Scale image:
+					if self.preloadimg_prev_pixbuf_original.get_has_alpha() == False:
+						self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original.scale_simple(self.preloadimg_prev_width, self.preloadimg_prev_height, self.zoom_quality)
+					else:
+						colormap = self.imageview.get_colormap()
+						light_grey = colormap.alloc_color('#666666', True, True)
+						dark_grey = colormap.alloc_color('#999999', True, True)
+						self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original.composite_color_simple(self.preloadimg_prev_width, self.preloadimg_prev_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
 				else:
-					colormap = self.imageview.get_colormap()
-					light_grey = colormap.alloc_color('#666666', True, True)
-					dark_grey = colormap.alloc_color('#999999', True, True)
-					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original.composite_color_simple(self.preloadimg_prev_width, self.preloadimg_prev_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
-			else:
-				self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original
-			gc.collect()
-			if self.verbose == True:
-				print "Preloaded prev:", self.preloadimg_prev_name
+					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original
+				gc.collect()
+				if self.verbose == True:
+					print _("Preloading:"), self.preloadimg_prev_name
+		except:
+			self.preloadimg_prev_pixbuf_original = None
 
 	def change_cursor(self, type):
 		for i in gtk.gdk.window_get_toplevels():
@@ -2426,11 +2719,12 @@ class Base:
 			if len(filelist) > 0:
 				filelist.sort(locale.strcoll)
 				for item2 in filelist:
-					self.image_list.append(item2)
-					if go_buttons_enabled == False:
-						if len(self.image_list) > 1:
-							self.set_go_navigation_sensitivities(True)
-							go_buttons_enabled = True
+					if not item2 in self.image_list:
+						self.image_list.append(item2)
+						if go_buttons_enabled == False:
+							if len(self.image_list) > 1:
+								self.set_go_navigation_sensitivities(True)
+								go_buttons_enabled = True
 			if len(folderlist) > 0:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
