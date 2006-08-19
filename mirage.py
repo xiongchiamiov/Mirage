@@ -1201,19 +1201,21 @@ class Base:
 		table_actions = gtk.Table(13, 2, False)
 		table_actions.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		actionscrollwindow = gtk.ScrolledWindow()
-		self.actionstore = gtk.ListStore(str, str)
+		self.actionstore = gtk.ListStore(gobject.TYPE_BOOLEAN, str, str)
 		self.actionwidget = gtk.TreeView()
 		self.actionwidget.set_enable_search(False)
 		self.actionwidget.set_rules_hint(True)
-		#self.actionwidget.set_headers_visible(False)
 		actionscrollwindow.add(self.actionwidget)
 		actionscrollwindow.set_shadow_type(gtk.SHADOW_IN)
 		actionscrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		actionscrollwindow.set_size_request(400, 200)
 		self.actionwidget.set_model(self.actionstore)
 		self.cell = gtk.CellRendererText()
-		self.tvcolumn1 = gtk.TreeViewColumn("Action", self.cell, markup=0)
-		self.tvcolumn2 = gtk.TreeViewColumn("Shortcut")
+		self.cellbool = gtk.CellRendererToggle()
+		self.tvcolumn0 = gtk.TreeViewColumn(_("Batch"))
+		self.tvcolumn1 = gtk.TreeViewColumn(_("Action"), self.cell, markup=0)
+		self.tvcolumn2 = gtk.TreeViewColumn(_("Shortcut"))
+		self.actionwidget.append_column(self.tvcolumn0)
 		self.actionwidget.append_column(self.tvcolumn1)
 		self.actionwidget.append_column(self.tvcolumn2)
 		self.populate_treeview()
@@ -1224,21 +1226,21 @@ class Base:
 		image, label = hbox_temp.get_children()
 		label.set_text('')
 		addbutton.connect('clicked', self.add_custom_action)
-		gtk.Tooltips().set_tip(addbutton, _("Add a custom action."))
+		gtk.Tooltips().set_tip(addbutton, _("Add action"))
 		editbutton = gtk.Button("", gtk.STOCK_EDIT)
 		alignment = editbutton.get_children()[0]
 		hbox_temp = alignment.get_children()[0]
 		image, label = hbox_temp.get_children()
 		label.set_text('')
 		editbutton.connect('clicked', self.edit_custom_action)
-		gtk.Tooltips().set_tip(editbutton, _("Edit the selected custom action."))
+		gtk.Tooltips().set_tip(editbutton, _("Edit selected action."))
 		removebutton = gtk.Button("", gtk.STOCK_REMOVE)
 		alignment = removebutton.get_children()[0]
 		hbox_temp = alignment.get_children()[0]
 		image, label = hbox_temp.get_children()
 		label.set_text('')
 		removebutton.connect('clicked', self.remove_custom_action)
-		gtk.Tooltips().set_tip(removebutton, _("Remove the selected custom action."))
+		gtk.Tooltips().set_tip(removebutton, _("Remove selected action."))
 		vbox_buttons = gtk.VBox()
 		propertyinfo = gtk.Label()
 		propertyinfo.set_markup('<small>' + _("Parameters:") + '\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
@@ -1261,7 +1263,7 @@ class Base:
 		info_image = gtk.Image()
 		info_image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_BUTTON)
 		hbox_instructions.pack_start(info_image, False, False, 5)
-		instructions = gtk.Label(_("You can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon."))
+		instructions = gtk.Label(_("You can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."))
 		instructions.set_line_wrap(True)
 		instructions.set_size_request(480, -1)
 		instructions.set_alignment(0, 0.5)
@@ -1398,17 +1400,16 @@ class Base:
 	def populate_treeview(self):
 		self.actionstore.clear()
 		for i in range(len(self.action_names)):
-			if self.action_batch[i] == True:
-				batchstring = "ALL: "
-			else:
-				batchstring = ""
-			self.actionstore.append(['<big><b>' + batchstring + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
+			self.actionstore.append([self.action_batch[i], '<big><b>' + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
+		self.tvcolumn0.clear()
 		self.tvcolumn1.clear()
 		self.tvcolumn2.clear()
+		self.tvcolumn0.pack_start(self.cellbool)
 		self.tvcolumn1.pack_start(self.cell)
 		self.tvcolumn2.pack_start(self.cell)
-		self.tvcolumn1.set_attributes(self.cell, markup=0)
-		self.tvcolumn2.set_attributes(self.cell, text=1)
+		self.tvcolumn0.add_attribute(self.cellbool, "active", 0)
+		self.tvcolumn1.set_attributes(self.cell, markup=1)
+		self.tvcolumn2.set_attributes(self.cell, text=2)
 		self.tvcolumn1.set_expand(True)
 
 	def prefs_show(self, action):
