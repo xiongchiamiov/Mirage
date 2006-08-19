@@ -125,8 +125,8 @@ class Base:
 		self.delete_without_prompt = False
 		self.preloading_images = False
 		self.action_names = ["Open in GIMP", "Create Thumbnail", "Create Thumbnails", "Move to Favorites"]
-		self.action_shortcuts = ["<Control>e", "<Alt>t", "<Ctrl><Alt>t", "<Control><Alt>f"]
-		self.action_commands = ["gimp-remote %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXTIMG]"]
+		self.action_shortcuts = ["<Control>e", "<Alt>t", "<Control><Alt>t", "<Control><Alt>f"]
+		self.action_commands = ["gimp-remote %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXT]"]
 		self.action_batch = [False, False, True, False]
 		self.onload_cmd = None
 
@@ -622,6 +622,31 @@ class Base:
 			self.parse_action_command2(command, self.currimg_name)
 		gc.collect()
 		self.change_cursor(None)
+		# Refresh the current image or any preloaded needed if they have changed:
+		if os.path.exists(self.currimg_name) == False:
+			self.currimg_pixbuf_original = None
+			self.image_load_failed(False)
+		else:
+			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
+			if (animtest.is_static_image() == True and self.currimg_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.currimg_pixbuf_original != animtest):
+				print "updating curr image"
+				self.load_new_image(False, False, True)
+		if os.path.exists(self.preloadimg_prev_name) == False:
+			self.preloadimg_prev_pixbuf_original = None
+		else:
+			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
+			if (animtest.is_static_image() == True and self.preloadimg_prev_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_prev_pixbuf_original != animtest):
+				print "updating previous preload image"
+				self.preloadimg_prev_pixbuf_original = None
+				self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
+		if os.path.exists(self.preloadimg_next_name) == False:
+			self.preloadimg_next_pixbuf_original = None
+		else:
+			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
+			if (animtest.is_static_image() == True and self.preloadimg_next_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_next_pixbuf_original != animtest):
+				print "updating next preload image"
+				self.preloadimg_next_pixbuf_original = None
+				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 
 	def parse_action_command2(self, command, imagename):
 		# First, replace any property keywords with their flags:
@@ -638,26 +663,18 @@ class Base:
 			commands[i] = string.lstrip(commands[i])
 			if self.verbose == True:
 				print _("Action:"), commands[i]
-			if commands[i] == "[REFRESH]":
-				self.load_new_image(False, False, True)
-			elif commands[i] == "[NEXTIMG]":
+			elif commands[i] == "[NEXT]":
 				self.next_img_in_list(None)
-			elif commands[i] == "[PREVIMG]":
+			elif commands[i] == "[PREV]":
 				self.prev_img_in_list(None)
 			else:
 				temp = os.system(commands[i])
 				if temp == 32512:
-					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' \"' + commands[i] + '\". ' + _('Please specify a valid command from Edit > Preferences.'))
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' \"' + commands[i] + '\". ' + _('Please specify a valid command from Edit > Custom Actions.'))
+					error_dialog.set_title(_("Invalid Custom Action"))
 					error_dialog.run()
 					error_dialog.destroy()
 					return
-		if os.path.exists(self.currimg_name) == False:
-			self.currimg_pixbuf_original = None
-			self.image_load_failed(False)
-		if os.path.exists(self.preloadimg_prev_name) == False:
-			self.preloadimg_prev_pixbuf_original = None
-		if os.path.exists(self.preloadimg_next_name) == False:
-			self.preloadimg_next_pixbuf_original = None
 
 	def set_go_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
@@ -1227,7 +1244,7 @@ class Base:
 		propertyinfo.set_markup('<small>' + _("Parameters:") + '\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
 		propertyinfo.set_alignment(0, 0)
 		actioninfo = gtk.Label()
-		actioninfo.set_markup('<small>' + _("Operations:") + '\n<span font_family="Monospace">[REFRESH]</span> - ' + _("Refresh current image") + '\n<span font_family="Monospace">[NEXTIMG]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREVIMG]</span> - ' + _("Go to previous image") +'</small>')
+		actioninfo.set_markup('<small>' + _("Operations:") + '\n<span font_family="Monospace">[NEXT]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREV]</span> - ' + _("Go to previous image") +'</small>')
 		actioninfo.set_alignment(0, 0)
 		hbox_info = gtk.HBox()
 		hbox_info.pack_start(propertyinfo, False, False, 15)
@@ -1271,6 +1288,7 @@ class Base:
 			self.populate_treeview()
 		elif canceled == False:
 			error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
+			error_dialog.set_title(_("Invalid Custom Action"))
 			error_dialog.run()
 			error_dialog.destroy()
 
@@ -1287,6 +1305,7 @@ class Base:
 				self.populate_treeview()
 			elif canceled == False:
 				error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
+				error_dialog.set_title(_("Invalid Custom Action"))
 				error_dialog.run()
 				error_dialog.destroy()
 
@@ -1351,12 +1370,14 @@ class Base:
 			for i in range(len(self.keys)):
 				if shortcut == self.keys[i][1]:
 					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.keys[i][0] + '\'.')
+					error_dialog.set_title(_("Invalid Shortcut"))
 					error_dialog.run()
 					error_dialog.destroy()
 					return
 			for i in range(len(self.action_shortcuts)):
 				if shortcut == self.action_shortcuts[i]:
 					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.action_names[i] + '\'.')
+					error_dialog.set_title(_("Invalid Shortcut"))
 					error_dialog.run()
 					error_dialog.destroy()
 					return
@@ -1674,6 +1695,7 @@ class Base:
 						self.set_image_sensitivities(False)
 				except:
 					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete ') + self.currimg_name)
+					error_dialog.set_title(_("Unable to delete"))
 					error_dialog.run()
 					error_dialog.destroy()
 			delete_dialog.destroy()
@@ -2046,6 +2068,7 @@ class Base:
 					if self.fullscreen_mode == True:
 						self.change_cursor(None)
 					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the first image in the list. Wrap around to the last image?"))
+					dialog.set_title(_("Wrap?"))
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					self.user_prompt_visible = True
 					response = dialog.run()
@@ -2102,6 +2125,7 @@ class Base:
 					if self.fullscreen_mode == True:
 						self.change_cursor(None)
 					dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the last image in the list. Wrap around to the first image?"))
+					dialog.set_title(_("Wrap?"))
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					self.user_prompt_visible = True
 					response = dialog.run()
@@ -2163,6 +2187,7 @@ class Base:
 							if self.fullscreen_mode == True:
 								self.change_cursor(None)
 							dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("All images have been viewed. Would you like to cycle through the images again?"))
+							dialog.set_title(_("Wrap?"))
 							dialog.set_default_response(gtk.RESPONSE_YES)
 							self.user_prompt_visible = True
 							response = dialog.run()
@@ -2866,14 +2891,6 @@ class Base:
 					while gtk.events_pending():
 						gtk.main_iteration()
 			self.controls_moving = False
-
-	def load_editor(self, action):
-		if self.UIManager.get_widget('/MainMenu/EditMenu/Open in Editor').get_property('sensitive') == True:
-			test = os.spawnlp(os.P_WAIT, self.editor, self.editor, self.currimg_name)
-			if test == 127:
-				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' \"' + self.editor + '\". ' + _('Please specify a valid application from Edit > Preferences.'))
-				error_dialog.run()
-				error_dialog.destroy()
 
 	def disable_screensaver_in_slideshow_mode(self):
 		if self.slideshow_mode == True and self.disable_screensaver == True:
