@@ -129,6 +129,7 @@ class Base:
 		self.action_commands = ["gimp-remote %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXT]"]
 		self.action_batch = [False, False, True, False]
 		self.onload_cmd = None
+		self.searching_for_images = False
 
 		# Read any passed options/arguments:
 		try:
@@ -365,7 +366,7 @@ class Base:
 
 		# Create interface
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.set_window_title()
+		self.update_title()
 		iconname = 'mirage.png'
 		if os.path.exists(iconname):
 			icon_path = iconname
@@ -599,8 +600,14 @@ class Base:
 			elif event.keyval == gtk.gdk.keyval_from_name('Right'):
 				self.next_img_in_list(None)
 				return
-		# Check if a custom action's shortcut was pressed:
 		shortcut = gtk.accelerator_name(event.keyval, event.state)
+		if "Escape" in shortcut:
+			self.stop_now = True
+			while gtk.events_pending():
+				gtk.main_iteration()
+			self.update_statusbar()
+			return
+		# Check if a custom action's shortcut was pressed:
 		if "<Mod2>" in shortcut:
 			shortcut = shortcut.replace("<Mod2>", "")
 		for i in range(len(self.action_shortcuts)):
@@ -1055,24 +1062,16 @@ class Base:
 		return height
 
 	def open_file(self, action):
+		self.stop_now = True
+		while gtk.events_pending():
+			gtk.main_iteration()
 		self.open_file_or_folder(action, True)
 
 	def open_folder(self, action):
+		self.stop_now = True
+		while gtk.events_pending():
+			gtk.main_iteration()
 		self.open_file_or_folder(action, False)
-
-	def update_preview(self, file_chooser, preview):
-		filename = file_chooser.get_preview_filename()
-		try:
-			pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
-			preview.set_from_pixbuf(pixbuf)
-			have_preview = True
-		except:
-			pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 1, 8, 128, 128)
-			pixbuf.fill(0x00000000)
-			preview.set_from_pixbuf(pixbuf)
-			have_preview = True
-		file_chooser.set_preview_widget_active(have_preview)
-		return
 
 	def open_file_or_folder(self, action, isfile):
 		# If isfile = True, file; If isfile = False, folder
@@ -1112,10 +1111,23 @@ class Base:
 			dialog.destroy()
 			while gtk.events_pending():
 				gtk.main_iteration()
-			self.expand_filelist_and_load_image(filenames)
-			self.recursive = False
+			getfiles = gobject.idle_add(self.expand_filelist_and_load_image, filenames)
 		else:
 			dialog.destroy()
+		return
+
+	def update_preview(self, file_chooser, preview):
+		filename = file_chooser.get_preview_filename()
+		try:
+			pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
+			preview.set_from_pixbuf(pixbuf)
+			have_preview = True
+		except:
+			pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 1, 8, 128, 128)
+			pixbuf.fill(0x00000000)
+			preview.set_from_pixbuf(pixbuf)
+			have_preview = True
+		file_chooser.set_preview_widget_active(have_preview)
 		return
 
 	def hide_cursor(self):
@@ -1189,6 +1201,8 @@ class Base:
 			filesize = st[6]/1000
 			ratio = int(100 * self.currimg_zoomratio)
 			status_text=str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
+			if self.searching_for_images == True:
+				status_text = status_text + "   " + _('Searching for images') + "..."
 		except:
 			status_text=_("Cannot load image.")
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
@@ -1689,7 +1703,7 @@ class Base:
 						self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 					else:
 						self.imageview.clear()
-						self.set_window_title()
+						self.update_title()
 						self.statusbar.push(self.statusbar.get_context_id(""), "")
 						self.image_loaded = False
 						self.set_slideshow_sensitivities()
@@ -2329,7 +2343,7 @@ class Base:
 		self.currimg_name = str(self.image_list[self.curr_img_in_list])
 		if self.verbose == True and self.currimg_name != "":
 			print _("Loading:"), self.currimg_name
-		self.set_window_title()
+		self.update_title()
 		self.put_error_image_to_window()
 		self.image_loaded = False
 		self.currimg_pixbuf_original = None
@@ -2425,7 +2439,7 @@ class Base:
 		if self.onload_cmd != None:
 			self.parse_action_command(self.onload_cmd, False)
 		self.update_statusbar()
-		self.set_window_title()
+		self.update_title()
 		self.image_loaded = True
 		self.set_slideshow_sensitivities()
 		if reset_cursor == True:
@@ -2562,6 +2576,12 @@ class Base:
 		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found; returns new list
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+		# If any directories were passed, display "Searching..." in statusbar:
+		self.searching_for_images = False
+		for item in inputlist:
+			if os.path.isdir(item):
+				self.searching_for_images = True
+				self.update_statusbar()
 		if not self.closing_app:
 			while gtk.events_pending():
 				gtk.main_iteration()
@@ -2700,10 +2720,12 @@ class Base:
 			else:
 				self.do_image_list_stuff(first_image, second_image)
 				self.add_folderlist_images(folderlist, go_buttons_enabled)
-			self.set_window_title()
+			self.update_title()
 			if not self.closing_app:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
+		self.searching_for_images = False
+		self.update_statusbar()
 		if not self.closing_app:
 			self.change_cursor(None)
 
@@ -2722,14 +2744,14 @@ class Base:
 			self.image_list = list(set(self.image_list))
 			self.image_list.sort(locale.strcoll)
 
-	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled, update_title, print_found_msg):
+	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled, update_window_title, print_found_msg):
 		if self.stop_now == False and self.closing_app == False:
 			folderlist = []
 			filelist = []
 			if os.access(item, os.R_OK) == False:
 				return False
 			for item2 in os.listdir(item):
-				if item2[0] != '.' and self.closing_app == False:
+				if item2[0] != '.' and self.closing_app == False and self.stop_now == False:
 					item2 = item + "/" + item2
 					item_fullpath2 = os.path.abspath(item2)
 					if os.path.isfile(item_fullpath2):
@@ -2742,6 +2764,11 @@ class Base:
 								print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
 					elif os.path.isdir(item_fullpath2) and self.recursive == True:
 						folderlist.append(item_fullpath2)
+			if update_window_title == True:
+				self.update_title()
+				if not self.closing_app:
+					while gtk.events_pending():
+						gtk.main_iteration(True)
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(filelist) > 0:
 				filelist.sort(locale.strcoll)
@@ -2755,12 +2782,8 @@ class Base:
 			if len(folderlist) > 0:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
-					self.expand_directory(item2, stop_when_image_found, go_buttons_enabled, update_title, print_found_msg)
-		if update_title == True:
-			self.set_window_title()
-			if not self.closing_app:
-				while gtk.events_pending():
-					gtk.main_iteration(True)
+					if self.stop_now == False:
+						self.expand_directory(item2, stop_when_image_found, go_buttons_enabled, update_window_title, print_found_msg)
 
 	def valid_image(self, file):
 		test = gtk.gdk.pixbuf_get_file_info(file)
@@ -2813,7 +2836,7 @@ class Base:
 				if self.slideshow_in_fullscreen == True and self.fullscreen_mode == False:
 					self.enter_fullscreen(None)
 				self.slideshow_mode = True
-				self.set_window_title()
+				self.update_title()
 				self.set_slideshow_sensitivities()
 				if self.curr_slideshow_random == False:
 					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.next_img_in_list, "ss")
@@ -2826,20 +2849,20 @@ class Base:
 			else:
 				self.slideshow_mode = False
 				gobject.source_remove(self.timer_delay)
-				self.set_window_title()
+				self.update_title()
 				self.set_slideshow_sensitivities()
 				self.set_zoom_sensitivities()
 				self.ss_stop.hide()
 				self.ss_start.show()
 
-	def set_window_title(self):
+	def update_title(self):
 		if len(self.image_list) == 0:
-			self.window.set_title("Mirage")
+			title = "Mirage"
 		else:
+			title = "Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name)
 			if self.slideshow_mode == True:
-				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name) + ' - ' + _('Slideshow Mode'))
-			else:
-				self.window.set_title("Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name))
+				title = title + ' - ' + _('Slideshow Mode')
+		self.window.set_title(title)
 
 	def slideshow_controls_show(self):
 		if self.slideshow_controls_visible == False and self.controls_moving == False:

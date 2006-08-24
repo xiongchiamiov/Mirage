@@ -3,7 +3,6 @@
 + Documentation
 + Resize, rotate, crop, and save (luzi)
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
-+ Cannot 'open folder' while still searching for images
 + expand_imagelist...() - problem with multiple cli arguments and sorting
 
 Future
@@ -13,5 +12,4 @@ Future
 + Test on Windows/Mac? Wait until gcc requirement is gone.
 + Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
-+ Add side treeview for browsing? (Bjoern Martensen)
 + Recent files in file menu (requires new pygtk and gtk 2.10)
