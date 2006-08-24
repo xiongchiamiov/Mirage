@@ -1,15 +1,22 @@
 0.8
-+ Try to make zooming smoother (argh..)
++ Try to make zooming smoother (is this even possible with pygtk?)
 + Documentation
 + Resize, rotate, crop, and save (luzi)
+	- Saving: jpeg/png, quality, transparency (for png) - pixbuf.save()
+		- File > Save, File > Save As...
+	- Cropping: pixbuf.copy_area()
+		- Edit > Crop...
+	- Resizing: same as zooming..
+		- Edit > Resize...
+	- Rotating/Flipping: done
+	- Pref: Auto-saving - No, yes, prompt
+		- Edit > Prefs > Behavior
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
-+ expand_imagelist...() - problem with multiple cli arguments and sorting
 
 Future
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
-+ Remove gcc requirement when mirroring/rotating is included in pygtk
-+ Allow image manipulations (rotate, zoom) on animated images
-+ Test on Windows/Mac? Wait until gcc requirement is gone.
-+ Printing support - wait for gtk 2.10 (Bjoern Martensen)
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
++ Printing support (requires gtk 2.10) (Bjoern Martensen)
 + Recent files in file menu (requires new pygtk and gtk 2.10)
++ Remove gcc requirement (requires new pygtk)
++ Test on Windows/Mac? (requires new pygtk)

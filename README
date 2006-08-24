@@ -17,9 +17,9 @@ USAGE:
 
 FEATURES:
 	+ Supports png, jpg, svg, xpm, gif, bmp, tiff, and others
-	+ Cycling through multiple images
+	+ Cycling through multiple images (with preloading)
 	+ Slideshow mode
 	+ Rotating, zooming, and flipping
-	+ Edit in external editor
+	+ Custom actions
 	+ Command-line access
 	+ Configurable interface
