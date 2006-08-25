@@ -59,8 +59,8 @@ class Base:
 		self.open_mode_fit = 1
 		self.open_mode_1to1 = 2
 		self.open_mode_last = 3
-		self.max_zoomratio = 5       # 5 x self.zoomratio_for_zoom_to_fit
-		self.min_zoomratio = 0.1     # 0.1 x self.zoomratio_for_zoom_to_fit
+		self.max_zoomratio = 5      			 # 5 x self.zoomratio_for_zoom_to_fit
+		self.min_zoomratio = 0.1    			 # 0.1 x self.zoomratio_for_zoom_to_fit
 
 		# Initialize vars:
 		width=600
@@ -100,7 +100,7 @@ class Base:
 		self.recursive = False
 		self.verbose = False
 		self.image_loaded = False
-		self.open_all_images = False		# open all images in the directory(ies)
+		self.open_all_images = False			# open all images in the directory(ies)
 		self.use_last_dir = True
 		self.last_dir = os.path.expanduser("~")
 		self.fixed_dir = os.path.expanduser("~")
@@ -109,9 +109,9 @@ class Base:
 		self.last_mode = self.open_mode_smart
 		self.zoomratio_for_zoom_to_fit = 1
 		self.mousewheel_nav = True
-		self.listwrap_mode = 0			# 0=no, 1=yes, 2=ask
-		self.user_prompt_visible = False	# the "wrap?" prompt
-		self.slideshow_delay = 1		# self.delayoptions[self.slideshow_delay] seconds
+		self.listwrap_mode = 0					# 0=no, 1=yes, 2=ask
+		self.user_prompt_visible = False		# the "wrap?" prompt
+		self.slideshow_delay = 1				# self.delayoptions[self.slideshow_delay] seconds
 		self.slideshow_mode = False
 		self.delayoptions = [2,3,5,10,15,30]	# in seconds
 		self.slideshow_random = False
@@ -130,6 +130,7 @@ class Base:
 		self.action_batch = [False, False, True, False]
 		self.onload_cmd = None
 		self.searching_for_images = False
+		self.zoomlevel_changed = False
 
 		# Read any passed options/arguments:
 		try:
@@ -229,13 +230,13 @@ class Base:
 			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
 			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
-			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.img_in_list_prev),
-			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.img_in_list_next),
-			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.img_in_list_prev),
-			('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', _('Next'), self.img_in_list_next),
-			('Random Image', None, _('_Random Image'), 'R', _('Random Image'), self.img_in_list_random),
-			('First Image', gtk.STOCK_GOTO_FIRST, _('_First Image'), 'Home', _('First Image'), self.img_in_list_first),
-			('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', _('Last Image'), self.img_in_list_last),
+			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.goto_prev_image),
+			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.goto_next_image),
+			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.goto_prev_image),
+			('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', _('Next'), self.goto_next_image),
+			('Random Image', None, _('_Random Image'), 'R', _('Random Image'), self.goto_random_image),
+			('First Image', gtk.STOCK_GOTO_FIRST, _('_First Image'), 'Home', _('First Image'), self.goto_first_image),
+			('Last Image', gtk.STOCK_GOTO_LAST, _('_Last Image'), 'End', _('Last Image'), self.goto_last_image),
 			('In', gtk.STOCK_ZOOM_IN, _('Zoom _In'), '<Ctrl>Up', _('Zoom In'), self.zoom_in),
 			('Out', gtk.STOCK_ZOOM_OUT, _('Zoom _Out'), '<Ctrl>Down', _('Zoom Out'), self.zoom_out),
 			('Fit', gtk.STOCK_ZOOM_FIT, _('Zoom To _Fit'), '<Ctrl>0', _('Fit'), self.zoom_to_fit_window_action),
@@ -257,7 +258,7 @@ class Base:
 			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
 			('Plus', None, '', 'plus', _('Zoom In'), self.zoom_in),
 			('Equal', None, '', 'equal', _('Zoom In'), self.zoom_in),
-			('Space', None, '', 'space', _('Next'), self.img_in_list_next),
+			('Space', None, '', 'space', _('Next'), self.goto_next_image),
 			('Ctrl-KP_Insert', None, '', '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
 			('Ctrl-KP_End', None, '', '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
 			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
@@ -430,7 +431,7 @@ class Base:
 		image, label = hbox2.get_children()
 		label.set_text('')
 		ss_back.set_property('can-focus', False)
-		ss_back.connect('clicked', self.img_in_list_prev)
+		ss_back.connect('clicked', self.goto_prev_image)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
 		alignment = self.ss_start.get_children()[0]
 		hbox2 = alignment.get_children()[0]
@@ -451,7 +452,7 @@ class Base:
 		image, label = hbox2.get_children()
 		label.set_text('')
 		ss_forward.set_property('can-focus', False)
-		ss_forward.connect('clicked', self.img_in_list_next)
+		ss_forward.connect('clicked', self.goto_next_image)
 		self.slideshow_controls.pack_start(ss_back, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_stop, False, False, 0)
@@ -598,10 +599,10 @@ class Base:
 		# accelerators so we will manually check for them here:
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
 			if event.keyval == gtk.gdk.keyval_from_name('Left'):
-				self.img_in_list_prev(None)
+				self.goto_prev_image(None)
 				return
 			elif event.keyval == gtk.gdk.keyval_from_name('Right'):
-				self.img_in_list_next(None)
+				self.goto_next_image(None)
 				return
 		shortcut = gtk.accelerator_name(event.keyval, event.state)
 		if "Escape" in shortcut:
@@ -674,9 +675,9 @@ class Base:
 			if self.verbose == True:
 				print _("Action:"), commands[i]
 			elif commands[i] == "[NEXT]":
-				self.img_in_list_next(None)
+				self.goto_next_image(None)
 			elif commands[i] == "[PREV]":
-				self.img_in_list_prev(None)
+				self.goto_prev_image(None)
 			else:
 				temp = os.system(commands[i])
 				if temp == 32512:
@@ -815,9 +816,9 @@ class Base:
 		if self.slideshow_mode == True:
 			gobject.source_remove(self.timer_delay)
 			if self.curr_slideshow_random == True:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 			else:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.window.set_focus(self.layout)
 
 	def random_changed(self, action):
@@ -1834,9 +1835,9 @@ class Base:
 			# Navigation of images with mousewheel:
 			elif self.mousewheel_nav == True:
 				if event.direction == gtk.gdk.SCROLL_UP:
-					self.img_in_list_prev(None)
+					self.goto_prev_image(None)
 				elif event.direction == gtk.gdk.SCROLL_DOWN:
-					self.img_in_list_next(None)
+					self.goto_next_image(None)
 				return True
 
 	def mouse_moved(self, widget, event):
@@ -1899,6 +1900,7 @@ class Base:
 			self.last_image_action_was_fit = False
 			self.put_zoom_image_to_window(False, False)
 			self.update_statusbar()
+			self.zoomlevel_changed = True
 
 	def zoom_out(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Out').get_property('sensitive') == True:
@@ -1907,6 +1909,7 @@ class Base:
 			self.last_image_action_was_fit = False
 			self.put_zoom_image_to_window(False, False)
 			self.update_statusbar()
+			self.zoomlevel_changed = True
 
 	def zoom_to_fit_window_action(self, action):
 		self.zoom_to_fit_window(action, False, False)
@@ -1960,6 +1963,7 @@ class Base:
 				self.set_zoom_sensitivities()
 				self.put_zoom_image_to_window(False, False)
 				self.update_statusbar()
+				self.zoomlevel_changed = True
 
 	def zoom_to_fit_or_1_to_1(self, action, is_preloadimg_next, is_preloadimg_prev):
 		if is_preloadimg_next == True:
@@ -2036,6 +2040,7 @@ class Base:
 				self.currimg_zoomratio = 1
 				self.put_zoom_image_to_window(False, False)
 				self.update_statusbar()
+				self.zoomlevel_changed = True
 
 	def rotate_left(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').get_property('sensitive') == True:
@@ -2105,11 +2110,13 @@ class Base:
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 		return
 
-	def img_in_list_prev(self, action):
+	def goto_prev_image(self, action):
 		if self.slideshow_mode == True and action != "ss":
 			gobject.source_remove(self.timer_delay)
-		currimg_location = self.location
-		currimg_orientation = self.orientation
+		if self.location != 0 or self.orientation != 0 or self.zoomlevel_changed == True:
+			regenerate_next_preload_img = True
+		else:
+			regenerate_next_preload_img = False
 		if len(self.image_list) > 1:
 			try:
 				gobject.source_remove(self.preload_when_idle)
@@ -2156,19 +2163,24 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode == True:
 				if self.curr_slideshow_random == True:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.preloadimg_prev_pixbuf_original = None
 		self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
-		if currimg_location != 0 or currimg_orientation != 0:
+		if regenerate_next_preload_img == True:
+			# The current image has been modified, so it should not be used as
+			# the preload image. Lets generate a new one.
 			self.preloadimg_next_pixbuf_original = None
 			self.preload_when_idle2 = gobject.idle_add(self.preload_next_image, False)
 
-	def img_in_list_next(self, action):
+	def goto_next_image(self, action):
 		if self.slideshow_mode == True and action != "ss":
 			gobject.source_remove(self.timer_delay)
-		currimg_location = self.location
+		if self.location != 0 or self.orientation != 0 or self.zoomlevel_changed == True:
+			regenerate_prev_preload_img = True
+		else:
+			regenerate_prev_preload_img = False
 		currimg_orientation = self.orientation
 		if len(self.image_list) > 1:
 			try:
@@ -2218,16 +2230,18 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode == True:
 				if self.curr_slideshow_random == True:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.preloadimg_next_pixbuf_original = None
 		self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
-		if currimg_location != 0 or currimg_orientation != 0:
+		if regenerate_prev_preload_img == True:
+			# The current image has been modified, so it should not be used as
+			# the preload image. Lets generate a new one.
 			self.preloadimg_prev_pixbuf_original = None
 			self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 
-	def img_in_list_random(self, action):
+	def goto_random_image(self, action):
 		if self.slideshow_mode == True and action != "ss":
 			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1:
@@ -2290,15 +2304,15 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode == True:
 				if self.curr_slideshow_random == True:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.preloadimg_next_pixbuf_original = None
 		self.preloadimg_prev_pixbuf_original = None
 		self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 		self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 
-	def img_in_list_first(self, action):
+	def goto_first_image(self, action):
 		if self.slideshow_mode == True and action != "ss":
 			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1 and self.curr_img_in_list != 0:
@@ -2318,15 +2332,15 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode == True:
 				if self.curr_slideshow_random == True:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.preloadimg_next_pixbuf_original = None
 		self.preloadimg_prev_pixbuf_original = None
 		self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 		self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 
-	def img_in_list_last(self, action):
+	def goto_last_image(self, action):
 		if self.slideshow_mode == True and action != "ss":
 			gobject.source_remove(self.timer_delay)
 		if len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1:
@@ -2346,9 +2360,9 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode == True:
 				if self.curr_slideshow_random == True:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 		self.preloadimg_next_pixbuf_original = None
 		self.preloadimg_prev_pixbuf_original = None
 		self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
@@ -2494,6 +2508,10 @@ class Base:
 		self.update_title()
 		self.image_loaded = True
 		self.set_slideshow_sensitivities()
+		# Keeping track of whether the user has changed the default zoomlevel
+		# of the image can speed up preloading; default it here to False.
+		# It will be set to true if any of the zoom_* defs are called.
+		self.zoomlevel_changed = False
 		if reset_cursor == True:
 			if self.fullscreen_mode == False:
 				self.change_cursor(None)
@@ -2891,10 +2909,10 @@ class Base:
 				self.update_title()
 				self.set_slideshow_sensitivities()
 				if self.curr_slideshow_random == False:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_next, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 				else:
 					self.reinitialize_randomlist()
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.img_in_list_random, "ss")
+					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				self.ss_start.hide()
 				self.ss_stop.show()
 				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
