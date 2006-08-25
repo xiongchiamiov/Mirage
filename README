@@ -1,4 +1,4 @@
-Mirage, a fast and simple GTK+ Image Viewer
+Mirage, a fast and simple GTK+ Image Viewer/Editor
 Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
 
 REQUIREMENTS:
@@ -19,7 +19,8 @@ FEATURES:
 	+ Supports png, jpg, svg, xpm, gif, bmp, tiff, and others
 	+ Cycling through multiple images (with preloading)
 	+ Slideshow mode
-	+ Rotating, zooming, and flipping
+	+ Rotating, zooming, flipping, resizing, cropping
+	+ Saving and deleting
 	+ Custom actions
 	+ Command-line access
 	+ Configurable interface

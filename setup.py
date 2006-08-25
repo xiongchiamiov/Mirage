@@ -24,7 +24,7 @@ if install_app == True:
 
 	setup(name='Mirage',
 			version='0.7.3',
-			description='A fast GTK+ image viewer',
+			description='A fast GTK+ image viewer/editor',
 			author='Scott Horowitz',
 			author_email='stonecrest@gmail.com',
 			url='http://mirageiv.berlios.de',

@@ -4,8 +4,6 @@
 + Resize, rotate, crop, and save (luzi)
 	- Cropping: pixbuf.copy_area()
 		- Edit > Crop...
-	- Resizing: same as zooming..
-		- Edit > Resize...
 	- Pref: Auto-saving - No, yes, prompt
 	- Save As?
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
