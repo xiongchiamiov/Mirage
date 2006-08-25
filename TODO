@@ -2,15 +2,12 @@
 + Try to make zooming smoother (is this even possible with pygtk?)
 + Documentation
 + Resize, rotate, crop, and save (luzi)
-	- Saving: jpeg/png, quality, transparency (for png) - pixbuf.save()
-		- File > Save, File > Save As...
 	- Cropping: pixbuf.copy_area()
 		- Edit > Crop...
 	- Resizing: same as zooming..
 		- Edit > Resize...
-	- Rotating/Flipping: done
 	- Pref: Auto-saving - No, yes, prompt
-		- Edit > Prefs > Behavior
+	- Save As?
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 
 Future
