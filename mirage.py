@@ -1081,7 +1081,8 @@ class Base:
 		# returns True if the user has canceled out of the dialog
 		if self.image_modified == True:
 			if self.savemode == 1:
-				self.save_image(None)
+				if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive') == True:
+					self.save_image(None)
 			elif self.savemode == 2:
 				dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("The current image has been modified. Save changes?"))
 				dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
@@ -1092,7 +1093,8 @@ class Base:
 				response = dialog.run()
 				dialog.destroy()
 				if response == gtk.RESPONSE_YES:
-					self.save_image(None)
+					if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive') == True:
+						self.save_image(None)
 				elif response != gtk.RESPONSE_NO:
 					return True
 
@@ -2059,7 +2061,7 @@ class Base:
 				self.show_scrollbars_if_needed()
 				self.center_image()
 				self.update_statusbar()
-		return
+			self.image_modified = True
 
 	def rotate_right(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').get_property('sensitive') == True:
@@ -2074,21 +2076,21 @@ class Base:
 				self.show_scrollbars_if_needed()
 				self.center_image()
 				self.update_statusbar()
-		return
+			self.image_modified = True
 
 	def flip_image_vert(self, action):
 		if self.currimg_name != ""  and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').get_property('sensitive') == True:
 			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, True)
 			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, True)
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
-		return
+			self.image_modified = True
 
 	def flip_image_horiz(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').get_property('sensitive') == True:
 			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, False)
 			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, False)
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
-		return
+			self.image_modified = True
 
 	def crop_image(self, action):
 		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
