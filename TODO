@@ -1,6 +1,8 @@
 0.8
 + Try to make zooming smoother (is this even possible with pygtk?)
 + Documentation
++ Feedback for custom actions
++ "Searching for images..."
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)

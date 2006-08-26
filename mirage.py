@@ -406,8 +406,8 @@ class Base:
 		self.UIManager.add_ui_from_string(uiDescription)
 		self.window.add_accel_group(self.UIManager.get_accel_group())
 		self.menubar = self.UIManager.get_widget('/MainMenu')
-		self.set_slideshow_sensitivities()
 		vbox.pack_start(self.menubar, False, False, 0)
+		self.set_slideshow_sensitivities()
 		self.toolbar = self.UIManager.get_widget('/MainToolbar')
 		vbox.pack_start(self.toolbar, False, False, 0)
 		self.toolbar.set_property('visible', self.toolbar_show)
@@ -618,9 +618,10 @@ class Base:
 		shortcut = gtk.accelerator_name(event.keyval, event.state)
 		if "Escape" in shortcut:
 			self.stop_now = True
+			self.searching_for_images = False
 			while gtk.events_pending():
 				gtk.main_iteration()
-			self.update_statusbar()
+			self.update_title()
 			return
 		# Check if a custom action's shortcut was pressed:
 		if "<Mod2>" in shortcut:
@@ -1166,17 +1167,30 @@ class Base:
 
 	def update_preview(self, file_chooser, preview):
 		filename = file_chooser.get_preview_filename()
+		pixbuf = None
 		try:
 			pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
-			preview.set_from_pixbuf(pixbuf)
-			have_preview = True
 		except:
+			pass
+		if pixbuf == None:
+			try:
+				pixbuf = gtk.gdk.PixbufAnimation(filename).get_static_image()
+				width = pixbuf.get_width()
+				height = pixbuf.get_height()
+				if width > height:
+					pixbuf = pixbuf.scale_simple(128, int(float(height)/width*128), self.zoom_quality)
+				else:
+					pixbuf = pixbuf.scale_simple(int(float(width)/height*128), 128, self.zoom_quality)
+			except:
+				pass
+		if pixbuf == None:
 			pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 1, 8, 128, 128)
 			pixbuf.fill(0x00000000)
-			preview.set_from_pixbuf(pixbuf)
-			have_preview = True
+		preview.set_from_pixbuf(pixbuf)
+		have_preview = True
 		file_chooser.set_preview_widget_active(have_preview)
-		return
+		del pixbuf
+		gc.collect()
 
 	def hide_cursor(self):
 		if self.fullscreen_mode == True and self.user_prompt_visible == False and self.slideshow_controls_visible == False:
@@ -1249,8 +1263,6 @@ class Base:
 			filesize = st[6]/1000
 			ratio = int(100 * self.currimg_zoomratio)
 			status_text = str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
-			if self.searching_for_images == True:
-				status_text = status_text + "   " + _('Searching for images') + "..."
 		except:
 			status_text=_("Cannot load image.")
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
@@ -2114,7 +2126,12 @@ class Base:
 			dark_grey = colormap.alloc_color('#999999', True, True)
 			crop_pixbuf = self.currimg_pixbuf_original.composite_color_simple(image_width, image_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
 		image.set_size_request(image_width, image_height)
-		dialog.vbox.pack_start(image, False, False, 0)
+		hbox = gtk.HBox()
+		hbox.pack_start(gtk.Label(), expand=True)
+		hbox.pack_start(image, expand=False)
+		hbox.pack_start(gtk.Label(), expand=True)
+		dialog.vbox.pack_start(hbox, False, False, 0)
+		dialog.set_resizable(False)
 		dialog.vbox.show_all()
 		image.set_events(gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.POINTER_MOTION_HINT_MASK | gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK)
 		image.connect("expose-event", self.crop_image_expose_cb, crop_pixbuf, image_width, image_height)
@@ -3102,6 +3119,8 @@ class Base:
 			title = "Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name)
 			if self.slideshow_mode == True:
 				title = title + ' - ' + _('Slideshow Mode')
+			if self.searching_for_images == True:
+				title = title + "          (" + _('Scanning') + "...)"
 		self.window.set_title(title)
 
 	def slideshow_controls_show(self):
