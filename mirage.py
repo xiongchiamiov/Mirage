@@ -252,7 +252,8 @@ class Base:
 			('Rotate Right', None, _('Rotate _Right'), '<Ctrl>Right', _('Rotate Right'), self.rotate_right),
 			('Flip Vertically', None, _('Flip _Vertically'), '<Ctrl>V', _('Flip Vertically'), self.flip_image_vert),
 			('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', _('Flip Horizontally'), self.flip_image_horiz),
-			('About', gtk.STOCK_ABOUT, _('_About'), 'F1', _('About'), self.show_about),
+			('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.show_about),
+			('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1', _('Contents'), self.show_help),
 			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), None, _('Preferences'), self.show_prefs),
 			('Full Screen', gtk.STOCK_FULLSCREEN, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
 			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
@@ -351,6 +352,7 @@ class Base:
 			      <menuitem action="Stop Slideshow"/>
 			    </menu>
 			    <menu action="HelpMenu">
+			      <menuitem action="Contents"/>
 			      <menuitem action="About"/>
 			    </menu>
 			    <menu action="MiscKeysMenuHidden">
@@ -427,9 +429,16 @@ class Base:
 		self.imageview = gtk.Image()
 		self.layout.add(self.imageview)
 		self.statusbar = gtk.Statusbar()
-		self.statusbar.set_has_resize_grip(True)
-		vbox.pack_start(self.statusbar, False, False, 0)
+		self.statusbar2 = gtk.Statusbar()
+		self.statusbar.set_has_resize_grip(False)
+		self.statusbar2.set_has_resize_grip(True)
+		self.statusbar2.set_size_request(100, -1)
+		hbox_statusbar = gtk.HBox()
+		hbox_statusbar.pack_start(self.statusbar, expand=True)
+		hbox_statusbar.pack_start(self.statusbar2, expand=False)
+		vbox.pack_start(hbox_statusbar, False, False, 0)
 		self.statusbar.set_property('visible', self.statusbar_show)
+		self.statusbar2.set_property('visible', self.statusbar_show)
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(width,height)
@@ -562,6 +571,7 @@ class Base:
 				if (o in ("-f", "--fullscreen")) or ((o in ("-s", "--slideshow")) and self.slideshow_in_fullscreen == True):
 					self.enter_fullscreen(None)
 					self.statusbar.set_no_show_all(True)
+					self.statusbar2.set_no_show_all(True)
 					self.toolbar.set_no_show_all(True)
 					self.menubar.set_no_show_all(True)
 		self.window.show_all()
@@ -1211,6 +1221,7 @@ class Base:
 			self.UIManager.get_widget('/Popup/Full Screen').hide()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
 			self.statusbar.hide()
+			self.statusbar2.hide()
 			self.toolbar.hide()
 			self.menubar.hide()
 			self.window.fullscreen()
@@ -1232,6 +1243,7 @@ class Base:
 			self.menubar.show()
 			if self.statusbar_show == True:
 				self.statusbar.show()
+				self.statusbar2.show()
 			self.window.unfullscreen()
 			self.change_cursor(None)
 			self.set_slideshow_sensitivities()
@@ -1239,9 +1251,11 @@ class Base:
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible') == True:
 			self.statusbar.hide()
+			self.statusbar2.hide()
 			self.statusbar_show = False
 		else:
 			self.statusbar.show()
+			self.statusbar2.show()
 			self.statusbar_show = True
 		if self.image_loaded == True and self.last_image_action_was_fit == True:
 			self.zoom_to_fit_window(None, False, False)
@@ -1266,7 +1280,10 @@ class Base:
 		except:
 			status_text=_("Cannot load image.")
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
-		return
+		status_text = ""
+		if self.searching_for_images == True:
+			status_text = _('Scanning') + '...'
+		self.statusbar2.push(self.statusbar2.get_context_id(""), status_text)
 
 	def custom_actions_show(self, action):
 		self.actions_dialog = gtk.Dialog(title=_("Configure Custom Actions"), parent=self.window)
@@ -1845,7 +1862,22 @@ class Base:
 		self.about_dialog.connect('response', self.close_about)
 		self.about_dialog.connect('delete_event', self.close_about)
 		self.about_dialog.show_all()
-		return
+
+	def show_help(self, action):
+		docslink = "http://mirageiv.berlios.de/docs.html"
+		test = os.spawnlp(os.P_WAIT, "firefox", "firefox", docslink)
+		if test == 127:
+			test = os.spawnlp(os.P_WAIT, "mozilla", "mozilla", docslink)
+			if test == 127:
+				test = os.spawnlp(os.P_WAIT, "opera", "opera", docslink)
+				if test == 127:
+					test = os.spawnlp(os.P_WAIT, "konquerer", "konqueror", docslink)
+					if test == 127:
+						test = os.spawnlp(os.P_WAIT, "netscape", "netscape", docslink)
+						if test == 127:
+							error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' ' + _('a suitable browser'))
+							error_dialog.run()
+							error_dialog.destroy()
 
 	def close_about(self, event, data=None):
 		self.about_dialog.hide()
@@ -3119,8 +3151,6 @@ class Base:
 			title = "Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name)
 			if self.slideshow_mode == True:
 				title = title + ' - ' + _('Slideshow Mode')
-			if self.searching_for_images == True:
-				title = title + "          (" + _('Scanning') + "...)"
 		self.window.set_title(title)
 
 	def slideshow_controls_show(self):

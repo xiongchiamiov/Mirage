@@ -1,8 +1,8 @@
 0.8
-+ Try to make zooming smoother (is this even possible with pygtk?)
 + Documentation
 + Feedback for custom actions
-+ "Searching for images..."
++ Bug hunting
++ Update translations
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
@@ -12,3 +12,4 @@ Future
 + Recent files in file menu (requires new pygtk and gtk 2.10)
 + Remove gcc requirement (requires new pygtk)
 + Test on Windows/Mac? (requires new pygtk)
++ Try to make zooming smoother (is this even possible with pygtk?)
