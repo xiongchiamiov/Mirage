@@ -1,5 +1,5 @@
 v0.8 - Pending
-	+ Image editing capabilities: resize, save, delete (luzi/Bjoern Martensen)
+	+ Editing capabilities: resize, crop, save, delete (luzi/Bjoern Martensen)
 	+ Preference to preload images for speeding up navigation (Mike Massonnet)
 	+ Implemented 'custom actions' framework, including batch actions (Thomas Güttler)
 	+ --onload or -o argument for performing actions on image loading (Thomas Güttler)

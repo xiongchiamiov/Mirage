@@ -1,14 +1,10 @@
 0.8
 + Try to make zooming smoother (is this even possible with pygtk?)
 + Documentation
-+ Resize, rotate, crop, and save (luzi)
-	- Cropping: pixbuf.copy_area()
-		- Edit > Crop...
-	- Pref: Auto-saving - No, yes, prompt
-	- Save As?
-+ Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
++ mirage -V images/mirage-test2/
 
 Future
++ Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
 + Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
 + Printing support (requires gtk 2.10) (Bjoern Martensen)
