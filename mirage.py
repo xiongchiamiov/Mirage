@@ -2982,7 +2982,7 @@ class Base:
 			self.image_list = list(set(self.image_list))
 			self.image_list.sort(locale.strcoll)
 
-	def expand_directory(self, item, stop_when_image_found, go_buttons_enabled, update_window_title, print_found_msg):
+	def expand_directory(self, item, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg):
 		if self.stop_now == False and self.closing_app == False:
 			folderlist = []
 			filelist = []
@@ -2995,24 +2995,26 @@ class Base:
 					if os.path.isfile(item_fullpath2):
 						if self.valid_image(item_fullpath2) == True:
 							filelist.append(item2)
-							if stop_when_image_found == True:
-								self.stop_now = True
 							if self.verbose == True and print_found_msg == True:
 								self.images_found += 1
 								print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
 					elif os.path.isdir(item_fullpath2) and self.recursive == True:
 						folderlist.append(item_fullpath2)
-			if update_window_title == True:
-				self.update_title()
-				if not self.closing_app:
-					while gtk.events_pending():
-						gtk.main_iteration(True)
+			if len(self.image_list)>0:
+				if update_window_title == True:
+					self.update_title()
+					if not self.closing_app:
+						while gtk.events_pending():
+							gtk.main_iteration(True)
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
 			if len(filelist) > 0:
 				filelist.sort(locale.strcoll)
 				for item2 in filelist:
 					if not item2 in self.image_list:
 						self.image_list.append(item2)
+						if stop_when_second_image_found == True and len(self.image_list)==2:
+							self.stop_now = True
+							return
 						if go_buttons_enabled == False:
 							if len(self.image_list) > 1:
 								self.set_go_navigation_sensitivities(True)
@@ -3021,7 +3023,7 @@ class Base:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
 					if self.stop_now == False:
-						self.expand_directory(item2, stop_when_image_found, go_buttons_enabled, update_window_title, print_found_msg)
+						self.expand_directory(item2, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg)
 
 	def valid_image(self, file):
 		test = gtk.gdk.pixbuf_get_file_info(file)
