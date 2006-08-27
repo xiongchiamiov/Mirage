@@ -115,7 +115,7 @@ class Base:
 		self.slideshow_random = False
 		self.slideshow_controls_visible = False	# fullscreen slideshow controls
 		self.controls_moving = False
-		self.zoomvalue = 3.0
+		self.zoomvalue = 2
 		self.updating_adjustments = False
 		self.disable_screensaver = True
 		self.slideshow_in_fullscreen = False
@@ -133,6 +133,7 @@ class Base:
 		self.savemode = 2
 		self.image_modified = False
 		self.image_zoomed = False
+		self.start_in_fullscreen = False
 
 		# Read any passed options/arguments:
 		try:
@@ -190,7 +191,7 @@ class Base:
 			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
 			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
 			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
-			self.zoomvalue = conf.getfloat('prefs', 'zoomvalue')
+			self.zoomvalue = conf.getint('prefs', 'zoomquality')
 			if int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
 			elif int(round(self.zoomvalue, 0)) == 2:
@@ -214,6 +215,7 @@ class Base:
 				self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
 				self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
 			self.savemode = conf.getint('prefs', 'savemode')
+			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
 			pass
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -565,14 +567,17 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 		self.hscroll.set_no_show_all(True)
 		self.vscroll.set_no_show_all(True)
+		go_into_fullscreen = False
 		if opts != []:
 			for o, a in opts:
 				if (o in ("-f", "--fullscreen")) or ((o in ("-s", "--slideshow")) and self.slideshow_in_fullscreen == True):
-					self.enter_fullscreen(None)
-					self.statusbar.set_no_show_all(True)
-					self.statusbar2.set_no_show_all(True)
-					self.toolbar.set_no_show_all(True)
-					self.menubar.set_no_show_all(True)
+					go_into_fullscreen = True
+		if go_into_fullscreen == True or self.start_in_fullscreen == True:
+			self.enter_fullscreen(None)
+			self.statusbar.set_no_show_all(True)
+			self.statusbar2.set_no_show_all(True)
+			self.toolbar.set_no_show_all(True)
+			self.menubar.set_no_show_all(True)
 		self.window.show_all()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
@@ -661,16 +666,12 @@ class Base:
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 			if (animtest.is_static_image() == True and self.currimg_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.currimg_pixbuf_original != animtest):
-				if self.verbose == True:
-					print "updating curr image"
 				self.load_new_image(False, False, False, True, False)
 		if os.path.exists(self.preloadimg_prev_name) == False:
 			self.preloadimg_prev_pixbuf_original = None
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
 			if (animtest.is_static_image() == True and self.preloadimg_prev_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_prev_pixbuf_original != animtest):
-				if self.verbose == True:
-					print "updating previous preload image"
 				self.preloadimg_prev_pixbuf_original = None
 				self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
 		if os.path.exists(self.preloadimg_next_name) == False:
@@ -678,8 +679,6 @@ class Base:
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
 			if (animtest.is_static_image() == True and self.preloadimg_next_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_next_pixbuf_original != animtest):
-				if self.verbose == True:
-					print "updating next preload image"
 				self.preloadimg_next_pixbuf_original = None
 				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 
@@ -697,7 +696,7 @@ class Base:
 		for i in range(len(commands)):
 			commands[i] = string.lstrip(commands[i])
 			if self.verbose == True:
-				print _("Action:"), commands[i]
+				print _("Action") + ":", commands[i]
 			elif commands[i] == "[NEXT]":
 				self.goto_next_image(None)
 			elif commands[i] == "[PREV]":
@@ -818,17 +817,17 @@ class Base:
 		print ""
 		print _("Usage: mirage [OPTION]... FILES|FOLDERS...")
 		print ""
-		print _("Options:")
-		print _("  -h, --help           Show this help and exit")
-		print _("  -v, --version        Show version information and exit")
-		print _("  -V, --verbose        Show more detailed information")
-		print _("  -R, --recursive      Recursively include all images found in")
-		print _("                       subdirectories of FOLDERS")
-		print _("  -s, --slideshow      Start in slideshow mode")
-		print _("  -f, --fullscreen     Start in fullscreen mode")
-		print _("  -o, --onload 'cmd'   Execute 'cmd' when an image is loaded")
-		print _("                       (uses same syntax as custom actions,")
-		print _("                       i.e. mirage -o 'echo file is %F')")
+		print _("Options") + ":"
+		print "  -h, --help           " + _("Show this help and exit")
+		print "  -v, --version        " + _("Show version information and exit")
+		print "  -V, --verbose        " + _("Show more detailed information")
+		print "  -R, --recursive      " + _("Recursively include all images found in")
+		print "                       " + _("subdirectories of FOLDERS")
+		print "  -s, --slideshow      " + _("Start in slideshow mode")
+		print "  -f, --fullscreen     " + _("Start in fullscreen mode")
+		print "  -o, --onload 'cmd'   " + _("Execute 'cmd' when an image is loaded")
+		print "                       " + _("(uses same syntax as custom actions,")
+		print "                       " + _("i.e. mirage -o 'echo file is %F')")
 
 	def delay_changed(self, action):
 		self.curr_slideshow_delay = self.ss_delaycombo.get_active()
@@ -928,12 +927,13 @@ class Base:
 		conf.set('prefs', 'listwrap_mode', self.listwrap_mode)
 		conf.set('prefs', 'slideshow_delay', self.slideshow_delay)
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
-		conf.set('prefs', 'zoomvalue', self.zoomvalue)
+		conf.set('prefs', 'zoomquality', self.zoomvalue)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
 		conf.set('prefs', 'delete_without_prompt', self.delete_without_prompt)
 		conf.set('prefs', 'preloading_images', self.preloading_images)
 		conf.set('prefs', 'savemode', self.savemode)
+		conf.set('prefs', 'start_in_fullscreen', self.start_in_fullscreen)
 		conf.add_section('actions')
 		conf.set('actions', 'num_actions', len(self.action_names))
 		for i in range(len(self.action_names)):
@@ -1327,10 +1327,10 @@ class Base:
 		gtk.Tooltips().set_tip(removebutton, _("Remove selected action."))
 		vbox_buttons = gtk.VBox()
 		propertyinfo = gtk.Label()
-		propertyinfo.set_markup('<small>' + _("Parameters:") + '\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
+		propertyinfo.set_markup('<small>' + _("Parameters") + ':\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
 		propertyinfo.set_alignment(0, 0)
 		actioninfo = gtk.Label()
-		actioninfo.set_markup('<small>' + _("Operations:") + '\n<span font_family="Monospace">[NEXT]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREV]</span> - ' + _("Go to previous image") +'</small>')
+		actioninfo.set_markup('<small>' + _("Operations") + ':\n<span font_family="Monospace">[NEXT]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREV]</span> - ' + _("Go to previous image") +'</small>')
 		actioninfo.set_alignment(0, 0)
 		hbox_info = gtk.HBox()
 		hbox_info.pack_start(propertyinfo, False, False, 15)
@@ -1347,7 +1347,7 @@ class Base:
 		info_image = gtk.Image()
 		info_image.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_BUTTON)
 		hbox_instructions.pack_start(info_image, False, False, 5)
-		instructions = gtk.Label(_("You can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."))
+		instructions = gtk.Label(_("Here you can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."))
 		instructions.set_line_wrap(True)
 		instructions.set_size_request(480, -1)
 		instructions.set_alignment(0, 0.5)
@@ -1398,11 +1398,11 @@ class Base:
 	def open_custom_action_dialog(self, name, command, shortcut, batch):
 		self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		table = gtk.Table(2, 4, False)
-		action_name_label = gtk.Label(_("Action Name:"))
+		action_name_label = gtk.Label(_("Action Name") + ":")
 		action_name_label.set_alignment(0, 0.5)
-		action_command_label = gtk.Label(_("Command:"))
+		action_command_label = gtk.Label(_("Command") + ":")
 		action_command_label.set_alignment(0, 0.5)
-		shortcut_label = gtk.Label(_("Shortcut:"))
+		shortcut_label = gtk.Label(_("Shortcut") + ":")
 		shortcut_label.set_alignment(0, 0.5)
 		table.attach(action_name_label, 0, 1, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table.attach(action_command_label, 0, 1, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
@@ -1416,7 +1416,7 @@ class Base:
 		self.shortcut = gtk.Button(shortcut)
 		self.shortcut.connect('clicked', self.shortcut_clicked)
 		table.attach(self.shortcut, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
-		batchmode = gtk.CheckButton(_("Perform action on all images in list"))
+		batchmode = gtk.CheckButton(_("Perform action on all images (Batch)"))
 		batchmode.set_active(batch)
 		table.attach(batchmode, 0, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		self.dialog_name.vbox.pack_start(table, False, False, 5)
@@ -1506,39 +1506,25 @@ class Base:
 		bglabel.set_markup('<b>' + _('Interface') + '</b>')
 		bglabel.set_alignment(0, 1)
 		color_hbox = gtk.HBox(False, 0)
-		colortext = gtk.Label(_('Background Color') + ':  ')
+		colortext = gtk.Label(_('Background color') + ':  ')
 		colorbutton = gtk.ColorButton(self.bgcolor)
 		colorbutton.connect('color-set', self.bgcolor_selected)
+		colorbutton.set_size_request(150, -1)
 		gtk.Tooltips().set_tip(colorbutton, _("Sets the background color for the application."))
 		color_hbox.pack_start(colortext, False, False, 0)
-		color_hbox.pack_start(colorbutton, True, True, 0)
-		zoomlabel = gtk.Label()
-		zoomlabel.set_markup('<b>' + _('Zoom Quality') + '</b>')
-		zoomlabel.set_alignment(0, 1)
-		zoompref = gtk.HScale()
-		zoompref.set_range(1, 4)
-		zoompref.set_increments(1,4)
-		zoompref.set_draw_value(False)
-		zoompref.set_value(self.zoomvalue)
-		gtk.Tooltips().set_tip(zoompref, _("Sets the quality of zooming for the images. Ranges from fastest (but worst quality) to the best quality (but slowest)."))
-		zoom_hbox = gtk.HBox(False, 0)
-		zoom_label1 = gtk.Label()
-		zoom_label1.set_markup('<i>' + _('Fastest') + '</i>')
-		zoom_label1.set_alignment(0, 0)
-		zoom_label2 = gtk.Label()
-		zoom_label2.set_markup('<i>' + _('Best') + '</i>')
-		zoom_label2.set_alignment(1, 0)
-		zoom_hbox.pack_start(zoom_label1, True, True, 0)
-		zoom_hbox.pack_start(zoom_label2, True, True, 0)
+		color_hbox.pack_start(colorbutton, False, False, 0)
+		color_hbox.pack_start(gtk.Label(), True, True, 0)
+		fullscreen = gtk.CheckButton(_("Open Mirage in fullscreen mode"))
+		fullscreen.set_active(self.start_in_fullscreen)
 		table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_settings.attach(bglabel, 1, 3, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_settings.attach(zoomlabel, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table_settings.attach(fullscreen, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(zoompref, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(zoom_hbox, 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1562,7 +1548,7 @@ class Base:
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		gtk.Tooltips().set_tip(openpref1, _("The default 'Open' directory will be the last directory used."))
-		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory:"))
+		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory") + ":")
 		openpref2.connect('toggled', self.use_fixed_dir_clicked)
 		gtk.Tooltips().set_tip(openpref2, _("The default 'Open' directory will be this specified directory."))
 		self.defaultdir = gtk.Button()
@@ -1600,22 +1586,13 @@ class Base:
 		preloadnav.set_active(self.preloading_images)
 		gtk.Tooltips().set_tip(preloadnav, _("If enabled, the next and previous images in the list will be preloaded during idle time. Note that the speed increase comes at the expense of memory usage, so it is recommended to disable this option on machines with limited ram."))
 		hbox_listwrap = gtk.HBox()
-		hbox_listwrap.pack_start(gtk.Label(_("Wrap around imagelist:")), False, False, 0)
+		hbox_listwrap.pack_start(gtk.Label(_("Wrap around imagelist") + ":"), False, False, 0)
 		combobox2 = gtk.combo_box_new_text()
 		combobox2.append_text(_("No"))
 		combobox2.append_text(_("Yes"))
 		combobox2.append_text(_("Prompt User"))
 		combobox2.set_active(self.listwrap_mode)
 		hbox_listwrap.pack_start(combobox2, False, False, 5)
-		hbox_save = gtk.HBox()
-		savelabel = gtk.Label(_("Auto-save modified images:"))
-		savecombo = gtk.combo_box_new_text()
-		savecombo.append_text(_("No"))
-		savecombo.append_text(_("Yes"))
-		savecombo.append_text(_("Prompt User"))
-		savecombo.set_active(self.savemode)
-		hbox_save.pack_start(savelabel, False, False, 0)
-		hbox_save.pack_start(savecombo, False, False, 5)
 		table_navigation.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(navlabel, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -1624,17 +1601,17 @@ class Base:
 		table_navigation.attach(mousewheelnav, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(preloadnav, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_navigation.attach(hbox_save, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_navigation.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# "Slideshow" tab:
 		table_slideshow = gtk.Table(13, 2, False)
 		slideshowlabel = gtk.Label()
-		slideshowlabel.set_markup('<b>' + _('Slideshow') + '</b>')
+		slideshowlabel.set_markup('<b>' + _('Slideshow Mode') + '</b>')
 		slideshowlabel.set_alignment(0, 1)
 		hbox_delay = gtk.HBox()
-		hbox_delay.pack_start(gtk.Label(_("Delay between images:")), False, False, 0)
+		hbox_delay.pack_start(gtk.Label(_("Delay between images") + ":"), False, False, 0)
 		delaycombo = gtk.combo_box_new_text()
 		delaycombo.append_text(str(self.delayoptions[0]) + ' ' + _('seconds'))
 		delaycombo.append_text(str(self.delayoptions[1]) + ' ' + _('seconds'))
@@ -1658,19 +1635,56 @@ class Base:
 		table_slideshow.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(hbox_delay, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_slideshow.attach(ss_in_fs, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_slideshow.attach(disable_screensaver, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_slideshow.attach(disable_screensaver, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_slideshow.attach(ss_in_fs, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_slideshow.attach(randomize, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		# "Image" tab:
+		table_image = gtk.Table(13, 2, False)
+		imagelabel = gtk.Label()
+		imagelabel.set_markup('<b>' + _('Image Editing') + '</b>')
+		imagelabel.set_alignment(0, 1)
+		zoom_hbox = gtk.HBox()
+		zoom_hbox.pack_start(gtk.Label(_('Scaling quality') + ": "), False, False, 0)
+		zoomcombo = gtk.combo_box_new_text()
+		zoomcombo.append_text(_("Nearest (Fastest)"))
+		zoomcombo.append_text(_("Tiles"))
+		zoomcombo.append_text(_("Bilinear"))
+		zoomcombo.append_text(_("Hyper (Best)"))
+		zoomcombo.set_active(self.zoomvalue)
+		zoom_hbox.pack_start(zoomcombo, False, False, 0)
+		zoom_hbox.pack_start(gtk.Label(), True, True, 0)
+		hbox_save = gtk.HBox()
+		savelabel = gtk.Label(_("Modified images") + ":")
+		savecombo = gtk.combo_box_new_text()
+		savecombo.append_text(_("Ignore Changes"))
+		savecombo.append_text(_("Auto-Save"))
+		savecombo.append_text(_("Prompt For Action"))
+		savecombo.set_active(self.savemode)
+		hbox_save.pack_start(savelabel, False, False, 0)
+		hbox_save.pack_start(savecombo, False, False, 5)
+		table_image.attach(gtk.Label(), 1, 3, 1, 2,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(imagelabel, 1, 3, 2, 3,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table_image.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(zoom_hbox, 1, 3, 4, 5,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 5, 6,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(hbox_save, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
 		notebook.append_page(table_behavior, gtk.Label(str=_("Behavior")))
 		notebook.append_page(table_navigation, gtk.Label(str=_("Navigation")))
 		notebook.append_page(table_settings, gtk.Label(str=_("Interface")))
 		notebook.append_page(table_slideshow, gtk.Label(str=_("Slideshow")))
+		notebook.append_page(table_image, gtk.Label(str=_("Image")))
 		notebook.set_current_page(0)
 		hbox = gtk.HBox()
 		self.prefs_dialog.vbox.pack_start(hbox, False, False, 7)
@@ -1682,7 +1696,7 @@ class Base:
 		self.close_button.grab_focus()
 		response = self.prefs_dialog.run()
 		if response == gtk.RESPONSE_CLOSE or response == gtk.RESPONSE_DELETE_EVENT:
-			self.zoomvalue = float(zoompref.get_value())
+			self.zoomvalue = zoomcombo.get_active()
 			if int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
 			elif int(round(self.zoomvalue, 0)) == 2:
@@ -1708,6 +1722,7 @@ class Base:
 			self.disable_screensaver = disable_screensaver.get_active()
 			self.slideshow_in_fullscreen = ss_in_fs.get_active()
 			self.savemode = savecombo.get_active()
+			self.start_in_fullscreen = fullscreen.get_active()
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
 			if self.preloading_images == True and preloading_images_prev == False:
@@ -1733,7 +1748,7 @@ class Base:
 				self.toggle_slideshow(None)
 			delete_dialog = gtk.Dialog(_('Delete Image'), self.window, gtk.DIALOG_MODAL)
 			if self.delete_without_prompt == False:
-				permlabel = gtk.Label(_('Are you sure you wish to permanently delete ') + os.path.split(self.currimg_name)[1] + _('?'))
+				permlabel = gtk.Label(_('Are you sure you wish to permanently delete') + ' ' + os.path.split(self.currimg_name)[1] + '?')
 				permlabel.set_line_wrap(True)
 				warningicon = gtk.Image()
 				warningicon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_DIALOG)
@@ -1795,7 +1810,7 @@ class Base:
 						self.set_image_sensitivities(False)
 						self.set_go_navigation_sensitivities(False)
 				except:
-					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete ') + self.currimg_name)
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete') + ' ' + self.currimg_name)
 					error_dialog.set_title(_("Unable to delete"))
 					error_dialog.run()
 					error_dialog.destroy()
@@ -1820,6 +1835,9 @@ class Base:
 			getdir.destroy()
 
 	def prefs_tab_switched(self, notebook, page, page_num):
+		do_when_idle = gobject.idle_add(self.grab_close_button)
+
+	def grab_close_button(self):
 		self.close_button.grab_focus()
 
 	def bgcolor_selected(self, widget):
@@ -1873,7 +1891,7 @@ class Base:
 					if test == 127:
 						test = os.spawnlp(os.P_WAIT, "netscape", "netscape", docslink)
 						if test == 127:
-							error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch') + ' ' + _('a suitable browser'))
+							error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch a suitable browser.'))
 							error_dialog.run()
 							error_dialog.destroy()
 
@@ -2259,7 +2277,7 @@ class Base:
 		width.set_numeric(True)
 		width.set_update_policy(gtk.UPDATE_IF_VALID)
 		width.set_wrap(False)
-		width_label = gtk.Label(_("Width:"))
+		width_label = gtk.Label(_("Width") + ":")
 		width_label.set_alignment(0, 0.7)
 		hbox_width.pack_start(width_label, False, False, 10)
 		hbox_width.pack_start(width, False, False, 0)
@@ -2270,7 +2288,7 @@ class Base:
 		height.set_numeric(True)
 		height.set_update_policy(gtk.UPDATE_IF_VALID)
 		height.set_wrap(False)
-		height_label = gtk.Label(_("Height:"))
+		height_label = gtk.Label(_("Height") + ":")
 		width_label.set_size_request(height_label.size_request()[0], -1)
 		height_label.set_alignment(0, 0.7)
 		hbox_height.pack_start(height_label, False, False, 10)
@@ -2621,7 +2639,7 @@ class Base:
 	def image_load_failed(self, reset_cursor):
 		self.currimg_name = str(self.image_list[self.curr_img_in_list])
 		if self.verbose == True and self.currimg_name != "":
-			print _("Loading:"), self.currimg_name
+			print _("Loading") + ":", self.currimg_name
 		self.update_title()
 		self.put_error_image_to_window()
 		self.image_loaded = False
@@ -2659,7 +2677,7 @@ class Base:
 				self.currimg_is_animation = self.preloadimg_next_is_animation
 				set_next_to_none = True
 				if self.verbose == True and self.currimg_name != "":
-					print _("Loading:"), self.currimg_name
+					print _("Loading") + ":", self.currimg_name
 				self.put_zoom_image_to_window(True)
 				if self.currimg_is_animation == False:
 					self.set_image_sensitivities(True)
@@ -2686,7 +2704,7 @@ class Base:
 				self.currimg_is_animation = self.preloadimg_prev_is_animation
 				set_prev_to_none = True
 				if self.verbose == True and self.currimg_name != "":
-					print _("Loading:"), self.currimg_name
+					print _("Loading") + ":", self.currimg_name
 				self.put_zoom_image_to_window(True)
 				if self.currimg_is_animation == False:
 					self.set_image_sensitivities(True)
@@ -2702,7 +2720,7 @@ class Base:
 			self.currimg_zoomratio = 1
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if self.verbose == True and self.currimg_name != "":
-				print _("Loading:"), self.currimg_name
+				print _("Loading") + ":", self.currimg_name
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 			if animtest.is_static_image() == True or (use_current_pixbuf_original == True and self.currimg_is_animation == False):
 				self.currimg_is_animation = False
@@ -2795,7 +2813,7 @@ class Base:
 					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original
 				gc.collect()
 				if self.verbose == True:
-					print _("Preloading:"), self.preloadimg_next_name
+					print _("Preloading") + ":", self.preloadimg_next_name
 		except:
 			self.preloadimg_next_pixbuf_original = None
 
@@ -2854,7 +2872,7 @@ class Base:
 					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original
 				gc.collect()
 				if self.verbose == True:
-					print _("Preloading:"), self.preloadimg_prev_name
+					print _("Preloading") + ":", self.preloadimg_prev_name
 		except:
 			self.preloadimg_prev_pixbuf_original = None
 
@@ -2945,7 +2963,7 @@ class Base:
 						self.image_list.append(item)
 						if self.verbose == True:
 							self.images_found += 1
-							print _("Found:"), item, "[" + str(self.images_found) + "]"
+							print _("Found") + ":", item, "[" + str(self.images_found) + "]"
 				else:
 					# If it's a directory that was explicitly selected or passed to
 					# the program, get all the files in the dir.
@@ -2979,7 +2997,7 @@ class Base:
 					if self.slideshow_mode == True:
 						self.toggle_slideshow(None)
 					if self.verbose == True and self.currimg_name != "":
-						print _("Loading:"), self.currimg_name
+						print _("Loading") + ":", self.currimg_name
 					try:
 						self.load_new_image(False, False, False, True, True)
 						if self.currimg_is_animation == False:
@@ -3054,7 +3072,7 @@ class Base:
 							filelist.append(item2)
 							if self.verbose == True and print_found_msg == True:
 								self.images_found += 1
-								print _("Found:"), item_fullpath2, "[" + str(self.images_found) + "]"
+								print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
 					elif os.path.isdir(item_fullpath2) and self.recursive == True:
 						folderlist.append(item_fullpath2)
 			if len(self.image_list)>0:
