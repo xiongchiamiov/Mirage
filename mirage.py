@@ -953,6 +953,9 @@ class Base:
 		return
 
 	def delete_event(self, widget, event, data=None):
+		cancel = self.autosave_image()
+		if cancel == True:
+			return
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
@@ -960,12 +963,18 @@ class Base:
 		return False
 
 	def destroy(self, event, data=None):
+		cancel = self.autosave_image()
+		if cancel == True:
+			return
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
 		return False
 
 	def exit_app(self, action):
+		cancel = self.autosave_image()
+		if cancel == True:
+			return
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
@@ -2209,15 +2218,19 @@ class Base:
 			if self.rect != None:
 				# Convert the rectangle coordinates of the current image
 				# to coordinates of pixbuf_original
+				print self.rect
+				if self.rect[0] < 0:
+					self.rect[2] = self.rect[2] + self.rect[0]
+					self.rect[0] = 0
+				if self.rect[1] < 0:
+					self.rect[3] = self.rect[3] + self.rect[1]
+					self.rect[1] = 0
+				print self.rect
 				coords = [0,0,0,0]
 				coords[0] = int(float(self.rect[0])/image_width*self.currimg_pixbuf_original.get_width())
 				coords[1] = int(float(self.rect[1])/image_height*self.currimg_pixbuf_original.get_height())
 				coords[2] = int(float(self.rect[2])/image_width*self.currimg_pixbuf_original.get_width())
 				coords[3] = int(float(self.rect[3])/image_height*self.currimg_pixbuf_original.get_height())
-				if coords[0] < 0:
-					coords[0] = 0
-				if coords[1] < 0:
-					coords[1] = 0
 				if coords[0] + coords[2] > self.currimg_pixbuf_original.get_width():
 					coords[2] = self.currimg_pixbuf_original.get_width() - coords[0]
 				if coords[1] + coords[3] > self.currimg_pixbuf_original.get_height():

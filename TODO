@@ -3,6 +3,7 @@
 + Feedback for custom actions
 + Bug hunting
 + Update translations
++ Prompt for saving on quitting
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
