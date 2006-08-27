@@ -261,7 +261,7 @@ class Base:
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
 			('Delete Image', gtk.STOCK_DELETE, _('_Delete Image'), 'Delete', _('Delete Image'), self.delete_image),
-			('Custom Actions', None, _('Custom _Actions...'), None, _('Custom Actions'), self.custom_actions_show),
+			('Custom Actions', None, _('Custom _Actions...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
 			('Escape', None, '', 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
 			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
@@ -1291,7 +1291,7 @@ class Base:
 			status_text = _('Scanning') + '...'
 		self.statusbar2.push(self.statusbar2.get_context_id(""), status_text)
 
-	def custom_actions_show(self, action):
+	def show_custom_actions(self, action):
 		self.actions_dialog = gtk.Dialog(title=_("Configure Custom Actions"), parent=self.window)
 		self.actions_dialog.set_has_separator(False)
 		self.actions_dialog.set_resizable(False)
@@ -1305,13 +1305,14 @@ class Base:
 		actionscrollwindow.add(self.actionwidget)
 		actionscrollwindow.set_shadow_type(gtk.SHADOW_IN)
 		actionscrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-		actionscrollwindow.set_size_request(400, 200)
+		actionscrollwindow.set_size_request(500, 200)
 		self.actionwidget.set_model(self.actionstore)
 		self.cell = gtk.CellRendererText()
 		self.cellbool = gtk.CellRendererToggle()
 		self.tvcolumn0 = gtk.TreeViewColumn(_("Batch"))
 		self.tvcolumn1 = gtk.TreeViewColumn(_("Action"), self.cell, markup=0)
 		self.tvcolumn2 = gtk.TreeViewColumn(_("Shortcut"))
+		self.tvcolumn1.set_max_width(self.actionwidget.size_request()[0] - self.tvcolumn0.get_width() - self.tvcolumn2.get_width())
 		self.actionwidget.append_column(self.tvcolumn0)
 		self.actionwidget.append_column(self.tvcolumn1)
 		self.actionwidget.append_column(self.tvcolumn2)
@@ -1362,7 +1363,6 @@ class Base:
 		hbox_instructions.pack_start(info_image, False, False, 5)
 		instructions = gtk.Label(_("Here you can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."))
 		instructions.set_line_wrap(True)
-		instructions.set_size_request(480, -1)
 		instructions.set_alignment(0, 0.5)
 		hbox_instructions.pack_start(instructions, False, False, 5)
 		table_actions.attach(hbox_instructions, 1, 3, 2, 3,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 5, 0)
@@ -1372,6 +1372,7 @@ class Base:
 		self.actions_dialog.vbox.pack_start(table_actions, False, False, 0)
 		# Show dialog:
 		self.actions_dialog.vbox.show_all()
+		instructions.set_size_request(self.actions_dialog.size_request()[0]-50, -1)
 		close_button = self.actions_dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 		close_button.grab_focus()
 		self.actions_dialog.run()
@@ -1564,12 +1565,17 @@ class Base:
 		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory") + ":")
 		openpref2.connect('toggled', self.use_fixed_dir_clicked)
 		gtk.Tooltips().set_tip(openpref2, _("The default 'Open' directory will be this specified directory."))
+		hbox_defaultdir = gtk.HBox()
 		self.defaultdir = gtk.Button()
+		hbox_defaultdir.pack_start(gtk.Label(), True, True, 0)
+		hbox_defaultdir.pack_start(self.defaultdir, False, False, 0)
+		hbox_defaultdir.pack_start(gtk.Label(), True, True, 0)
 		if len(self.fixed_dir) > 25:
 			self.defaultdir.set_label('...' + self.fixed_dir[-22:])
 		else:
 			self.defaultdir.set_label(self.fixed_dir)
 		self.defaultdir.connect('clicked', self.defaultdir_clicked)
+		self.defaultdir.set_size_request(250, -1)
 		if self.use_last_dir == True:
 			openpref1.set_active(True)
 			self.defaultdir.set_sensitive(False)
@@ -1585,7 +1591,7 @@ class Base:
 		table_behavior.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_behavior.attach(openpref1, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_behavior.attach(openpref2, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(self.defaultdir, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
+		table_behavior.attach(hbox_defaultdir, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
 		table_behavior.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# "Navigation" tab:
 		table_navigation = gtk.Table(13, 2, False)
