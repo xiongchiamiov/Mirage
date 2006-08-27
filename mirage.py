@@ -59,8 +59,7 @@ class Base:
 		self.open_mode_fit = 1
 		self.open_mode_1to1 = 2
 		self.open_mode_last = 3
-		self.max_zoomratio = 5      			 # 5 x self.zoomratio_for_zoom_to_fit
-		self.min_zoomratio = 0.1    			 # 0.1 x self.zoomratio_for_zoom_to_fit
+		self.min_zoomratio = 0.02
 
 		# Initialize vars:
 		width=600
@@ -107,7 +106,6 @@ class Base:
 		self.image_list = []
 		self.open_mode = self.open_mode_smart
 		self.last_mode = self.open_mode_smart
-		self.zoomratio_for_zoom_to_fit = 1
 		self.mousewheel_nav = True
 		self.listwrap_mode = 0					# 0=no, 1=yes, 2=ask
 		self.user_prompt_visible = False		# the "wrap?" prompt
@@ -134,6 +132,7 @@ class Base:
 		self.ignore_preserve_aspect_callback = False
 		self.savemode = 2
 		self.image_modified = False
+		self.image_zoomed = False
 
 		# Read any passed options/arguments:
 		try:
@@ -804,14 +803,8 @@ class Base:
 
 	def set_zoom_sensitivities(self):
 		if self.currimg_is_animation == False:
-			if self.currimg_zoomratio < self.min_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_out_sensitivities(False)
-			else:
-				self.set_zoom_out_sensitivities(True)
-			if self.currimg_zoomratio > self.max_zoomratio * self.zoomratio_for_zoom_to_fit:
-				self.set_zoom_in_sensitivities(False)
-			else:
-				self.set_zoom_in_sensitivities(True)
+			self.set_zoom_out_sensitivities(True)
+			self.set_zoom_in_sensitivities(True)
 		else:
 			self.set_zoom_out_sensitivities(False)
 			self.set_zoom_in_sensitivities(False)
@@ -1705,14 +1698,9 @@ class Base:
 				self.use_last_dir = False
 			self.open_mode = combobox.get_active()
 			self.mousewheel_nav = mousewheelnav.get_active()
+			preloading_images_prev = self.preloading_images
 			self.preloading_images = preloadnav.get_active()
-			if self.preloading_images == True:
-				self.preloadimg_next_pixbuf_original = None
-				self.preloadimg_prev_pixbuf_original = None
-				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
-				self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 			self.listwrap_mode = combobox2.get_active()
-			self.set_go_navigation_sensitivities(False)
 			self.slideshow_delay = delaycombo.get_active()
 			self.curr_slideshow_delay = self.slideshow_delay
 			self.slideshow_random = randomize.get_active()
@@ -1721,6 +1709,16 @@ class Base:
 			self.slideshow_in_fullscreen = ss_in_fs.get_active()
 			self.savemode = savecombo.get_active()
 			self.prefs_dialog.destroy()
+			self.set_go_navigation_sensitivities(False)
+			if self.preloading_images == True and preloading_images_prev == False:
+				# The user just turned on preloading, so do it:
+				self.preloadimg_next_pixbuf_original = None
+				self.preloadimg_prev_pixbuf_original = None
+				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
+				self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
+			elif self.preloading_images == False:
+				self.preloadimg_next_pixbuf_original = None
+				self.preloadimg_prev_pixbuf_original = None
 
 	def use_fixed_dir_clicked(self, button):
 		if button.get_active() == True:
@@ -1955,6 +1953,7 @@ class Base:
 
 	def zoom_in(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/In').get_property('sensitive') == True:
+			self.image_zoomed = True
 			self.currimg_zoomratio = self.currimg_zoomratio * 1.25
 			self.set_zoom_sensitivities()
 			self.last_image_action_was_fit = False
@@ -1963,7 +1962,13 @@ class Base:
 
 	def zoom_out(self, action):
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Out').get_property('sensitive') == True:
+			if self.currimg_zoomratio == self.min_zoomratio:
+				# No point in proceeding..
+				return
+			self.image_zoomed = True
 			self.currimg_zoomratio = self.currimg_zoomratio * 1/1.25
+			if self.currimg_zoomratio < self.min_zoomratio:
+				self.currimg_zoomratio = self.min_zoomratio
 			self.set_zoom_sensitivities()
 			self.last_image_action_was_fit = False
 			self.put_zoom_image_to_window(False)
@@ -2001,6 +2006,7 @@ class Base:
 				self.preloadimg_prev_zoomratio = 1/float(max_ratio)
 		else:
 			if self.currimg_name != "" and (self.slideshow_mode == True or self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').get_property('sensitive') == True):
+				self.image_zoomed = True
 				self.last_mode = self.open_mode_fit
 				self.last_image_action_was_fit = True
 				# Calculate zoomratio needed to fit to window:
@@ -2052,6 +2058,7 @@ class Base:
 					self.preloadimg_prev_zoomratio = 1
 		else:
 			if self.currimg_name != "":
+				self.image_zoomed = True
 				self.last_image_action_was_fit = True
 				# Calculate zoomratio needed to fit to window:
 				win_width = self.available_image_width()
@@ -2065,7 +2072,6 @@ class Base:
 				else:
 					max_ratio = width_ratio
 				self.currimg_zoomratio = 1/float(max_ratio)
-				self.zoomratio_for_zoom_to_fit = self.currimg_zoomratio
 				self.set_zoom_sensitivities()
 				if self.first_image_load == True and self.currimg_zoomratio > 1:
 					# Revert to 1:1 zoom
@@ -2086,6 +2092,7 @@ class Base:
 				self.preloadimg_prev_zoomratio = 1
 		else:
 			if self.currimg_name != "" and (self.slideshow_mode == True or self.currimg_is_animation == True or (self.currimg_is_animation == False and self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').get_property('sensitive') == True)):
+				self.image_zoomed = True
 				self.last_mode = self.open_mode_1to1
 				self.last_image_action_was_fit = False
 				self.currimg_zoomratio = 1
@@ -2633,7 +2640,7 @@ class Base:
 		# a new one:
 		if use_preloadimg_next == True and self.preloading_images == True:
 			# Set current image as preload_prev_image
-			if self.image_modified == False:
+			if self.image_modified == False and self.image_zoomed == False:
 				self.preloadimg_prev_name = self.currimg_name
 				self.preloadimg_prev_width = self.currimg_width
 				self.preloadimg_prev_height = self.currimg_height
@@ -2660,7 +2667,7 @@ class Base:
 					self.set_image_sensitivities(False)
 		elif use_preloadimg_prev == True and self.preloading_images == True:
 			# Set current image as preload_next_image
-			if self.image_modified == False:
+			if self.image_modified == False and self.image_zoomed == False:
 				self.preloadimg_next_name = self.currimg_name
 				self.preloadimg_next_width = self.currimg_width
 				self.preloadimg_next_height = self.currimg_height
@@ -2727,6 +2734,7 @@ class Base:
 		self.update_title()
 		self.image_loaded = True
 		self.image_modified = False
+		self.image_zoomed = False
 		self.set_slideshow_sensitivities()
 		if reset_cursor == True:
 			if self.fullscreen_mode == False:
@@ -2973,7 +2981,7 @@ class Base:
 					if self.verbose == True and self.currimg_name != "":
 						print _("Loading:"), self.currimg_name
 					try:
-						self.load_new_image(False, False, False, False, True)
+						self.load_new_image(False, False, False, True, True)
 						if self.currimg_is_animation == False:
 							self.previmg_width = self.currimg_pixbuf.get_width()
 						else:
