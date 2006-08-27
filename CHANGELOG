@@ -1,9 +1,9 @@
 v0.8 - Pending
 	+ Editing capabilities: resize, crop, save, delete (luzi/Bjoern Martensen)
-	+ Preference to preload images for speeding up navigation (Mike Massonnet)
+	+ Preference to preload images for faster navigation (Mike Massonnet)
 	+ Implemented 'custom actions' framework, including batch actions (Thomas Güttler)
 	+ --onload or -o argument for performing actions on image loading (Thomas Güttler)
-	+ Show "searching..." in statusbar when searching for images (Escape to abort)
+	+ Show "Scanning..." in statusbar when scanning for images (Escape to abort)
 	+ Bug: Opening with 'load all images in dir' gives expected result (Bjoern Martensen)
 	+ Bug: Cannot open folder while search process is active
 	+ Added French translation (Mike Massonnet)
