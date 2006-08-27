@@ -446,13 +446,13 @@ class Base:
 		# Slideshow control:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls = gtk.HBox()
-		ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
-		alignment = ss_back.get_children()[0]
+		self.ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
+		alignment = self.ss_back.get_children()[0]
 		hbox2 = alignment.get_children()[0]
 		image, label = hbox2.get_children()
 		label.set_text('')
-		ss_back.set_property('can-focus', False)
-		ss_back.connect('clicked', self.goto_prev_image)
+		self.ss_back.set_property('can-focus', False)
+		self.ss_back.connect('clicked', self.goto_prev_image)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
 		alignment = self.ss_start.get_children()[0]
 		hbox2 = alignment.get_children()[0]
@@ -467,17 +467,17 @@ class Base:
 		label.set_text('')
 		self.ss_stop.set_property('can-focus', False)
 		self.ss_stop.connect('clicked', self.toggle_slideshow)
-		ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
-		alignment = ss_forward.get_children()[0]
+		self.ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
+		alignment = self.ss_forward.get_children()[0]
 		hbox2 = alignment.get_children()[0]
 		image, label = hbox2.get_children()
 		label.set_text('')
-		ss_forward.set_property('can-focus', False)
-		ss_forward.connect('clicked', self.goto_next_image)
-		self.slideshow_controls.pack_start(ss_back, False, False, 0)
+		self.ss_forward.set_property('can-focus', False)
+		self.ss_forward.connect('clicked', self.goto_next_image)
+		self.slideshow_controls.pack_start(self.ss_back, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_start, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_stop, False, False, 0)
-		self.slideshow_controls.pack_start(ss_forward, False, False, 0)
+		self.slideshow_controls.pack_start(self.ss_forward, False, False, 0)
 		self.slideshow_window.add(self.slideshow_controls)
 		self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.slideshow_window2 = gtk.Window(gtk.WINDOW_POPUP)
@@ -510,7 +510,7 @@ class Base:
 			factory.add('test', iconset)
 			factory.add_default()
 			self.ss_randomize.set_image(gtk.image_new_from_stock('test', gtk.ICON_SIZE_MENU))
-			self.ss_randomize.set_size_request(ss_back.size_request()[0], -1)
+			self.ss_randomize.set_size_request(self.ss_back.size_request()[0], -1)
 		except:
 			self.ss_randomize.set_label("Rand")
 		self.ss_randomize.connect('toggled', self.random_changed)
@@ -720,6 +720,8 @@ class Base:
 		self.UIManager.get_widget('/Popup/Next Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Previous2').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
+		self.ss_forward.set_sensitive(enable)
+		self.ss_back.set_sensitive(enable)
 
 	def set_image_sensitivities(self, enable):
 		self.set_zoom_in_sensitivities(enable)
@@ -761,11 +763,13 @@ class Base:
 		self.UIManager.get_widget('/MainToolbar/Next2').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Next Image').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Next Image').set_sensitive(enable)
+		self.ss_forward.set_sensitive(enable)
 
 	def set_previous_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainToolbar/Previous2').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Previous Image').set_sensitive(enable)
+		self.ss_back.set_sensitive(enable)
 
 	def set_first_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/First Image').set_sensitive(enable)
@@ -2162,7 +2166,8 @@ class Base:
 			self.image_modified = True
 
 	def crop_image(self, action):
-		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		dialog.add_button(_("Crop"), gtk.RESPONSE_ACCEPT)
 		image = gtk.DrawingArea()
 		# Create a pixbuf that fits in a window of 400x400
 		image_width = self.currimg_pixbuf_original.get_width()
@@ -2270,7 +2275,8 @@ class Base:
 			self.drawing_crop_rectangle = False
 
 	def resize_image(self, action):
-		dialog = gtk.Dialog(_("Resize Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		dialog = gtk.Dialog(_("Resize Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		dialog.add_button(_("Resize"), gtk.RESPONSE_ACCEPT)
 		hbox_width = gtk.HBox()
 		width_adj = gtk.Adjustment(self.currimg_pixbuf_original.get_width(), 1, 100000000000, 1, 10, 10)
 		width = gtk.SpinButton(width_adj, 0, 0)
