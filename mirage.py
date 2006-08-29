@@ -225,6 +225,40 @@ class Base:
 		self.curr_slideshow_random = self.slideshow_random
 
 		# Define the main menubar and toolbar:
+		factory = gtk.IconFactory()
+		iconname = 'stock_leave-fullscreen.png'
+		iconname2 = 'stock_fullscreen.png'
+		if os.path.exists(iconname):
+			leave_fullscreen_icon_path = iconname
+			fullscreen_icon_path = iconname2
+		elif os.path.exists('../share/mirage/' + iconname):
+			leave_fullscreen_icon_path = '../share/mirage/' + iconname
+			fullscreen_icon_path = '../share/mirage/' + iconname2
+		elif os.path.exists('/usr/share/mirage/' + iconname):
+			leave_fullscreen_icon_path = '/usr/share/mirage/' + iconname
+			fullscreen_icon_path = '/usr/share/mirage/' + iconname2
+		elif os.path.exists('/usr/local/share/mirage/' + iconname):
+			leave_fullscreen_icon_path = '/usr/local/share/mirage/' + iconname
+			fullscreen_icon_path = '/usr/local/share/mirage/' + iconname2
+		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + iconname):
+			leave_fullscreen_icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname
+			fullscreen_icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname2
+		pixbuf = gtk.gdk.pixbuf_new_from_file(leave_fullscreen_icon_path)
+		iconset = gtk.IconSet(pixbuf)
+		factory.add('leave-fullscreen', iconset)
+		factory.add_default()
+		pixbuf = gtk.gdk.pixbuf_new_from_file(fullscreen_icon_path)
+		iconset = gtk.IconSet(pixbuf)
+		factory.add('fullscreen', iconset)
+		factory.add_default()
+		try:
+			test = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
+			leave_fullscreen_icon = gtk.STOCK_LEAVE_FULLSCREEN
+			fullscreen_icon = gtk.STOCK_FULLSCREEN
+		except:
+			# This will allow gtk 2.6 users to run Mirage
+			leave_fullscreen_icon = 'leave-fullscreen'
+			fullscreen_icon = 'fullscreen'
 		actions = (
 			('FileMenu', None, _('_File')),
 			('EditMenu', None, _('_Edit')),
@@ -256,8 +290,8 @@ class Base:
 			('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.show_about),
 			('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1', _('Contents'), self.show_help),
 			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), None, _('Preferences'), self.show_prefs),
-			('Full Screen', gtk.STOCK_FULLSCREEN, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
-			('Exit Full Screen', gtk.STOCK_LEAVE_FULLSCREEN, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
+			('Full Screen', fullscreen_icon, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
+			('Exit Full Screen', leave_fullscreen_icon, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
 			('Delete Image', gtk.STOCK_DELETE, _('_Delete Image'), 'Delete', _('Delete Image'), self.delete_image),
@@ -482,15 +516,18 @@ class Base:
 		self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.slideshow_window2 = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls2 = gtk.HBox()
-		self.ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
-		alignment = self.ss_exit.get_children()[0]
-		hbox2 = alignment.get_children()[0]
-		image, label = hbox2.get_children()
-		label.set_text('')
+		try:
+			self.ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
+			alignment = self.ss_exit.get_children()[0]
+			hbox2 = alignment.get_children()[0]
+			image, label = hbox2.get_children()
+			label.set_text('')
+		except:
+			self.ss_exit = gtk.Button()
+			self.ss_exit.set_image(gtk.image_new_from_stock('leave-fullscreen', gtk.ICON_SIZE_MENU))
 		self.ss_exit.set_property('can-focus', False)
 		self.ss_exit.connect('clicked', self.leave_fullscreen)
 		self.ss_randomize = gtk.ToggleButton()
-		factory = gtk.IconFactory()
 		iconname = 'stock_shuffle.png'
 		if os.path.exists(iconname):
 			icon_path = iconname
@@ -507,9 +544,9 @@ class Base:
 		try:
 			pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
 			iconset = gtk.IconSet(pixbuf)
-			factory.add('test', iconset)
+			factory.add('stock-shuffle', iconset)
 			factory.add_default()
-			self.ss_randomize.set_image(gtk.image_new_from_stock('test', gtk.ICON_SIZE_MENU))
+			self.ss_randomize.set_image(gtk.image_new_from_stock('stock-shuffle', gtk.ICON_SIZE_MENU))
 			self.ss_randomize.set_size_request(self.ss_back.size_request()[0], -1)
 		except:
 			self.ss_randomize.set_label("Rand")
@@ -583,7 +620,7 @@ class Base:
 		self.window.set_focus(self.layout)
 		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
 		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
-		self.ss_exit.set_size_request(-1, self.ss_stop.size_request()[1])
+		self.ss_exit.set_size_request(self.ss_back.size_request()[0], self.ss_stop.size_request()[1])
 		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 		if opts != []:
 			for o, a in opts:
