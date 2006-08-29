@@ -226,27 +226,14 @@ class Base:
 
 		# Define the main menubar and toolbar:
 		factory = gtk.IconFactory()
+		leave_fullscreen_icon_path = self.find_path('stock_leave-fullscreen.png')
 		iconname = 'stock_leave-fullscreen.png'
 		iconname2 = 'stock_fullscreen.png'
-		if os.path.exists(iconname):
-			leave_fullscreen_icon_path = iconname
-			fullscreen_icon_path = iconname2
-		elif os.path.exists('../share/mirage/' + iconname):
-			leave_fullscreen_icon_path = '../share/mirage/' + iconname
-			fullscreen_icon_path = '../share/mirage/' + iconname2
-		elif os.path.exists('/usr/share/mirage/' + iconname):
-			leave_fullscreen_icon_path = '/usr/share/mirage/' + iconname
-			fullscreen_icon_path = '/usr/share/mirage/' + iconname2
-		elif os.path.exists('/usr/local/share/mirage/' + iconname):
-			leave_fullscreen_icon_path = '/usr/local/share/mirage/' + iconname
-			fullscreen_icon_path = '/usr/local/share/mirage/' + iconname2
-		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + iconname):
-			leave_fullscreen_icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname
-			fullscreen_icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname2
 		pixbuf = gtk.gdk.pixbuf_new_from_file(leave_fullscreen_icon_path)
 		iconset = gtk.IconSet(pixbuf)
 		factory.add('leave-fullscreen', iconset)
 		factory.add_default()
+		fullscreen_icon_path = self.find_path('stock_fullscreen.png')
 		pixbuf = gtk.gdk.pixbuf_new_from_file(fullscreen_icon_path)
 		iconset = gtk.IconSet(pixbuf)
 		factory.add('fullscreen', iconset)
@@ -419,17 +406,7 @@ class Base:
 		# Create interface
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.update_title()
-		iconname = 'mirage.png'
-		if os.path.exists(iconname):
-			icon_path = iconname
-		elif os.path.exists('../share/pixmaps/' + iconname):
-			icon_path = '../share/pixmaps/' + iconname
-		elif os.path.exists('/usr/share/pixmaps/' + iconname):
-			icon_path = '/usr/share/pixmaps/' + iconname
-		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
-			icon_path = '/usr/local/share/pixmaps/' + iconname
-		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + iconname):
-			icon_path = os.path.dirname(__file__) + '/share/pixmaps/' + iconname
+		icon_path = self.find_path('mirage.png')
 		try:
 			gtk.window_set_default_icon_from_file(icon_path)
 		except:
@@ -528,19 +505,7 @@ class Base:
 		self.ss_exit.set_property('can-focus', False)
 		self.ss_exit.connect('clicked', self.leave_fullscreen)
 		self.ss_randomize = gtk.ToggleButton()
-		iconname = 'stock_shuffle.png'
-		if os.path.exists(iconname):
-			icon_path = iconname
-		elif os.path.exists('../share/mirage/' + iconname):
-			icon_path = '../share/mirage/' + iconname
-		elif os.path.exists('/usr/share/mirage/' + iconname):
-			icon_path = '/usr/share/mirage/' + iconname
-		elif os.path.exists('/usr/local/share/mirage/' + iconname):
-			icon_path = '/usr/local/share/mirage/' + iconname
-		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + iconname):
-			icon_path = os.path.dirname(__file__) + '/share/mirage/' + iconname
-		else:
-			icon_path = ''
+		icon_path = self.find_path('stock_shuffle.png')
 		try:
 			pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
 			iconset = gtk.IconSet(pixbuf)
@@ -641,6 +606,28 @@ class Base:
 			for o, a in opts:
 				if o in ("-s", "--slideshow"):
 					self.toggle_slideshow(None)
+
+	def find_path(self, filename):
+		full_path = ''
+		if os.path.exists(filename):
+			full_path = filename
+		elif os.path.exists('../share/mirage/' + filename):
+			full_path = '../share/mirage/' + filename
+		elif os.path.exists('/usr/share/mirage/' + filename):
+			full_path = '/usr/share/mirage/' + filename
+		elif os.path.exists('/usr/local/share/mirage/' + filename):
+			full_path = '/usr/local/share/mirage/' + filename
+		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + filename):
+			full_path = os.path.dirname(__file__) + '/share/mirage/' + filename
+		elif os.path.exists('../share/pixmaps/' + filename):
+			full_path = '../share/pixmaps/' + filename
+		elif os.path.exists('/usr/share/pixmaps/' + filename):
+			full_path = '/usr/share/pixmaps/' + filename
+		elif os.path.exists('/usr/local/share/pixmaps/' + filename):
+			full_path = '/usr/local/share/pixmaps/' + filename
+		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + filename):
+			full_path = os.path.dirname(__file__) + '/share/pixmaps/' + filename
+		return full_path
 
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
 		if entry.value.type == gconf.VALUE_STRING:
@@ -1915,17 +1902,7 @@ class Base:
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
 		self.about_dialog.set_translator_credits('de - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\nru - mavka <mavka@justos.org>')
 		self.about_dialog.set_website('http://mirageiv.berlios.de')
-		iconname = 'mirage_large.png'
-		if os.path.exists(iconname):
-			icon_path = iconname
-		elif os.path.exists('../share/pixmaps/' + iconname):
-			icon_path = '../share/pixmaps/' + iconname
-		elif os.path.exists('/usr/share/pixmaps/' + iconname):
-			icon_path = '/usr/share/pixmaps/' + iconname
-		elif os.path.exists('/usr/local/share/pixmaps/' + iconname):
-			icon_path = '/usr/local/share/pixmaps/' + iconname
-		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + iconname):
-			icon_path = os.path.dirname(__file__) + '/share/pixmaps/' + iconname
+		icon_path = self.find_path('mirage_large.png')
 		try:
 			icon_pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
 			self.about_dialog.set_logo(icon_pixbuf)
