@@ -424,7 +424,6 @@ class Base:
 		self.set_slideshow_sensitivities()
 		self.toolbar = self.UIManager.get_widget('/MainToolbar')
 		vbox.pack_start(self.toolbar, False, False, 0)
-		self.toolbar.set_property('visible', self.toolbar_show)
 		self.layout = gtk.Layout()
 		self.vscroll = gtk.VScrollbar(None)
 		self.vscroll.set_adjustment(self.layout.get_vadjustment())
@@ -449,8 +448,6 @@ class Base:
 		hbox_statusbar.pack_start(self.statusbar, expand=True)
 		hbox_statusbar.pack_start(self.statusbar2, expand=False)
 		vbox.pack_start(hbox_statusbar, False, False, 0)
-		self.statusbar.set_property('visible', self.statusbar_show)
-		self.statusbar2.set_property('visible', self.statusbar_show)
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(width,height)
@@ -567,6 +564,14 @@ class Base:
 
 		# Show GUI:
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
+		if self.toolbar_show == False:
+			self.toolbar.set_property('visible', False)
+			self.toolbar.set_no_show_all(True)
+		if self.statusbar_show == False:
+			self.statusbar.set_property('visible', False)
+			self.statusbar.set_no_show_all(True)
+			self.statusbar2.set_property('visible', False)
+			self.statusbar2.set_no_show_all(True)
 		self.hscroll.set_no_show_all(True)
 		self.vscroll.set_no_show_all(True)
 		go_into_fullscreen = False
@@ -581,12 +586,12 @@ class Base:
 			self.toolbar.set_no_show_all(True)
 			self.menubar.set_no_show_all(True)
 		self.window.show_all()
-		self.layout.set_flags(gtk.CAN_FOCUS)
-		self.window.set_focus(self.layout)
 		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
 		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
 		self.ss_exit.set_size_request(self.ss_back.size_request()[0], self.ss_stop.size_request()[1])
 		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
+		self.layout.set_flags(gtk.CAN_FOCUS)
+		self.window.set_focus(self.layout)
 		if opts != []:
 			for o, a in opts:
 				if o in ("-f", "--fullscreen"):
@@ -641,7 +646,10 @@ class Base:
 			elif style == "text":
 				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
 			if self.image_loaded == True and self.last_image_action_was_fit == True:
-				self.zoom_to_fit_window(None, False, False)
+				if self.last_image_action_was_smart_fit == True:
+					self.zoom_to_fit_or_1_to_1(None, False, False)
+				else:
+					self.zoom_to_fit_window(None, False, False)
 
 	def topwindow_keypress(self, widget, event):
 		# For whatever reason, 'Left' and 'Right' cannot be used as menu
@@ -919,8 +927,12 @@ class Base:
 		if self.image_loaded == True:
 			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
 				if self.last_image_action_was_fit == True:
-					self.zoom_to_fit_window(None, False, False)
+					if self.last_image_action_was_smart_fit == True:
+						self.zoom_to_fit_or_1_to_1(None, False, False)
+					else:
+						self.zoom_to_fit_window(None, False, False)
 				else:
+					print "3"
 					self.center_image()
 				try:
 					gobject.source_remove(self.preload_when_idle)
@@ -979,26 +991,24 @@ class Base:
 	def delete_event(self, widget, event, data=None):
 		cancel = self.autosave_image()
 		if cancel == True:
-			return
+			return True
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
 		sys.exit(0)
-		return False
 
 	def destroy(self, event, data=None):
 		cancel = self.autosave_image()
 		if cancel == True:
-			return
+			return True
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
-		return False
 
 	def exit_app(self, action):
 		cancel = self.autosave_image()
 		if cancel == True:
-			return
+			return True
 		self.stop_now = True
 		self.closing_app = True
 		self.save_settings()
@@ -1032,7 +1042,6 @@ class Base:
 		else:
 			self.imageview.set_from_animation(self.currimg_pixbuf)
 			self.previmage_is_animation = True
-		self.first_image_load = False
 		# Clean up (free memory) because I'm lazy
 		gc.collect()
 		self.window.window.thaw_updates()
@@ -1288,7 +1297,10 @@ class Base:
 			self.statusbar2.show()
 			self.statusbar_show = True
 		if self.image_loaded == True and self.last_image_action_was_fit == True:
-			self.zoom_to_fit_window(None, False, False)
+			if self.last_image_action_was_smart_fit == True:
+				self.zoom_to_fit_or_1_to_1(None, False, False)
+			else:
+				self.zoom_to_fit_window(None, False, False)
 
 	def toggle_toolbar(self, action):
 		if self.toolbar.get_property('visible') == True:
@@ -1298,7 +1310,10 @@ class Base:
 			self.toolbar.show()
 			self.toolbar_show = True
 		if self.image_loaded == True and self.last_image_action_was_fit == True:
-			self.zoom_to_fit_window(None, False, False)
+			if self.last_image_action_was_smart_fit == True:
+				self.zoom_to_fit_or_1_to_1(None, False, False)
+			else:
+				self.zoom_to_fit_window(None, False, False)
 
 	def update_statusbar(self):
 		# Update status bar:
@@ -2060,6 +2075,7 @@ class Base:
 				self.image_zoomed = True
 				self.last_mode = self.open_mode_fit
 				self.last_image_action_was_fit = True
+				self.last_image_action_was_smart_fit = False
 				# Calculate zoomratio needed to fit to window:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
@@ -2110,7 +2126,6 @@ class Base:
 		else:
 			if self.currimg_name != "":
 				self.image_zoomed = True
-				self.last_image_action_was_fit = True
 				# Calculate zoomratio needed to fit to window:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
@@ -2124,12 +2139,14 @@ class Base:
 					max_ratio = width_ratio
 				self.currimg_zoomratio = 1/float(max_ratio)
 				self.set_zoom_sensitivities()
-				if self.first_image_load == True and self.currimg_zoomratio > 1:
+				if self.currimg_zoomratio > 1:
 					# Revert to 1:1 zoom
 					self.zoom_1_to_1(action, False, False)
 				else:
 					self.put_zoom_image_to_window(False)
 					self.update_statusbar()
+				self.last_image_action_was_fit = True
+				self.last_image_action_was_smart_fit = True
 
 	def zoom_1_to_1_action(self, action):
 		self.zoom_1_to_1(action, False, False)
@@ -2154,7 +2171,10 @@ class Base:
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').get_property('sensitive') == True:
 			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, 90)
 			if self.last_image_action_was_fit == True:
-				self.zoom_to_fit_or_1_to_1(None, False, False)
+				if self.last_image_action_was_smart_fit == True:
+					self.zoom_to_fit_or_1_to_1(None, False, False)
+				else:
+					self.zoom_to_fit_window(None, False, False)
 			else:
 				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
 				self.layout.set_size(self.currimg_width, self.currimg_height)
@@ -2169,7 +2189,10 @@ class Base:
 		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').get_property('sensitive') == True:
 			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, 270)
 			if self.last_image_action_was_fit == True:
-				self.zoom_to_fit_or_1_to_1(None, False, False)
+				if self.last_image_action_was_smart_fit == True:
+					self.zoom_to_fit_or_1_to_1(None, False, False)
+				else:
+					self.zoom_to_fit_window(None, False, False)
 			else:
 				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
 				self.layout.set_size(self.currimg_width, self.currimg_height)
@@ -2755,7 +2778,6 @@ class Base:
 			elif set_next_to_none == True:
 				self.preloadimg_next_pixbuf_original = None
 			self.currimg_pixbuf = None
-			self.first_image_load = True
 			self.currimg_zoomratio = 1
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if self.verbose == True and self.currimg_name != "":

@@ -3,11 +3,8 @@
 + Feedback for custom actions
 + Bug hunting
 + Update translations
-+ Fix zooming issue (self.last_image_action = 0 for fit, 1 for smart fit)
-+ Fullscreen controls: make right controls same height as left controls
-+ Make changes to image, click X, cancel -> fix this
-+ Hide toolbar/statusbar -> don't stay hidden
 + use fullscreen/unfullscreen icons - bump gtk version needed down to 2.6
+	- is this working?
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
