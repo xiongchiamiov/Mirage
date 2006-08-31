@@ -3,8 +3,6 @@
 + Feedback for custom actions
 + Bug hunting
 + Update translations
-+ use fullscreen/unfullscreen icons - bump gtk version needed down to 2.6
-	- is this working?
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
