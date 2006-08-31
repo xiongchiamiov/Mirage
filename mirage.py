@@ -106,7 +106,6 @@ class Base:
 		self.image_list = []
 		self.open_mode = self.open_mode_smart
 		self.last_mode = self.open_mode_smart
-		self.mousewheel_nav = True
 		self.listwrap_mode = 0					# 0=no, 1=yes, 2=ask
 		self.user_prompt_visible = False		# the "wrap?" prompt
 		self.slideshow_delay = 1				# self.delayoptions[self.slideshow_delay] seconds
@@ -187,7 +186,6 @@ class Base:
 			self.open_all_images = conf.getboolean('prefs', 'open_all')
 			self.open_mode = conf.getint('prefs', 'open_mode')
 			self.last_mode = conf.getint('prefs', 'last_mode')
-			self.mousewheel_nav = conf.getboolean('prefs', 'mousewheel_nav')
 			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
 			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
 			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
@@ -963,7 +961,6 @@ class Base:
 		conf.set('prefs', 'fixed_dir', self.fixed_dir)
 		conf.set('prefs', 'open_mode', self.open_mode)
 		conf.set('prefs', 'last_mode', self.last_mode)
-		conf.set('prefs', 'mousewheel_nav', self.mousewheel_nav)
 		conf.set('prefs', 'listwrap_mode', self.listwrap_mode)
 		conf.set('prefs', 'slideshow_delay', self.slideshow_delay)
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
@@ -1637,9 +1634,6 @@ class Base:
 		navlabel = gtk.Label()
 		navlabel.set_markup('<b>' + _('Navigation') + '</b>')
 		navlabel.set_alignment(0, 1)
-		mousewheelnav = gtk.CheckButton(label=_("Use mousewheel for imagelist navigation"))
-		mousewheelnav.set_active(self.mousewheel_nav)
-		gtk.Tooltips().set_tip(mousewheelnav, _("If enabled, mousewheel-down (up) will go to the next (previous) image."))
 		preloadnav = gtk.CheckButton(label=_("Preload images for faster navigation"))
 		preloadnav.set_active(self.preloading_images)
 		gtk.Tooltips().set_tip(preloadnav, _("If enabled, the next and previous images in the list will be preloaded during idle time. Note that the speed increase comes at the expense of memory usage, so it is recommended to disable this option on machines with limited ram."))
@@ -1656,8 +1650,8 @@ class Base:
 		table_navigation.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(hbox_listwrap, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_navigation.attach(mousewheelnav, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_navigation.attach(preloadnav, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_navigation.attach(preloadnav, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_navigation.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1769,7 +1763,6 @@ class Base:
 			else:
 				self.use_last_dir = False
 			self.open_mode = combobox.get_active()
-			self.mousewheel_nav = mousewheelnav.get_active()
 			preloading_images_prev = self.preloading_images
 			self.preloading_images = preloadnav.get_active()
 			self.listwrap_mode = combobox2.get_active()
@@ -1957,7 +1950,7 @@ class Base:
 					self.zoom_in(None)
 				return True
 			# Navigation of images with mousewheel:
-			elif self.mousewheel_nav == True:
+			else:
 				if event.direction == gtk.gdk.SCROLL_UP:
 					self.goto_prev_image(None)
 				elif event.direction == gtk.gdk.SCROLL_DOWN:
