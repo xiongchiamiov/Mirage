@@ -2246,18 +2246,15 @@ class Base:
 		dialog.vbox.pack_start(hbox, False, False, 0)
 		dialog.set_resizable(False)
 		dialog.vbox.show_all()
-		image.set_events(gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.POINTER_MOTION_HINT_MASK | gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK | gtk.gdk.ENTER_NOTIFY_MASK | gtk.gdk.LEAVE_NOTIFY_MASK)
+		image.set_events(gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.POINTER_MOTION_HINT_MASK | gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK)
 		image.connect("expose-event", self.crop_image_expose_cb, crop_pixbuf, image_width, image_height)
 		image.connect("motion_notify_event", self.crop_image_mouse_moved, image)
 		image.connect("button_press_event", self.crop_image_button_press, image)
 		image.connect("button_release_event", self.crop_image_button_release)
-		image.connect("enter-notify-event", self.crop_change_cursor)
-		image.connect("leave-notify-event", self.crop_change_cursor)
 		image.realize()
 		self.drawing_crop_rectangle = False
 		self.crop_rectangle = None
 		self.rect = None
-		self.fill_image = gtk.gdk.pixbuf_new_from_file("/home/stonecrest/alpha.png")
 		response = dialog.run()
 		if response == gtk.RESPONSE_ACCEPT:
 			dialog.destroy()
@@ -2288,13 +2285,6 @@ class Base:
 				self.image_modified = True
 		else:
 			dialog.destroy()
-		self.change_cursor(None)
-
-	def crop_change_cursor(self, widget, event):
-		if event.type == gtk.gdk.ENTER_NOTIFY:
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.CROSSHAIR))
-		elif event.type == gtk.gdk.LEAVE_NOTIFY:
-			self.change_cursor(None)
 
 	def crop_image_expose_cb(self, image, event, pixbuf, width, height):
 		image.window.draw_pixbuf(None, pixbuf, 0, 0, 0, 0, width, height)
