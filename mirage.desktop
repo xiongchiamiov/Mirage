@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Mirage
-Comment=A fast GTK+ Image Viewer/Editor
+Comment=A fast GTK+ Image Viewer
 Exec=mirage %U
 Terminal=false
 Type=Application

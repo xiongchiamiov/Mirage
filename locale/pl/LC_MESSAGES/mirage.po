@@ -757,8 +757,8 @@ msgid "Choose directory"
 msgstr "Wybierz katalog"
 
 #: mirage.py:1860
-msgid "A fast GTK+ Image Viewer/Editor."
-msgstr "Szybka przeglądarka/edytor obrazów GTK+."
+msgid "A fast GTK+ Image Viewer."
+msgstr "Szybka przeglądarka obrazów GTK+."
 
 #: mirage.py:1898
 msgid "Unable to launch a suitable browser."

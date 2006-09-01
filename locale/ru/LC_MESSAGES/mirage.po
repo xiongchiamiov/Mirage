@@ -779,7 +779,7 @@ msgstr "Выбор каталога"
 
 #: mirage.py:1860
 #, fuzzy
-msgid "A fast GTK+ Image Viewer/Editor."
+msgid "A fast GTK+ Image Viewer."
 msgstr "Быстрый просмотрщик изображений на GTK+."
 
 #: mirage.py:1898

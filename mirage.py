@@ -6,7 +6,7 @@
 __version__ = "0.8"
 
 __license__ = """
-Mirage, a fast GTK+ Image Viewer/Editor
+Mirage, a fast GTK+ Image Viewer
 Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it
@@ -1904,7 +1904,7 @@ class Base:
 		self.about_dialog = gtk.AboutDialog()
 		self.about_dialog.set_name('Mirage')
 		self.about_dialog.set_version(__version__)
-		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer/Editor.'))
+		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
 		self.about_dialog.set_license(__license__)
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
