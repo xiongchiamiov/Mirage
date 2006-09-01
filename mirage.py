@@ -930,7 +930,6 @@ class Base:
 					else:
 						self.zoom_to_fit_window(None, False, False)
 				else:
-					print "3"
 					self.center_image()
 				try:
 					gobject.source_remove(self.preload_when_idle)
