@@ -1909,7 +1909,8 @@ class Base:
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
 		self.about_dialog.set_translator_credits('de - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\nru - mavka <mavka@justos.org>')
-		self.about_dialog.set_website('http://mirageiv.berlios.de')
+		gtk.about_dialog_set_url_hook(self.show_website, "http://mirageiv.berlios.de")
+		self.about_dialog.set_website_label("http://mirageiv.berlios.de")
 		icon_path = self.find_path('mirage_large.png')
 		try:
 			icon_pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
@@ -1920,8 +1921,13 @@ class Base:
 		self.about_dialog.connect('delete_event', self.close_about)
 		self.about_dialog.show_all()
 
+	def show_website(self, dialog, blah, link):
+		self.browser_load(link)
+
 	def show_help(self, action):
-		docslink = "http://mirageiv.berlios.de/docs.html"
+		self.browser_load("http://mirageiv.berlios.de/docs.html")
+
+	def browser_load(self, docslink):
 		test = os.spawnlp(os.P_WAIT, "firefox", "firefox", docslink)
 		if test == 127:
 			test = os.spawnlp(os.P_WAIT, "mozilla", "mozilla", docslink)
