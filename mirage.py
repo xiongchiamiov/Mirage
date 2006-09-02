@@ -40,6 +40,8 @@ import sets
 import gobject
 import gettext
 import locale
+import stat
+import time
 try:
 	import gconf
 except:
@@ -119,7 +121,7 @@ class Base:
 		self.disable_screensaver = True
 		self.slideshow_in_fullscreen = False
 		self.closing_app = False
-		self.delete_without_prompt = False
+		self.confirm_delete = True
 		self.preloading_images = True
 		self.action_names = ["Open in GIMP", "Create Thumbnail", "Create Thumbnails", "Move to Favorites"]
 		self.action_shortcuts = ["<Control>e", "<Alt>t", "<Control><Alt>t", "<Control><Alt>f"]
@@ -200,7 +202,6 @@ class Base:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
 			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
-			self.delete_without_prompt = conf.getboolean('prefs', 'delete_without_prompt')
 			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
 			num_actions = conf.getint('actions', 'num_actions')
 			self.action_names = []
@@ -214,6 +215,7 @@ class Base:
 				self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
 			self.savemode = conf.getint('prefs', 'savemode')
 			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
+			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
 		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
 			pass
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -254,8 +256,8 @@ class Base:
 			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('_Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
 			('Save As', gtk.STOCK_SAVE, _('Save Image _As...'), '<Shift><Ctrl>S', _('Save Image As'), self.save_image_as),
-			('Crop', None, _('_Crop Image...'), None, _('Crop Image'), self.crop_image),
-			('Resize', None, _('Re_size Image...'), None, _('Resize Image'), self.resize_image),
+			('Crop', None, _('_Crop...'), None, _('Crop Image'), self.crop_image),
+			('Resize', None, _('Re_size...'), None, _('Resize Image'), self.resize_image),
 			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
 			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.goto_prev_image),
 			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.goto_next_image),
@@ -279,7 +281,9 @@ class Base:
 			('Exit Full Screen', leave_fullscreen_icon, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
-			('Delete Image', gtk.STOCK_DELETE, _('_Delete Image'), 'Delete', _('Delete Image'), self.delete_image),
+			('Delete Image', gtk.STOCK_DELETE, _('_Delete...'), 'Delete', _('Delete Image'), self.delete_image),
+			('Rename Image', None, _('Re_name...'), 'F2', _('Rename Image'), self.rename_image),
+			('Properties', gtk.STOCK_PROPERTIES, _('_Properties...'), None, _('Properties'), self.show_properties),
 			('Custom Actions', None, _('Custom _Actions...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
 			('Escape', None, '', 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
@@ -331,6 +335,8 @@ class Base:
 			      <separator name="FM2"/>
 			      <menuitem action="Save"/>
 			      <menuitem action="Save As"/>
+			      <separator name="FM3"/>
+			      <menuitem action="Properties"/>
 			      <separator name="FM1"/>
 			      <menuitem action="Quit"/>
 			    </menu>
@@ -344,6 +350,7 @@ class Base:
 			      <menuitem action="Crop"/>
 			      <menuitem action="Resize"/>
 			      <separator name="FM4"/>
+			      <menuitem action="Rename Image"/>
 			      <menuitem action="Delete Image"/>
 			      <separator name="FM3"/>
 			      <menuitem action="Custom Actions"/>
@@ -763,6 +770,7 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Delete Image').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Rename Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Crop').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Resize').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/1:1').set_sensitive(enable)
@@ -773,8 +781,10 @@ class Base:
 		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/FileMenu/Save As').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(False)
+		self.UIManager.get_widget('/MainMenu/FileMenu/Properties').set_sensitive(False)
 		# Only jpeg, png, and bmp images are currently supported for saving
 		if len(self.image_list) > 0:
+			self.UIManager.get_widget('/MainMenu/FileMenu/Properties').set_sensitive(True)
 			filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
 			if self.filetype_is_writable(filetype) == True:
 				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(enable)
@@ -966,7 +976,7 @@ class Base:
 		conf.set('prefs', 'zoomquality', self.zoomvalue)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
-		conf.set('prefs', 'delete_without_prompt', self.delete_without_prompt)
+		conf.set('prefs', 'confirm_delete', self.confirm_delete)
 		conf.set('prefs', 'preloading_images', self.preloading_images)
 		conf.set('prefs', 'savemode', self.savemode)
 		conf.set('prefs', 'start_in_fullscreen', self.start_in_fullscreen)
@@ -1083,11 +1093,7 @@ class Base:
 		dialog = gtk.FileChooserDialog(title=_("Save As"),action=gtk.FILE_CHOOSER_ACTION_SAVE,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_SAVE,gtk.RESPONSE_OK))
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		filename = os.path.basename(self.currimg_name)
-		filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
-		if self.filetype_is_writable(filetype) == False:
-			# Default to png file:
-			filename = os.path.splitext(os.path.basename(filename))[0] + ".png"
-			filetype = "png"
+		filetype = None
 		dialog.set_current_folder(os.path.dirname(self.currimg_name))
 		dialog.set_current_name(filename)
 		dialog.set_do_overwrite_confirmation(True)
@@ -1095,12 +1101,13 @@ class Base:
 		if response == gtk.RESPONSE_OK:
 			filename = dialog.get_filename()
 			dialog.destroy()
-			fileext = os.path.splitext(os.path.basename(self.currimg_name))[1]
+			fileext = os.path.splitext(os.path.basename(filename))[1]
+			if len(fileext) > 0:
+				fileext = fileext[1:]
 			# Override filetype if user typed a filename with a different extension:
 			for i in gtk.gdk.pixbuf_get_formats():
 				if fileext in i['extensions']:
-					if i['is_writable'] == True:
-						filetype = i['name']
+					filetype = i['name']
 			self.save_image_now(filename, filetype)
 		else:
 			dialog.destroy()
@@ -1110,12 +1117,26 @@ class Base:
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			while gtk.events_pending():
 				gtk.main_iteration()
-			self.currimg_pixbuf_original.save(dest_name, filetype)
-			self.currimg_name = dest_name
-			self.image_list[self.curr_img_in_list] = dest_name
-			self.update_title()
-			self.update_statusbar()
-			self.image_modified = False
+			if filetype == None:
+				filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
+			if self.filetype_is_writable(filetype) == True:
+				self.currimg_pixbuf_original.save(dest_name, filetype)
+				self.currimg_name = dest_name
+				self.image_list[self.curr_img_in_list] = dest_name
+				self.update_title()
+				self.update_statusbar()
+				self.image_modified = False
+			else:
+				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, _('The') + ' ' + filetype + ' ' + 'format is not supported for saving. Do you wish to save the file in a different format?')
+				error_dialog.set_title(_("Save"))
+				response = error_dialog.run()
+				if response == gtk.RESPONSE_YES:
+					error_dialog.destroy()
+					while gtk.events_pending():
+						gtk.main_iteration()
+					self.save_image_as(None)
+				else:
+					error_dialog.destroy()
 		except:
 			error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to save ') + dest_name)
 			error_dialog.set_title(_("Save"))
@@ -1127,8 +1148,10 @@ class Base:
 		# returns True if the user has canceled out of the dialog
 		if self.image_modified == True:
 			if self.savemode == 1:
-				if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive') == True:
-					self.save_image(None)
+				temp = self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive')
+				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', True)
+				self.save_image(None)
+				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', temp)
 			elif self.savemode == 2:
 				dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, _("The current image has been modified. Save changes?"))
 				dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
@@ -1139,8 +1162,10 @@ class Base:
 				response = dialog.run()
 				dialog.destroy()
 				if response == gtk.RESPONSE_YES:
-					if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive') == True:
-						self.save_image(None)
+					temp = self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive')
+					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', True)
+					self.save_image(None)
+					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', temp)
 				elif response != gtk.RESPONSE_NO:
 					return True
 
@@ -1315,7 +1340,7 @@ class Base:
 		# Update status bar:
 		try:
 			st = os.stat(self.currimg_name)
-			filesize = st[6]/1000
+			filesize = st[stat.ST_SIZE]/1000
 			ratio = int(100 * self.currimg_zoomratio)
 			status_text = str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
 		except:
@@ -1545,8 +1570,88 @@ class Base:
 		self.tvcolumn2.set_attributes(self.cell, text=2)
 		self.tvcolumn1.set_expand(True)
 
+	def show_properties(self, action):
+		show_props = gtk.Dialog(_("Properties"), self.window)
+		show_props.set_has_separator(False)
+		show_props.set_resizable(False)
+		table = gtk.Table(3, 3, False)
+		image = gtk.Image()
+		animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
+		if animtest.is_static_image() == True:
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 180)
+		else:
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180)
+		image.set_from_pixbuf(pixbuf)
+		vbox_left = gtk.VBox()
+		filename = gtk.Label(_("File name") + ":")
+		filename.set_alignment(1, 1)
+		filedate = gtk.Label(_("File date") + ":")
+		filedate.set_alignment(1, 1)
+		imagesize = gtk.Label(_("Dimensions") + ":")
+		imagesize.set_alignment(1, 1)
+		filesize = gtk.Label(_("File size") + ":")
+		filesize.set_alignment(1, 1)
+		filetype = gtk.Label(_("File type") + ":")
+		filetype.set_alignment(1, 1)
+		transparency = gtk.Label(_("Transparency") + ":")
+		transparency.set_alignment(1, 1)
+		animation = gtk.Label(_("Animation") + ":")
+		animation.set_alignment(1, 1)
+		bits = gtk.Label(_("Bits per sample") + ":")
+		bits.set_alignment(1, 1)
+		channels = gtk.Label(_("Channels") + ":")
+		channels.set_alignment(1, 1)
+		vbox_left.pack_start(filename, False, False, 2)
+		vbox_left.pack_start(filedate, False, False, 2)
+		vbox_left.pack_start(imagesize, False, False, 2)
+		vbox_left.pack_start(filesize, False, False, 2)
+		vbox_left.pack_start(filetype, False, False, 2)
+		vbox_left.pack_start(transparency, False, False, 2)
+		vbox_left.pack_start(animation, False, False, 2)
+		vbox_left.pack_start(bits, False, False, 2)
+		vbox_left.pack_start(channels, False, False, 2)
+		vbox_right = gtk.VBox()
+		filename2 = gtk.Label(os.path.basename(self.currimg_name))
+		filedate2 = gtk.Label(time.strftime('%Y/%m/%d  %H:%M', time.localtime(os.stat(self.currimg_name)[stat.ST_ATIME])))
+		imagesize2 = gtk.Label(str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()))
+		filetype2 = gtk.Label(gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['mime_types'][0])
+		filesize2 = gtk.Label(str(os.stat(self.currimg_name)[stat.ST_SIZE]/1000) + "KB")
+		transparency2 = gtk.Label(str(pixbuf.get_has_alpha()))
+		animation2 = gtk.Label(str(not animtest.is_static_image()))
+		bits2 = gtk.Label(str(pixbuf.get_bits_per_sample()))
+		channels2 = gtk.Label(str(pixbuf.get_n_channels()))
+		filename2.set_alignment(0, 1)
+		filedate2.set_alignment(0, 1)
+		imagesize2.set_alignment(0, 1)
+		filesize2.set_alignment(0, 1)
+		filetype2.set_alignment(0, 1)
+		transparency2.set_alignment(0, 1)
+		animation2.set_alignment(0, 1)
+		bits2.set_alignment(0, 1)
+		channels2.set_alignment(0, 1)
+		vbox_right.pack_start(filename2, False, False, 2)
+		vbox_right.pack_start(filedate2, False, False, 2)
+		vbox_right.pack_start(imagesize2, False, False, 2)
+		vbox_right.pack_start(filesize2, False, False, 2)
+		vbox_right.pack_start(filetype2, False, False, 2)
+		vbox_right.pack_start(transparency2, False, False, 2)
+		vbox_right.pack_start(animation2, False, False, 2)
+		vbox_right.pack_start(bits2, False, False, 2)
+		vbox_right.pack_start(channels2, False, False, 2)
+		hbox = gtk.HBox()
+		hbox.pack_start(vbox_left, False, False, 3)
+		hbox.pack_start(vbox_right, False, False, 3)
+		table.attach(image, 1, 2, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(hbox, 2, 3, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		show_props.vbox.pack_start(table, False, False, 15)
+		show_props.vbox.show_all()
+		close_button = show_props.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
+		close_button.grab_focus()
+		show_props.run()
+		show_props.destroy()
+
 	def show_prefs(self, action):
-		self.prefs_dialog = gtk.Dialog(title=_("Mirage Preferences"), parent=self.window)
+		self.prefs_dialog = gtk.Dialog(_("Mirage Preferences"), self.window)
 		self.prefs_dialog.set_has_separator(False)
 		self.prefs_dialog.set_resizable(False)
 		# "Interface" prefs:
@@ -1698,6 +1803,8 @@ class Base:
 		imagelabel = gtk.Label()
 		imagelabel.set_markup('<b>' + _('Image Editing') + '</b>')
 		imagelabel.set_alignment(0, 1)
+		deletebutton = gtk.CheckButton(_("Confirm image delete"))
+		deletebutton.set_active(self.confirm_delete)
 		zoom_hbox = gtk.HBox()
 		zoom_hbox.pack_start(gtk.Label(_('Scaling quality') + ": "), False, False, 0)
 		zoomcombo = gtk.combo_box_new_text()
@@ -1724,7 +1831,7 @@ class Base:
 		table_image.attach(gtk.Label(), 1, 3, 5, 6,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(hbox_save, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_image.attach(gtk.Label(), 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(deletebutton, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -1773,6 +1880,7 @@ class Base:
 			self.slideshow_in_fullscreen = ss_in_fs.get_active()
 			self.savemode = savecombo.get_active()
 			self.start_in_fullscreen = fullscreen.get_active()
+			self.confirm_delete = deletebutton.get_active()
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
 			if self.preloading_images == True and preloading_images_prev == False:
@@ -1791,13 +1899,67 @@ class Base:
 		else:
 			self.defaultdir.set_sensitive(False)
 
+	def rename_image(self, action):
+		if len(self.image_list) > 0:
+			temp_slideshow_mode = self.slideshow_mode
+			if self.slideshow_mode == True:
+				self.toggle_slideshow(None)
+			rename_dialog = gtk.Dialog(_('Rename Image'), self.window, gtk.DIALOG_MODAL)
+			self.rename_txt = gtk.Entry()
+			filename = os.path.basename(self.currimg_name)
+			self.rename_txt.set_text(filename)
+			self.rename_txt.set_activates_default(True)
+			cancelbutton = rename_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+			renamebutton = rename_dialog.add_button(_("Rename"), gtk.RESPONSE_ACCEPT)
+			renameimage = gtk.Image()
+			renameimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+			renamebutton.set_image(renameimage)
+			instructions = gtk.Label(_("Enter the new name") + ":")
+			instructions.set_alignment(0, 1)
+			hbox = gtk.HBox()
+			hbox.pack_start(gtk.Label(), False, False, 5)
+			vbox_stuff = gtk.VBox()
+			vbox_stuff.pack_start(gtk.Label(), False, False, 0)
+			vbox_stuff.pack_start(instructions, False, False, 0)
+			vbox_stuff.pack_start(gtk.Label(), False, False, 0)
+			vbox_stuff.pack_start(self.rename_txt, False, False, 0)
+			vbox_stuff.pack_start(gtk.Label(), False, False, 0)
+			hbox.pack_start(vbox_stuff, True, True, 0)
+			hbox.pack_start(gtk.Label(), False, False, 5)
+			rename_dialog.vbox.pack_start(hbox, False, False, 0)
+			rename_dialog.set_has_separator(True)
+			rename_dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+			rename_dialog.set_size_request(300, -1)
+			rename_dialog.vbox.show_all()
+			rename_dialog.connect('show', self.select_rename_text)
+			response = rename_dialog.run()
+			if response == gtk.RESPONSE_ACCEPT:
+				try:
+					new_filename = os.path.dirname(self.currimg_name) + "/" + self.rename_txt.get_text()
+					os.rename(self.currimg_name, new_filename)
+					self.currimg_name = new_filename
+					self.update_title()
+				except:
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to rename') + ' ' + self.currimg_name)
+					error_dialog.set_title(_("Unable to rename"))
+					error_dialog.run()
+					error_dialog.destroy()
+			rename_dialog.destroy()
+			if temp_slideshow_mode == True:
+				self.toggle_slideshow(None)
+
+	def select_rename_text(self, widget):
+		filename = os.path.basename(self.currimg_name)
+		fileext = os.path.splitext(os.path.basename(self.currimg_name))[1]
+		self.rename_txt.select_region(0, len(filename) - len(fileext))
+
 	def delete_image(self, action):
 		if len(self.image_list) > 0:
 			temp_slideshow_mode = self.slideshow_mode
 			if self.slideshow_mode == True:
 				self.toggle_slideshow(None)
 			delete_dialog = gtk.Dialog(_('Delete Image'), self.window, gtk.DIALOG_MODAL)
-			if self.delete_without_prompt == False:
+			if self.confirm_delete == True:
 				permlabel = gtk.Label(_('Are you sure you wish to permanently delete') + ' ' + os.path.split(self.currimg_name)[1] + '?')
 				permlabel.set_line_wrap(True)
 				warningicon = gtk.Image()
@@ -1805,13 +1967,10 @@ class Base:
 				hbox = gtk.HBox()
 				hbox.pack_start(warningicon, False, False, 10)
 				hbox.pack_start(permlabel, False, False, 10)
-				delete_prompt = gtk.CheckButton(_('Do not ask again'))
 				delete_dialog.vbox.pack_start(gtk.Label(), False, False, 0)
 				delete_dialog.vbox.pack_start(hbox, False, False, 0)
-				delete_dialog.action_area.pack_start(delete_prompt, False, False, 10)
 				cancelbutton = delete_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
 				deletebutton = delete_dialog.add_button(gtk.STOCK_DELETE, gtk.RESPONSE_YES)
-				delete_dialog.action_area.set_layout(gtk.BUTTONBOX_EDGE)
 				delete_dialog.set_has_separator(False)
 				deletebutton.set_property('has-focus', True)
 				delete_dialog.set_default_response(gtk.RESPONSE_YES)
@@ -1820,8 +1979,6 @@ class Base:
 			else:
 				response = gtk.RESPONSE_YES
 			if response  == gtk.RESPONSE_YES:
-				if self.delete_without_prompt == False:
-					self.delete_without_prompt = delete_prompt.get_active()
 				try:
 					os.remove(self.currimg_name)
 					templist = self.image_list
@@ -2215,68 +2372,116 @@ class Base:
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 			self.image_modified = True
 
-	def crop_image(self, action):
-		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		dialog.add_button(_("Crop"), gtk.RESPONSE_ACCEPT)
-		image = gtk.DrawingArea()
-		# Create a pixbuf that fits in a window of 400x400
-		image_width = self.currimg_pixbuf_original.get_width()
-		image_height = self.currimg_pixbuf_original.get_height()
-		if image_width-400 > image_height-400:
-			if image_width > 400:
-				image_height = int(400/float(image_width)*image_height)
-				image_width = 400
+	def get_pixbuf_of_size(self, pixbuf, size):
+		# Creates a pixbuf that fits in the specified square of sizexsize
+		# while preserving the aspect ratio
+		# Returns tuple: (scaled_pixbuf, actual_width, actual_height)
+		image_width = pixbuf.get_width()
+		image_height = pixbuf.get_height()
+		if image_width-size > image_height-size:
+			if image_width > size:
+				image_height = int(size/float(image_width)*image_height)
+				image_width = size
 		else:
-			if image_height > 400:
-				image_width = int(400/float(image_height)*image_width)
-				image_height = 400
-		if self.currimg_pixbuf_original.get_has_alpha() == False:
-			crop_pixbuf = self.currimg_pixbuf_original.scale_simple(image_width, image_height, self.zoom_quality)
+			if image_height > size:
+				image_width = int(size/float(image_height)*image_width)
+				image_height = size
+		if pixbuf.get_has_alpha() == False:
+			crop_pixbuf = pixbuf.scale_simple(image_width, image_height, self.zoom_quality)
 		else:
 			colormap = self.imageview.get_colormap()
 			light_grey = colormap.alloc_color('#666666', True, True)
 			dark_grey = colormap.alloc_color('#999999', True, True)
-			crop_pixbuf = self.currimg_pixbuf_original.composite_color_simple(image_width, image_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+			crop_pixbuf = pixbuf.composite_color_simple(image_width, image_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+		return (crop_pixbuf, image_width, image_height)
+
+	def crop_image(self, action):
+		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		cropbutton = dialog.add_button(_("Crop"), gtk.RESPONSE_ACCEPT)
+		cropimage = gtk.Image()
+		cropimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+		cropbutton.set_image(cropimage)
+		image = gtk.DrawingArea()
+		crop_pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 400)
 		image.set_size_request(image_width, image_height)
 		hbox = gtk.HBox()
 		hbox.pack_start(gtk.Label(), expand=True)
 		hbox.pack_start(image, expand=False)
 		hbox.pack_start(gtk.Label(), expand=True)
+		vbox_left = gtk.VBox()
+		x_adj = gtk.Adjustment(0, 0, self.currimg_pixbuf_original.get_width(), 1, 10, 10)
+		x = gtk.SpinButton(x_adj, 0, 0)
+		x.set_numeric(True)
+		x.set_update_policy(gtk.UPDATE_IF_VALID)
+		x.set_wrap(False)
+		x_label = gtk.Label("X:")
+		x_label.set_alignment(0, 0.7)
+		y_adj = gtk.Adjustment(0, 0, self.currimg_pixbuf_original.get_height(), 1, 10, 10)
+		y = gtk.SpinButton(y_adj, 0, 0)
+		y.set_numeric(True)
+		y.set_update_policy(gtk.UPDATE_IF_VALID)
+		y.set_wrap(False)
+		y_label = gtk.Label("Y:")
+		x_label.set_size_request(y_label.size_request()[0], -1)
+		hbox_x = gtk.HBox()
+		hbox_y = gtk.HBox()
+		hbox_x.pack_start(x_label, False, False, 10)
+		hbox_x.pack_start(x, False, False, 0)
+		hbox_y.pack_start(y_label, False, False, 10)
+		hbox_y.pack_start(y, False, False, 0)
+		vbox_left.pack_start(hbox_x, False, False, 0)
+		vbox_left.pack_start(hbox_y, False, False, 0)
+		vbox_right = gtk.VBox()
+		width_adj = gtk.Adjustment(self.currimg_pixbuf_original.get_width(), 1, self.currimg_pixbuf_original.get_width(), 1, 10, 10)
+		width = gtk.SpinButton(width_adj, 0, 0)
+		width.set_numeric(True)
+		width.set_update_policy(gtk.UPDATE_IF_VALID)
+		width.set_wrap(False)
+		width_label = gtk.Label(_("Width") + ":")
+		width_label.set_alignment(0, 0.7)
+		height_adj = gtk.Adjustment(self.currimg_pixbuf_original.get_height(), 1, self.currimg_pixbuf_original.get_height(), 1, 10, 10)
+		height = gtk.SpinButton(height_adj, 0, 0)
+		height.set_numeric(True)
+		height.set_update_policy(gtk.UPDATE_IF_VALID)
+		height.set_wrap(False)
+		height_label = gtk.Label(_("Height") + ":")
+		width_label.set_size_request(height_label.size_request()[0], -1)
+		height_label.set_alignment(0, 0.7)
+		hbox_width = gtk.HBox()
+		hbox_height = gtk.HBox()
+		hbox_width.pack_start(width_label, False, False, 10)
+		hbox_width.pack_start(width, False, False, 0)
+		hbox_height.pack_start(height_label, False, False, 10)
+		hbox_height.pack_start(height, False, False, 0)
+		vbox_right.pack_start(hbox_width, False, False, 0)
+		vbox_right.pack_start(hbox_height, False, False, 0)
+		hbox2 = gtk.HBox()
+		hbox2.pack_start(vbox_left, False, False, 0)
+		hbox2.pack_start(vbox_right, False, False, 0)
 		dialog.vbox.pack_start(hbox, False, False, 0)
+		dialog.vbox.pack_start(hbox2, False, False, 15)
 		dialog.set_resizable(False)
 		dialog.vbox.show_all()
 		image.set_events(gtk.gdk.POINTER_MOTION_MASK | gtk.gdk.POINTER_MOTION_HINT_MASK | gtk.gdk.BUTTON_PRESS_MASK | gtk.gdk.BUTTON_MOTION_MASK | gtk.gdk.BUTTON_RELEASE_MASK)
 		image.connect("expose-event", self.crop_image_expose_cb, crop_pixbuf, image_width, image_height)
-		image.connect("motion_notify_event", self.crop_image_mouse_moved, image)
+		image.connect("motion_notify_event", self.crop_image_mouse_moved, image, 0, 0, x, y, width, height, image_width, image_height, width_adj, height_adj)
 		image.connect("button_press_event", self.crop_image_button_press, image)
 		image.connect("button_release_event", self.crop_image_button_release)
+		self.x_changed = x.connect('value-changed', self.crop_value_changed, x, y, width, height, width_adj, height_adj, image_width, image_height, image, 0)
+		self.y_changed = y.connect('value-changed', self.crop_value_changed, x, y, width, height, width_adj, height_adj, image_width, image_height, image, 1)
+		self.width_changed = width.connect('value-changed', self.crop_value_changed, x, y, width, height, width_adj, height_adj, image_width, image_height, image, 2)
+		self.height_changed = height.connect('value-changed', self.crop_value_changed, x, y, width, height, width_adj, height_adj, image_width, image_height, image, 3)
 		image.realize()
+		self.crop_rectangle = [0, 0]
 		self.drawing_crop_rectangle = False
-		self.crop_rectangle = None
+		self.update_rectangle = False
 		self.rect = None
 		response = dialog.run()
 		if response == gtk.RESPONSE_ACCEPT:
 			dialog.destroy()
 			if self.rect != None:
-				# Convert the rectangle coordinates of the current image
-				# to coordinates of pixbuf_original
-				if self.rect[0] < 0:
-					self.rect[2] = self.rect[2] + self.rect[0]
-					self.rect[0] = 0
-				if self.rect[1] < 0:
-					self.rect[3] = self.rect[3] + self.rect[1]
-					self.rect[1] = 0
-				coords = [0,0,0,0]
-				coords[0] = int(float(self.rect[0])/image_width*self.currimg_pixbuf_original.get_width())
-				coords[1] = int(float(self.rect[1])/image_height*self.currimg_pixbuf_original.get_height())
-				coords[2] = int(float(self.rect[2])/image_width*self.currimg_pixbuf_original.get_width())
-				coords[3] = int(float(self.rect[3])/image_height*self.currimg_pixbuf_original.get_height())
-				if coords[0] + coords[2] > self.currimg_pixbuf_original.get_width():
-					coords[2] = self.currimg_pixbuf_original.get_width() - coords[0]
-				if coords[1] + coords[3] > self.currimg_pixbuf_original.get_height():
-					coords[3] = self.currimg_pixbuf_original.get_height() - coords[1]
 				temp_pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, self.currimg_pixbuf_original.get_has_alpha(), 8, coords[2], coords[3])
-				self.currimg_pixbuf_original.copy_area(coords[0], coords[1], coords[2], coords[3], temp_pixbuf, 0, 0)
+				self.currimg_pixbuf_original.copy_area(self.coords[0], self.coords[1], self.coords[2], self.coords[3], temp_pixbuf, 0, 0)
 				self.currimg_pixbuf_original = temp_pixbuf
 				del temp_pixbuf
 				gc.collect()
@@ -2285,31 +2490,86 @@ class Base:
 		else:
 			dialog.destroy()
 
+	def crop_value_changed(self, currspinbox, x, y, width, height, width_adj, height_adj, image_width, image_height, image, type):
+		if type == 0:   # X
+			if x.get_value() + width.get_value() > self.currimg_pixbuf_original.get_width():
+				width.handler_block(self.width_changed)
+				width.set_value(self.currimg_pixbuf_original.get_width() - x.get_value())
+				width.handler_unblock(self.width_changed)
+		elif type == 1: # Y
+			if y.get_value() + height.get_value() > self.currimg_pixbuf_original.get_height():
+				height.handler_block(self.height_changed)
+				height.set_value(self.currimg_pixbuf_original.get_height() - y.get_value())
+				height.handler_unblock(self.height_changed)
+		self.coords = [x.get_value(), y.get_value(), width.get_value(), height.get_value()]
+		self.crop_rectangle[0] = int(float(self.coords[0])/self.currimg_pixbuf_original.get_width()*image_width)
+		self.crop_rectangle[1] = int(float(self.coords[1])/self.currimg_pixbuf_original.get_height()*image_height)
+		x2 = int(float(self.coords[2])/self.currimg_pixbuf_original.get_width()*image_width) + self.crop_rectangle[0]
+		y2 = int(float(self.coords[3])/self.currimg_pixbuf_original.get_height()*image_height) + self.crop_rectangle[1]
+		self.drawing_crop_rectangle = True
+		self.update_rectangle = True
+		self.crop_image_mouse_moved(None, None, image, x2, y2, x, y, width, height, image_width, image_height, width_adj, height_adj)
+		self.update_rectangle = False
+		self.drawing_crop_rectangle = False
+
 	def crop_image_expose_cb(self, image, event, pixbuf, width, height):
 		image.window.draw_pixbuf(None, pixbuf, 0, 0, 0, 0, width, height)
 
-	def crop_image_mouse_moved(self, widget, event, image):
-		x, y, state = event.window.get_pointer()
+	def crop_image_mouse_moved(self, widget, event, image, x2, y2, x, y, width, height, image_width, image_height, width_adj, height_adj):
+		if event != None:
+			x2, y2, state = event.window.get_pointer()
 		if self.drawing_crop_rectangle == True:
-			if self.crop_rectangle != None:
+			if self.crop_rectangle != None or self.update_rectangle == True:
 				gc = image.window.new_gc(function=gtk.gdk.INVERT)
 				if self.rect != None:
 					# Get rid of the previous drawn rectangle:
 					image.window.draw_rectangle(gc, False, self.rect[0], self.rect[1], self.rect[2], self.rect[3])
 				self.rect = [0, 0, 0, 0]
-				if self.crop_rectangle[0] > x:
-					self.rect[0] = x
-					self.rect[2] = self.crop_rectangle[0]-x
+				if self.crop_rectangle[0] > x2:
+					self.rect[0] = x2
+					self.rect[2] = self.crop_rectangle[0]-x2
 				else:
 					self.rect[0] = self.crop_rectangle[0]
-					self.rect[2] = x-self.crop_rectangle[0]
-				if self.crop_rectangle[1] > y:
-					self.rect[1] = y
-					self.rect[3] = self.crop_rectangle[1]-y
+					self.rect[2] = x2-self.crop_rectangle[0]
+				if self.crop_rectangle[1] > y2:
+					self.rect[1] = y2
+					self.rect[3] = self.crop_rectangle[1]-y2
 				else:
 					self.rect[1] = self.crop_rectangle[1]
-					self.rect[3] = y-self.crop_rectangle[1]
+					self.rect[3] = y2-self.crop_rectangle[1]
 				image.window.draw_rectangle(gc, False, self.rect[0], self.rect[1], self.rect[2], self.rect[3])
+				# Convert the rectangle coordinates of the current image
+				# to coordinates of pixbuf_original
+				if self.rect[0] < 0:
+					self.rect[2] = self.rect[2] + self.rect[0]
+					self.rect[0] = 0
+				if self.rect[1] < 0:
+					self.rect[3] = self.rect[3] + self.rect[1]
+					self.rect[1] = 0
+				if event != None:
+					self.coords = [0,0,0,0]
+					self.coords[0] = int(float(self.rect[0])/image_width*self.currimg_pixbuf_original.get_width())
+					self.coords[1] = int(float(self.rect[1])/image_height*self.currimg_pixbuf_original.get_height())
+					self.coords[2] = int(float(self.rect[2])/image_width*self.currimg_pixbuf_original.get_width())
+					self.coords[3] = int(float(self.rect[3])/image_height*self.currimg_pixbuf_original.get_height())
+					if self.coords[0] + self.coords[2] > self.currimg_pixbuf_original.get_width():
+						self.coords[2] = self.currimg_pixbuf_original.get_width() - self.coords[0]
+					if self.coords[1] + self.coords[3] > self.currimg_pixbuf_original.get_height():
+						self.coords[3] = self.currimg_pixbuf_original.get_height() - self.coords[1]
+				x.handler_block(self.x_changed)
+				y.handler_block(self.y_changed)
+				width.handler_block(self.width_changed)
+				height.handler_block(self.height_changed)
+				x.set_value(self.coords[0])
+				y.set_value(self.coords[1])
+				width.set_value(self.coords[2])
+				height.set_value(self.coords[3])
+				x.handler_unblock(self.x_changed)
+				y.handler_unblock(self.y_changed)
+				width_adj.set_property('upper', self.currimg_pixbuf_original.get_width() - self.coords[0])
+				height_adj.set_property('upper', self.currimg_pixbuf_original.get_height() - self.coords[1])
+				width.handler_unblock(self.width_changed)
+				height.handler_unblock(self.height_changed)
 
 	def crop_image_button_press(self, widget, event, image):
 		x, y, state = event.window.get_pointer()
@@ -2329,7 +2589,10 @@ class Base:
 
 	def resize_image(self, action):
 		dialog = gtk.Dialog(_("Resize Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		dialog.add_button(_("Resize"), gtk.RESPONSE_ACCEPT)
+		resizebutton = dialog.add_button(_("Resize"), gtk.RESPONSE_ACCEPT)
+		resizeimage = gtk.Image()
+		resizeimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+		resizebutton.set_image(resizeimage)
 		hbox_width = gtk.HBox()
 		width_adj = gtk.Adjustment(self.currimg_pixbuf_original.get_width(), 1, 100000000000, 1, 10, 10)
 		width = gtk.SpinButton(width_adj, 0, 0)

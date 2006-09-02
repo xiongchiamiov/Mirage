@@ -1,13 +1,20 @@
 0.8
 + Feedback for custom actions
 + Bug hunting
++ Cropping bug - drag box, then move x-value... off by a pixel
++ Update docs
 
 Future
++ Image effect - saturation
++ Highlight selected region of cropped image (or darken unselected region)
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
+	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
+	- delete thumbnail if image is deleted, update if image is moved
 + Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
-+ Sorting algorithm options (case sensitivity, file10 vs file9)? (Michael Campbell)
-+ Printing support (requires gtk 2.10) (Bjoern Martensen)
++ Sorting options (case sensitivity, file10 vs file9, hidden files)? (Michael Campbell)
 + Recent files in file menu (requires new pygtk and gtk 2.10)
+	- Recent *viewed* files, not opened
++ Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
 + Remove gcc requirement (requires new pygtk)
 + Test on Windows/Mac? (requires new pygtk)
 + Try to make zooming smoother (is this even possible with pygtk?)

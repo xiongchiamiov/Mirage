@@ -1,8 +1,10 @@
 v0.8 - Pending
 	+ Editing capabilities: resize, crop, save, delete (luzi/Bjoern Martensen)
+	+ More editing capabilities: rename
 	+ Preference to preload images for faster navigation (Mike Massonnet)
 	+ Implemented 'custom actions' framework, including batch actions (Thomas Güttler)
 	+ --onload or -o argument for performing actions on image loading (Thomas Güttler)
+	+ Added File > Properties to display image properties
 	+ Show "Scanning..." in statusbar when scanning for images; Escape to abort
 	+ Reduce GTK+ requirement to 2.6.0 (William Rea)
 	+ Bug: Opening with 'load all images in dir' gives expected result (Bjoern Martensen)
