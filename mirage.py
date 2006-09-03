@@ -135,6 +135,7 @@ class Base:
 		self.image_modified = False
 		self.image_zoomed = False
 		self.start_in_fullscreen = False
+		self.running_custom_actions = False
 
 		# Read any passed options/arguments:
 		try:
@@ -448,7 +449,7 @@ class Base:
 		self.statusbar2 = gtk.Statusbar()
 		self.statusbar.set_has_resize_grip(False)
 		self.statusbar2.set_has_resize_grip(True)
-		self.statusbar2.set_size_request(100, -1)
+		self.statusbar2.set_size_request(200, -1)
 		hbox_statusbar = gtk.HBox()
 		hbox_statusbar.pack_start(self.statusbar, expand=True)
 		hbox_statusbar.pack_start(self.statusbar2, expand=False)
@@ -685,14 +686,26 @@ class Base:
 				pass
 
 	def parse_action_command(self, command, batchmode):
+		self.running_custom_actions = True
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 		while gtk.events_pending():
 			gtk.main_iteration()
+		self.curr_custom_action = 0
 		if batchmode == True:
-			for i in range(len(self.image_list)):
+			self.num_custom_actions = len(self.image_list)
+			for i in range(self.num_custom_actions):
+				self.curr_custom_action += 1
+				self.update_statusbar()
+				while gtk.events_pending():
+					gtk.main_iteration()
 				imagename = self.image_list[i]
 				self.parse_action_command2(command, imagename)
 		else:
+			self.num_custom_actions = 1
+			self.curr_custom_action = 1
+			self.update_statusbar()
+			while gtk.events_pending():
+				gtk.main_iteration()
 			self.parse_action_command2(command, self.currimg_name)
 		gc.collect()
 		self.change_cursor(None)
@@ -702,22 +715,46 @@ class Base:
 			self.image_load_failed(False)
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
-			if (animtest.is_static_image() == True and self.currimg_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.currimg_pixbuf_original != animtest):
-				self.load_new_image(False, False, False, True, False)
+			if animtest.is_static_image() == True:
+				if self.images_are_different(animtest.get_static_image(), self.currimg_pixbuf_original):
+					self.load_new_image(False, False, False, True, False)
+			else:
+				if self.images_are_different(animtest, self.currimg_pixbuf_original):
+					self.load_new_image(False, False, False, True, False)
+		self.running_custom_actions = False
+		self.update_statusbar()
+		while gtk.events_pending():
+			gtk.main_iteration()
 		if os.path.exists(self.preloadimg_prev_name) == False:
 			self.preloadimg_prev_pixbuf_original = None
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
-			if (animtest.is_static_image() == True and self.preloadimg_prev_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_prev_pixbuf_original != animtest):
-				self.preloadimg_prev_pixbuf_original = None
-				self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
+			if animtest.is_static_image() == True:
+				if self.images_are_different(animtest.get_static_image(), self.preloadimg_prev_pixbuf_original):
+					self.preloadimg_prev_pixbuf_original = None
+					self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
+			else:
+				if self.images_are_different(animtest, self.preloadimg_prev_pixbuf_original):
+					self.preloadimg_prev_pixbuf_original = None
+					self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
 		if os.path.exists(self.preloadimg_next_name) == False:
 			self.preloadimg_next_pixbuf_original = None
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
-			if (animtest.is_static_image() == True and self.preloadimg_next_pixbuf_original != animtest.get_static_image()) or (animtest.is_static_image() == False and self.preloadimg_next_pixbuf_original != animtest):
-				self.preloadimg_next_pixbuf_original = None
-				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
+			if animtest.is_static_image() == True:
+				if self.images_are_different(animtest.get_static_image(), self.preloadimg_next_pixbuf_original):
+					self.preloadimg_next_pixbuf_original = None
+					self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
+			else:
+				if self.images_are_different(animtest, self.preloadimg_next_pixbuf_original):
+					self.preloadimg_next_pixbuf_original = None
+					self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
+
+	def images_are_different(self, pixbuf1, pixbuf2):
+		if pixbuf1.get_pixels() == pixbuf2.get_pixels():
+			return False
+		else:
+			return True
 
 	def parse_action_command2(self, command, imagename):
 		# First, replace any property keywords with their flags:
@@ -745,6 +782,7 @@ class Base:
 					error_dialog.set_title(_("Invalid Custom Action"))
 					error_dialog.run()
 					error_dialog.destroy()
+					self.running_custom_actions = False
 					return
 
 	def set_go_sensitivities(self, enable):
@@ -1347,7 +1385,9 @@ class Base:
 			status_text=_("Cannot load image.")
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
 		status_text = ""
-		if self.searching_for_images == True:
+		if self.running_custom_actions:
+			status_text = _('Custom actions') + ': ' + str(self.curr_custom_action) + ' ' + _('of') + ' ' + str(self.num_custom_actions)
+		elif self.searching_for_images == True:
 			status_text = _('Scanning') + '...'
 		self.statusbar2.push(self.statusbar2.get_context_id(""), status_text)
 
@@ -2717,7 +2757,7 @@ class Base:
 						return
 			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			gtk.main_iteration()
+				gtk.main_iteration()
 			try:
 				self.load_new_image(False, True, False, True, True)
 			except:
@@ -2777,7 +2817,7 @@ class Base:
 						return
 			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			gtk.main_iteration()
+				gtk.main_iteration()
 			try:
 				self.load_new_image(True, False, False, True, True)
 			except:
@@ -2849,7 +2889,7 @@ class Base:
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			gtk.main_iteration()
+				gtk.main_iteration()
 			try:
 				self.load_new_image(False, False, False, True, True)
 			except:
@@ -2877,8 +2917,9 @@ class Base:
 				return
 			self.randomlist = []
 			self.curr_img_in_list = 0
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			gtk.main_iteration()
+			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
+				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+				gtk.main_iteration()
 			try:
 				self.load_new_image(False, False, False, True, True)
 			except:
@@ -2906,8 +2947,9 @@ class Base:
 				return
 			self.randomlist = []
 			self.curr_img_in_list = len(self.image_list)-1
-			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			gtk.main_iteration()
+			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
+				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+				gtk.main_iteration()
 			try:
 				self.load_new_image(False, False, False, True, True)
 			except:
@@ -3032,11 +3074,11 @@ class Base:
 					self.set_image_sensitivities(True)
 				else:
 					self.set_image_sensitivities(False)
+		if set_prev_to_none == True:
+			self.preloadimg_prev_pixbuf_original = None
+		elif set_next_to_none == True:
+			self.preloadimg_next_pixbuf_original = None
 		if (use_preloadimg_next == False and use_preloadimg_prev == False) or (use_preloadimg_next == True and self.preloadimg_next_pixbuf_original == None) or (use_preloadimg_prev == True and self.preloadimg_prev_pixbuf_original == None) or self.preloading_images == False:
-			if set_prev_to_none == True:
-				self.preloadimg_prev_pixbuf_original = None
-			elif set_next_to_none == True:
-				self.preloadimg_next_pixbuf_original = None
 			self.currimg_pixbuf = None
 			self.currimg_zoomratio = 1
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])

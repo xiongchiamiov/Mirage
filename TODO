@@ -1,5 +1,4 @@
 0.8
-+ Feedback for custom actions
 + Bug hunting
 + Cropping bug - drag box, then move x-value... off by a pixel
 + Update docs
