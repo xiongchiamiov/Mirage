@@ -2541,11 +2541,11 @@ class Base:
 				height.handler_block(self.height_changed)
 				height.set_value(self.currimg_pixbuf_original.get_height() - y.get_value())
 				height.handler_unblock(self.height_changed)
-		self.coords = [x.get_value(), y.get_value(), width.get_value(), height.get_value()]
-		self.crop_rectangle[0] = int(float(self.coords[0])/self.currimg_pixbuf_original.get_width()*image_width)
-		self.crop_rectangle[1] = int(float(self.coords[1])/self.currimg_pixbuf_original.get_height()*image_height)
-		x2 = int(float(self.coords[2])/self.currimg_pixbuf_original.get_width()*image_width) + self.crop_rectangle[0]
-		y2 = int(float(self.coords[3])/self.currimg_pixbuf_original.get_height()*image_height) + self.crop_rectangle[1]
+		self.coords = [int(x.get_value()), int(y.get_value()), int(width.get_value()), int(height.get_value())]
+		self.crop_rectangle[0] = int(round(float(self.coords[0])/self.currimg_pixbuf_original.get_width()*image_width, 0))
+		self.crop_rectangle[1] = int(round(float(self.coords[1])/self.currimg_pixbuf_original.get_height()*image_height, 0))
+		x2 = int(round(float(self.coords[2])/self.currimg_pixbuf_original.get_width()*image_width, 0)) + self.crop_rectangle[0]
+		y2 = int(round(float(self.coords[3])/self.currimg_pixbuf_original.get_height()*image_height, 0)) + self.crop_rectangle[1]
 		self.drawing_crop_rectangle = True
 		self.update_rectangle = True
 		self.crop_image_mouse_moved(None, None, image, x2, y2, x, y, width, height, image_width, image_height, width_adj, height_adj)
@@ -2588,10 +2588,10 @@ class Base:
 					self.rect[1] = 0
 				if event != None:
 					self.coords = [0,0,0,0]
-					self.coords[0] = int(float(self.rect[0])/image_width*self.currimg_pixbuf_original.get_width())
-					self.coords[1] = int(float(self.rect[1])/image_height*self.currimg_pixbuf_original.get_height())
-					self.coords[2] = int(float(self.rect[2])/image_width*self.currimg_pixbuf_original.get_width())
-					self.coords[3] = int(float(self.rect[3])/image_height*self.currimg_pixbuf_original.get_height())
+					self.coords[0] = int(round(float(self.rect[0])/image_width*self.currimg_pixbuf_original.get_width(), 0))
+					self.coords[1] = int(round(float(self.rect[1])/image_height*self.currimg_pixbuf_original.get_height(), 0))
+					self.coords[2] = int(round(float(self.rect[2])/image_width*self.currimg_pixbuf_original.get_width(), 0))
+					self.coords[3] = int(round(float(self.rect[3])/image_height*self.currimg_pixbuf_original.get_height(), 0))
 					if self.coords[0] + self.coords[2] > self.currimg_pixbuf_original.get_width():
 						self.coords[2] = self.currimg_pixbuf_original.get_width() - self.coords[0]
 					if self.coords[1] + self.coords[3] > self.currimg_pixbuf_original.get_height():
