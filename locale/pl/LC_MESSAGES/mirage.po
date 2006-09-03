@@ -9,12 +9,12 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-09-02 20:22-0600\n"
-"PO-Revision-Date: 2006-08-27 21:00+0200\n"
+"PO-Revision-Date: 2006-09-03 11:05+0200\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Polish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: mirage.py:251
 msgid "_File"
@@ -69,18 +69,16 @@ msgid "Save Image As"
 msgstr "Zapisz obraz jako"
 
 #: mirage.py:260
-#, fuzzy
 msgid "_Crop..."
-msgstr "Prz_ytnij obraz..."
+msgstr "Prz_ytnij..."
 
 #: mirage.py:260 mirage.py:2439
 msgid "Crop Image"
 msgstr "Przytnij obraz"
 
 #: mirage.py:261
-#, fuzzy
 msgid "Re_size..."
-msgstr "Zmi_eń rozmiar obrazu..."
+msgstr "Zmi_eń rozmiar..."
 
 #: mirage.py:261 mirage.py:2631
 msgid "Resize Image"
@@ -271,33 +269,28 @@ msgid "Stop Slideshow"
 msgstr "Zatrzymaj pokaz slajdów"
 
 #: mirage.py:285
-#, fuzzy
 msgid "_Delete..."
-msgstr "_Usuń obraz"
+msgstr "_Usuń..."
 
 #: mirage.py:285 mirage.py:2001
 msgid "Delete Image"
 msgstr "Następny obraz"
 
 #: mirage.py:286
-#, fuzzy
 msgid "Re_name..."
-msgstr "Zmi_eń rozmiar obrazu..."
+msgstr "Zmi_eń nazwę..."
 
 #: mirage.py:286 mirage.py:1947
-#, fuzzy
 msgid "Rename Image"
-msgstr "Zmień rozmiar obrazu"
+msgstr "Zmień nazwę obrazu"
 
 #: mirage.py:287
-#, fuzzy
 msgid "_Properties..."
-msgstr "P_referencje..."
+msgstr "_Właściwości..."
 
 #: mirage.py:287 mirage.py:1614
-#, fuzzy
 msgid "Properties"
-msgstr "Działania"
+msgstr "Właściwości"
 
 #: mirage.py:288
 msgid "Custom _Actions..."
@@ -407,7 +400,7 @@ msgstr "Zapisz jako"
 
 #: mirage.py:1168
 msgid "The"
-msgstr ""
+msgstr " "
 
 #: mirage.py:1169 mirage.py:1180
 msgid "Save"
@@ -446,7 +439,6 @@ msgid "Cannot load image."
 msgstr "Nie można wczytać obrazu."
 
 #: mirage.py:1389
-#, fuzzy
 msgid "Custom actions"
 msgstr "Własne czynności"
 
@@ -566,45 +558,40 @@ msgid "Invalid Shortcut"
 msgstr "Niepoprawny skrót"
 
 #: mirage.py:1626
-#, fuzzy
 msgid "File name"
-msgstr "Ścieżka do pliku"
+msgstr "Nazwa pliku"
 
 #: mirage.py:1628
-#, fuzzy
 msgid "File date"
-msgstr "Ścieżka do pliku"
+msgstr "Data pliku"
 
 #: mirage.py:1630
 msgid "Dimensions"
-msgstr ""
+msgstr "Rozmiary"
 
 #: mirage.py:1632
-#, fuzzy
 msgid "File size"
-msgstr "Zmień rozmiar"
+msgstr "Rozmiar pliku"
 
 #: mirage.py:1634
-#, fuzzy
 msgid "File type"
-msgstr "Ścieżka do pliku"
+msgstr "Typ pliku"
 
 #: mirage.py:1636
 msgid "Transparency"
-msgstr ""
+msgstr "Przezroczystość"
 
 #: mirage.py:1638
-#, fuzzy
 msgid "Animation"
-msgstr "Czynność"
+msgstr "Animacja"
 
 #: mirage.py:1640
 msgid "Bits per sample"
-msgstr ""
+msgstr "Bitów na próbkę"
 
 #: mirage.py:1642
 msgid "Channels"
-msgstr ""
+msgstr "Kanałów"
 
 #: mirage.py:1694
 msgid "Mirage Preferences"
@@ -760,7 +747,7 @@ msgstr "Modyfikowanie obrazów"
 
 #: mirage.py:1846
 msgid "Confirm image delete"
-msgstr ""
+msgstr "Potwierdź usunięcie obrazu"
 
 #: mirage.py:1849
 msgid "Scaling quality"
@@ -812,16 +799,15 @@ msgstr "Obraz"
 
 #: mirage.py:1953
 msgid "Rename"
-msgstr ""
+msgstr "Zmiana nazwy"
 
 #: mirage.py:1957
 msgid "Enter the new name"
-msgstr ""
+msgstr "Podaj nową nazwę"
 
 #: mirage.py:1983 mirage.py:1984
-#, fuzzy
 msgid "Unable to rename"
-msgstr "Zapis niemożliwy "
+msgstr "Zmiana nazwy niemożliwa"
 
 #: mirage.py:2003
 msgid "Are you sure you wish to permanently delete"
