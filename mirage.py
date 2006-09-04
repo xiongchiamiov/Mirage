@@ -2105,6 +2105,11 @@ class Base:
 	def show_about(self, action):
 		# Help > About
 		self.about_dialog = gtk.AboutDialog()
+		try:
+			self.about_dialog.set_transient_for(self.window)
+			self.about_dialog.set_modal(True)
+		except:
+			pass
 		self.about_dialog.set_name('Mirage')
 		self.about_dialog.set_version(__version__)
 		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
@@ -3097,10 +3102,6 @@ class Base:
 					self.set_image_sensitivities(True)
 				else:
 					self.set_image_sensitivities(False)
-		if set_prev_to_none == True:
-			self.preloadimg_prev_pixbuf_original = None
-		elif set_next_to_none == True:
-			self.preloadimg_next_pixbuf_original = None
 		if (use_preloadimg_next == False and use_preloadimg_prev == False) or (use_preloadimg_next == True and self.preloadimg_next_pixbuf_original == None) or (use_preloadimg_prev == True and self.preloadimg_prev_pixbuf_original == None) or self.preloading_images == False:
 			self.currimg_pixbuf = None
 			self.currimg_zoomratio = 1
@@ -3132,6 +3133,10 @@ class Base:
 					self.currimg_pixbuf_original = animtest
 				self.zoom_1_to_1(None, False, False)
 				self.set_image_sensitivities(False)
+		if set_prev_to_none == True:
+			self.preloadimg_prev_pixbuf_original = None
+		elif set_next_to_none == True:
+			self.preloadimg_next_pixbuf_original = None
 		if self.onload_cmd != None and perform_onload_action == True:
 			self.parse_action_command(self.onload_cmd, False)
 		self.update_statusbar()
