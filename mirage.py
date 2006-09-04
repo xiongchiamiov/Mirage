@@ -1657,8 +1657,14 @@ class Base:
 		imagesize2 = gtk.Label(str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()))
 		filetype2 = gtk.Label(gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['mime_types'][0])
 		filesize2 = gtk.Label(str(filestat[stat.ST_SIZE]/1000) + "KB")
-		transparency2 = gtk.Label(str(pixbuf.get_has_alpha()))
-		animation2 = gtk.Label(str(not animtest.is_static_image()))
+		if pixbuf.get_has_alpha() == True:
+			transparency2 = gtk.Label(_("Yes"))
+		else:
+			transparency2 = gtk.Label(_("No"))
+		if animtest.is_static_image() == True:
+			animation2 = gtk.Label(_("No"))
+		else:
+			animation2 = gtk.Label(_("Yes"))
 		bits2 = gtk.Label(str(pixbuf.get_bits_per_sample()))
 		channels2 = gtk.Label(str(pixbuf.get_n_channels()))
 		filename2.set_alignment(0, 1)
@@ -2536,7 +2542,7 @@ class Base:
 		if response == gtk.RESPONSE_ACCEPT:
 			dialog.destroy()
 			if self.rect != None:
-				temp_pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, self.currimg_pixbuf_original.get_has_alpha(), 8, coords[2], coords[3])
+				temp_pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, self.currimg_pixbuf_original.get_has_alpha(), 8, self.coords[2], self.coords[3])
 				self.currimg_pixbuf_original.copy_area(self.coords[0], self.coords[1], self.coords[2], self.coords[3], temp_pixbuf, 0, 0)
 				self.currimg_pixbuf_original = temp_pixbuf
 				del temp_pixbuf
