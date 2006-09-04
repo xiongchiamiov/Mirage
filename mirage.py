@@ -1915,6 +1915,7 @@ class Base:
 				self.use_last_dir = True
 			else:
 				self.use_last_dir = False
+			open_mode_prev = self.open_mode
 			self.open_mode = combobox.get_active()
 			preloading_images_prev = self.preloading_images
 			self.preloading_images = preloadnav.get_active()
@@ -1930,7 +1931,7 @@ class Base:
 			self.confirm_delete = deletebutton.get_active()
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
-			if self.preloading_images == True and preloading_images_prev == False:
+			if (self.preloading_images == True and preloading_images_prev == False) or (open_mode_prev != self.open_mode):
 				# The user just turned on preloading, so do it:
 				self.preloadimg_next_pixbuf_original = None
 				self.preloadimg_prev_pixbuf_original = None
@@ -3108,6 +3109,16 @@ class Base:
 					self.set_image_sensitivities(True)
 				else:
 					self.set_image_sensitivities(False)
+		if set_next_to_none == True or set_prev_to_none == True:
+			# If we used a preload image, set the correct boolean variables
+			if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
+				self.last_image_action_was_fit = True
+				self.last_image_action_was_smart_fit = True
+			elif self.open_mode == self.open_mode_fit or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_fit):
+				self.last_image_action_was_fit = True
+				self.last_image_action_was_smart_fit = False
+			elif self.open_mode == self.open_mode_1to1 or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_1to1):
+				self.last_image_action_was_fit = False
 		if (use_preloadimg_next == False and use_preloadimg_prev == False) or (use_preloadimg_next == True and self.preloadimg_next_pixbuf_original == None) or (use_preloadimg_prev == True and self.preloadimg_prev_pixbuf_original == None) or self.preloading_images == False:
 			self.currimg_pixbuf = None
 			self.currimg_zoomratio = 1
@@ -3120,19 +3131,12 @@ class Base:
 				if use_current_pixbuf_original == False:
 					self.currimg_pixbuf_original = animtest.get_static_image()
 				self.set_image_sensitivities(True)
-				if self.open_mode == self.open_mode_smart:
+				if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
 					self.zoom_to_fit_or_1_to_1(None, False, False)
-				elif self.open_mode == self.open_mode_fit:
+				elif self.open_mode == self.open_mode_fit or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_fit):
 					self.zoom_to_fit_window(None, False, False)
-				elif self.open_mode == self.open_mode_1to1:
+				elif self.open_mode == self.open_mode_1to1 or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_1to1):
 					self.zoom_1_to_1(None, False, False)
-				elif self.open_mode == self.open_mode_last:
-					if self.last_mode == self.open_mode_smart:
-						self.zoom_to_fit_or_1_to_1(None, False, False)
-					elif self.last_mode == self.open_mode_fit:
-						self.zoom_to_fit_window(None, False, False)
-					elif self.last_mode == self.open_mode_1to1:
-						self.zoom_1_to_1(None, False, False)
 			else:
 				self.currimg_is_animation = True
 				if use_current_pixbuf_original == False:
@@ -3180,19 +3184,12 @@ class Base:
 				if self.preloadimg_next_pixbuf_original == None:
 					return
 				# Determine self.preloadimg_next_zoomratio
-				if self.open_mode == self.open_mode_smart:
+				if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
 					self.zoom_to_fit_or_1_to_1(None, True, False)
-				elif self.open_mode == self.open_mode_fit:
+				elif self.open_mode == self.open_mode_fit or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_fit):
 					self.zoom_to_fit_window(None, True, False)
-				elif self.open_mode == self.open_mode_1to1:
+				elif self.open_mode == self.open_mode_1to1 or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_1to1):
 					self.zoom_1_to_1(None, True, False)
-				elif self.open_mode == self.open_mode_last:
-					if self.last_mode == self.open_mode_smart:
-						self.zoom_to_fit_or_1_to_1(None, True, False)
-					elif self.last_mode == self.open_mode_fit:
-						self.zoom_to_fit_window(None, True, False)
-					elif self.last_mode == self.open_mode_1to1:
-						self.zoom_1_to_1(None, True, False)
 				# Always start with the original image to preserve quality!
 				# Calculate image size:
 				self.preloadimg_next_width = int(self.preloadimg_next_pixbuf_original.get_width() * self.preloadimg_next_zoomratio)
@@ -3239,19 +3236,12 @@ class Base:
 				if self.preloadimg_prev_pixbuf_original == None:
 					return
 				# Determine self.preloadimg_prev_zoomratio
-				if self.open_mode == self.open_mode_smart:
+				if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
 					self.zoom_to_fit_or_1_to_1(None, False, True)
-				elif self.open_mode == self.open_mode_fit:
+				elif self.open_mode == self.open_mode_fit or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_fit):
 					self.zoom_to_fit_window(None, False, True)
-				elif self.open_mode == self.open_mode_1to1:
+				elif self.open_mode == self.open_mode_1to1 or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_1to1):
 					self.zoom_1_to_1(None, False, True)
-				elif self.open_mode == self.open_mode_last:
-					if self.last_mode == self.open_mode_smart:
-						self.zoom_to_fit_or_1_to_1(None, False, True)
-					elif self.last_mode == self.open_mode_fit:
-						self.zoom_to_fit_window(None, False, True)
-					elif self.last_mode == self.open_mode_1to1:
-						self.zoom_1_to_1(None, False, True)
 				# Always start with the original image to preserve quality!
 				# Calculate image size:
 				self.preloadimg_prev_width = int(self.preloadimg_prev_pixbuf_original.get_width() * self.preloadimg_prev_zoomratio)
