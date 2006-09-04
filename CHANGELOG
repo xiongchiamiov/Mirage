@@ -1,7 +1,6 @@
-v0.8 - Pending
-	+ Editing capabilities: resize, crop, save, delete (luzi/Bjoern Martensen)
-	+ More editing capabilities: rename
-	+ Preference to preload images for faster navigation (Mike Massonnet)
+v0.8 - September 4, 2006
+	+ Editing capabilities: resize, crop, save, delete, rename (luzi/Bjoern Martensen)
+	+ Pref to preload images for faster navigation (enabled by default) (Mike Massonnet)
 	+ Implemented 'custom actions' framework, including batch actions (Thomas Güttler)
 	+ --onload or -o argument for performing actions on image loading (Thomas Güttler)
 	+ Added File > Properties to display image properties

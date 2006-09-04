@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-09-02 20:22-0600\n"
+"POT-Creation-Date: 2006-09-03 19:43-0600\n"
 "PO-Revision-Date: 2006-09-03 10:52+0100\n"
 "Last-Translator: Björn Martensen <bjoern.martensen@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,8 +71,7 @@ msgstr "Bild speichern unter"
 msgid "_Crop..."
 msgstr "Bild_ausschnitt wählen..."
 
-#: mirage.py:260
-#: mirage.py:2439
+#: mirage.py:260 mirage.py:2458
 msgid "Crop Image"
 msgstr "Bildausschnitt wählen"
 
@@ -80,8 +79,7 @@ msgstr "Bildausschnitt wählen"
 msgid "Re_size..."
 msgstr "_Größe ändern..."
 
-#: mirage.py:261
-#: mirage.py:2631
+#: mirage.py:261 mirage.py:2654
 msgid "Resize Image"
 msgstr "Bildgröße ändern"
 
@@ -121,8 +119,7 @@ msgstr "Vorheriges"
 msgid "_Next"
 msgstr "_Nächstes"
 
-#: mirage.py:266
-#: mirage.py:294
+#: mirage.py:266 mirage.py:294
 msgid "Next"
 msgstr "Nächstes"
 
@@ -154,10 +151,7 @@ msgstr "Letztes Bild"
 msgid "Zoom _In"
 msgstr "Hin_einzoomen"
 
-#: mirage.py:270
-#: mirage.py:292
-#: mirage.py:293
-#: mirage.py:298
+#: mirage.py:270 mirage.py:292 mirage.py:293 mirage.py:298
 msgid "Zoom In"
 msgstr "Hineinzoomen"
 
@@ -165,9 +159,7 @@ msgstr "Hineinzoomen"
 msgid "Zoom _Out"
 msgstr "Hera_uszoomen"
 
-#: mirage.py:271
-#: mirage.py:291
-#: mirage.py:297
+#: mirage.py:271 mirage.py:291 mirage.py:297
 msgid "Zoom Out"
 msgstr "Herauszoomen"
 
@@ -175,8 +167,7 @@ msgstr "Herauszoomen"
 msgid "Zoom To _Fit"
 msgstr "An Fenstergröße anpassen"
 
-#: mirage.py:272
-#: mirage.py:295
+#: mirage.py:272 mirage.py:295
 msgid "Fit"
 msgstr "Anpassen"
 
@@ -184,8 +175,7 @@ msgstr "Anpassen"
 msgid "_1:1"
 msgstr "_Originalgröße"
 
-#: mirage.py:273
-#: mirage.py:296
+#: mirage.py:273 mirage.py:296
 msgid "1:1"
 msgstr "Originalgröße"
 
@@ -257,8 +247,7 @@ msgstr "Vollbild"
 msgid "E_xit Full Screen"
 msgstr "_Vollbild verlassen"
 
-#: mirage.py:282
-#: mirage.py:290
+#: mirage.py:282 mirage.py:290
 msgid "Exit Full Screen"
 msgstr "Vollbild verlassen"
 
@@ -282,8 +271,7 @@ msgstr "Diashow stoppen"
 msgid "_Delete..."
 msgstr "_Löschen..."
 
-#: mirage.py:285
-#: mirage.py:2001
+#: mirage.py:285 mirage.py:2015
 msgid "Delete Image"
 msgstr "Nächstes Bild"
 
@@ -291,8 +279,7 @@ msgstr "Nächstes Bild"
 msgid "Re_name..."
 msgstr "Um_benennen..."
 
-#: mirage.py:286
-#: mirage.py:1947
+#: mirage.py:286 mirage.py:1955
 msgid "Rename Image"
 msgstr "Bild umbenennen"
 
@@ -300,8 +287,7 @@ msgstr "Bild umbenennen"
 msgid "_Properties..."
 msgstr "_Bestandteile..."
 
-#: mirage.py:287
-#: mirage.py:1614
+#: mirage.py:287 mirage.py:1614
 msgid "Properties"
 msgstr "Bestandteile"
 
@@ -329,23 +315,13 @@ msgstr "_Werkzeugleiste"
 msgid "Toolbar"
 msgstr "Werkzeugleiste"
 
-#: mirage.py:523
-#: mirage.py:524
-#: mirage.py:525
-#: mirage.py:526
-#: mirage.py:527
-#: mirage.py:528
-#: mirage.py:1812
-#: mirage.py:1813
-#: mirage.py:1814
-#: mirage.py:1815
-#: mirage.py:1816
-#: mirage.py:1817
+#: mirage.py:523 mirage.py:524 mirage.py:525 mirage.py:526 mirage.py:527
+#: mirage.py:528 mirage.py:1819 mirage.py:1820 mirage.py:1821 mirage.py:1822
+#: mirage.py:1823 mirage.py:1824
 msgid "seconds"
 msgstr "Sekunden"
 
-#: mirage.py:773
-#: mirage.py:1413
+#: mirage.py:773 mirage.py:1413
 msgid "Action"
 msgstr "Aktion"
 
@@ -357,9 +333,7 @@ msgstr "Folgendes Programm konnte nicht ausgeführt werden: "
 msgid "Please specify a valid command from Edit > Custom Actions."
 msgstr "Bitte ein gültiges Kommando unter Edit > Custom Actions."
 
-#: mirage.py:782
-#: mirage.py:1491
-#: mirage.py:1508
+#: mirage.py:782 mirage.py:1491 mirage.py:1508
 msgid "Invalid Custom Action"
 msgstr "Ungültige Benutzerdefinierte Aktion"
 
@@ -427,8 +401,7 @@ msgstr "Speichern unter"
 msgid "The"
 msgstr "Die"
 
-#: mirage.py:1169
-#: mirage.py:1180
+#: mirage.py:1169 mirage.py:1180
 msgid "Save"
 msgstr "Speichern"
 
@@ -468,8 +441,7 @@ msgstr "Das Bild konnte nicht geladen werden"
 msgid "Custom actions"
 msgstr "Benutzerdefinierte Aktionen"
 
-#: mirage.py:1389
-#: mirage.py:3540
+#: mirage.py:1389 mirage.py:3564
 msgid "of"
 msgstr "von"
 
@@ -485,8 +457,7 @@ msgstr "Benutzerdefinierte Aktionen konfigurieren"
 msgid "Batch"
 msgstr "Stapelverarbeitung"
 
-#: mirage.py:1414
-#: mirage.py:1519
+#: mirage.py:1414 mirage.py:1519
 msgid "Shortcut"
 msgstr "Tastenkombination"
 
@@ -535,11 +506,18 @@ msgid "Go to previous image"
 msgstr "Zum vorherigen Bild gehen"
 
 #: mirage.py:1464
-msgid "Here you can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."
-msgstr "Hier können sie Benutzerdefinierte Aktionen mit Tastenkombinationen definieren. Aktionen verwenden die vorhandenen Parameter und die unten angegebenen Operationen  können mehrere mit Semikolon getrennte Angaben besitzen. Stapelverarbeitungsaktionen werden auf alle Bilder in der Liste angewandt."
+msgid ""
+"Here you can define custom actions with shortcuts. Actions use the built-in "
+"parameters and operations listed below and can have multiple statements "
+"separated by a semicolon. Batch actions apply to all images in the list."
+msgstr ""
+"Hier können sie Benutzerdefinierte Aktionen mit Tastenkombinationen "
+"definieren. Aktionen verwenden die vorhandenen Parameter und die unten "
+"angegebenen Operationen  können mehrere mit Semikolon getrennte Angaben "
+"besitzen. Stapelverarbeitungsaktionen werden auf alle Bilder in der Liste "
+"angewandt."
 
-#: mirage.py:1490
-#: mirage.py:1507
+#: mirage.py:1490 mirage.py:1507
 msgid "Incomplete custom action specified."
 msgstr "Unvollständige Benutzerdefinierte Aktion angegeben."
 
@@ -567,18 +545,15 @@ msgstr "Tastenkombination hinzufügen"
 msgid "Press the desired shortcut for the action."
 msgstr "Drücken sie die gewünschte Tastenkombination für die Aktion."
 
-#: mirage.py:1572
-#: mirage.py:1579
+#: mirage.py:1572 mirage.py:1579
 msgid "The shortcut "
 msgstr "Die Tastenkombination"
 
-#: mirage.py:1572
-#: mirage.py:1579
+#: mirage.py:1572 mirage.py:1579
 msgid " is already used for "
 msgstr "wird bereits benutzt für"
 
-#: mirage.py:1573
-#: mirage.py:1580
+#: mirage.py:1573 mirage.py:1580
 msgid "Invalid Shortcut"
 msgstr "Ungültige Tastenkombination"
 
@@ -618,323 +593,348 @@ msgstr "Bits pro sample"
 msgid "Channels"
 msgstr "Kanäle"
 
-#: mirage.py:1694
-msgid "Mirage Preferences"
-msgstr "Einstellungen von Mirage"
-
-#: mirage.py:1700
-#: mirage.py:1883
-msgid "Interface"
-msgstr "Oberfläche"
-
-#: mirage.py:1703
-msgid "Background color"
-msgstr "Hintergrundfarbe"
-
-#: mirage.py:1707
-msgid "Sets the background color for the application."
-msgstr "Legt die Hintergrundfarbe der Anwendung fest."
-
-#: mirage.py:1711
-msgid "Open Mirage in fullscreen mode"
-msgstr "Mirage im Vollbild-Modus starten"
-
-#: mirage.py:1728
-msgid "Open Behavior"
-msgstr "\"Öffnen\"-Einstellungen"
-
-#: mirage.py:1731
-msgid "Open new image in"
-msgstr "Zoom-Modus des nächsten Bildes"
-
-#: mirage.py:1733
-msgid "Smart Mode"
-msgstr "Intelligente Bildgröße"
-
-#: mirage.py:1734
-msgid "Zoom To Fit Mode"
-msgstr "An Fenstergröße anpassen"
-
-#: mirage.py:1735
-msgid "1:1 Mode"
-msgstr "Originalgröße"
-
-#: mirage.py:1736
-msgid "Last Active Mode"
-msgstr "Zuletzt aktiver Modus"
-
-#: mirage.py:1739
-msgid "Load all images in current directory"
-msgstr "Alle Bilder im aktuellen Verzeichnis laden"
-
-#: mirage.py:1741
-msgid "If enabled, opening an image in Mirage will automatically load all images found in that image's directory."
-msgstr "Wenn aktiviert, wird Mirage automatisch alle im sich im Verzeichnis befindenden Bilder laden."
-
-#: mirage.py:1743
-msgid "Use last chosen directory"
-msgstr "Das zuletzt gewählte Verzeichnis verwenden"
-
-#: mirage.py:1744
-msgid "The default 'Open' directory will be the last directory used."
-msgstr "Das 'Öffnen'-Verzeichnis wird das zuletzt verwendete sein."
-
-#: mirage.py:1745
-msgid "Use this fixed directory"
-msgstr "Dieses Verzeichnis verwenden"
-
-#: mirage.py:1747
-msgid "The default 'Open' directory will be this specified directory."
-msgstr "Das 'Öffnen'-Verzeichnis wird das angegebene sein."
-
-#: mirage.py:1779
-#: mirage.py:1882
-msgid "Navigation"
-msgstr "Navigation"
-
-#: mirage.py:1781
-msgid "Preload images for faster navigation"
-msgstr "Bilder für schnellere Navigation vorladen"
-
-#: mirage.py:1783
-msgid "If enabled, the next and previous images in the list will be preloaded during idle time. Note that the speed increase comes at the expense of memory usage, so it is recommended to disable this option on machines with limited ram."
-msgstr "Wenn aktiviert, werden das nächste und das vorherige Bild während des Programmleerlaufs vorgeladen. Beachten sie, dass der Geschwindigkeitszuwachs eine höhere Speichernutzung mit sich bringt. Es wird daher empfohlen, diese Option auf Maschinen mit wenig Speicher zu deaktivieren."
-
-#: mirage.py:1785
-msgid "Wrap around imagelist"
-msgstr "Umbruch der Bilderliste"
-
-#: mirage.py:1787
-msgid "No"
-msgstr "Nein"
-
-#: mirage.py:1788
+#: mirage.py:1661 mirage.py:1667 mirage.py:1795
 msgid "Yes"
 msgstr "Ja"
 
-#: mirage.py:1789
+#: mirage.py:1663 mirage.py:1665 mirage.py:1794
+msgid "No"
+msgstr "Nein"
+
+#: mirage.py:1701
+msgid "Mirage Preferences"
+msgstr "Einstellungen von Mirage"
+
+#: mirage.py:1707 mirage.py:1890
+msgid "Interface"
+msgstr "Oberfläche"
+
+#: mirage.py:1710
+msgid "Background color"
+msgstr "Hintergrundfarbe"
+
+#: mirage.py:1714
+msgid "Sets the background color for the application."
+msgstr "Legt die Hintergrundfarbe der Anwendung fest."
+
+#: mirage.py:1718
+msgid "Open Mirage in fullscreen mode"
+msgstr "Mirage im Vollbild-Modus starten"
+
+#: mirage.py:1735
+msgid "Open Behavior"
+msgstr "\"Öffnen\"-Einstellungen"
+
+#: mirage.py:1738
+msgid "Open new image in"
+msgstr "Zoom-Modus des nächsten Bildes"
+
+#: mirage.py:1740
+msgid "Smart Mode"
+msgstr "Intelligente Bildgröße"
+
+#: mirage.py:1741
+msgid "Zoom To Fit Mode"
+msgstr "An Fenstergröße anpassen"
+
+#: mirage.py:1742
+msgid "1:1 Mode"
+msgstr "Originalgröße"
+
+#: mirage.py:1743
+msgid "Last Active Mode"
+msgstr "Zuletzt aktiver Modus"
+
+#: mirage.py:1746
+msgid "Load all images in current directory"
+msgstr "Alle Bilder im aktuellen Verzeichnis laden"
+
+#: mirage.py:1748
+msgid ""
+"If enabled, opening an image in Mirage will automatically load all images "
+"found in that image's directory."
+msgstr ""
+"Wenn aktiviert, wird Mirage automatisch alle im sich im Verzeichnis "
+"befindenden Bilder laden."
+
+#: mirage.py:1750
+msgid "Use last chosen directory"
+msgstr "Das zuletzt gewählte Verzeichnis verwenden"
+
+#: mirage.py:1751
+msgid "The default 'Open' directory will be the last directory used."
+msgstr "Das 'Öffnen'-Verzeichnis wird das zuletzt verwendete sein."
+
+#: mirage.py:1752
+msgid "Use this fixed directory"
+msgstr "Dieses Verzeichnis verwenden"
+
+#: mirage.py:1754
+msgid "The default 'Open' directory will be this specified directory."
+msgstr "Das 'Öffnen'-Verzeichnis wird das angegebene sein."
+
+#: mirage.py:1786 mirage.py:1889
+msgid "Navigation"
+msgstr "Navigation"
+
+#: mirage.py:1788
+msgid "Preload images for faster navigation"
+msgstr "Bilder für schnellere Navigation vorladen"
+
+#: mirage.py:1790
+msgid ""
+"If enabled, the next and previous images in the list will be preloaded "
+"during idle time. Note that the speed increase comes at the expense of "
+"memory usage, so it is recommended to disable this option on machines with "
+"limited ram."
+msgstr ""
+"Wenn aktiviert, werden das nächste und das vorherige Bild während des "
+"Programmleerlaufs vorgeladen. Beachten sie, dass der Geschwindigkeitszuwachs "
+"eine höhere Speichernutzung mit sich bringt. Es wird daher empfohlen, diese "
+"Option auf Maschinen mit wenig Speicher zu deaktivieren."
+
+#: mirage.py:1792
+msgid "Wrap around imagelist"
+msgstr "Umbruch der Bilderliste"
+
+#: mirage.py:1796
 msgid "Prompt User"
 msgstr "Nachfragen"
 
-#: mirage.py:1807
-#: mirage.py:3542
+#: mirage.py:1814 mirage.py:3566
 msgid "Slideshow Mode"
 msgstr "Diashow-Einstellungen"
 
-#: mirage.py:1810
+#: mirage.py:1817
 msgid "Delay between images"
 msgstr "Pause zwischen den Bildern"
 
-#: mirage.py:1820
+#: mirage.py:1827
 msgid "Randomize order of images"
 msgstr "Zufällige Bildauswahl"
 
-#: mirage.py:1822
-msgid "If enabled, a random image will be chosen during slideshow mode (without loading any image twice)."
-msgstr "Wenn aktiviert, wird ein zufälliges Bild während der Diashow geladen (ohne zweimal das selbe Bild zu laden)."
+#: mirage.py:1829
+msgid ""
+"If enabled, a random image will be chosen during slideshow mode (without "
+"loading any image twice)."
+msgstr ""
+"Wenn aktiviert, wird ein zufälliges Bild während der Diashow geladen (ohne "
+"zweimal das selbe Bild zu laden)."
 
-#: mirage.py:1823
+#: mirage.py:1830
 msgid "Disable screensaver in slideshow mode"
 msgstr "Bildschirmschoner während der Diashow deaktivieren"
 
-#: mirage.py:1825
-msgid "If enabled, xscreensaver will be temporarily disabled during slideshow mode."
+#: mirage.py:1832
+msgid ""
+"If enabled, xscreensaver will be temporarily disabled during slideshow mode."
 msgstr "Bildschirmschoner während der Diashow deaktivieren"
 
-#: mirage.py:1826
+#: mirage.py:1833
 msgid "Always start in fullscreen mode"
 msgstr "Immer im Vollbild-Modus starten"
 
-#: mirage.py:1827
-msgid "If enabled, starting a slideshow will put the application in fullscreen mode."
-msgstr "Wenn aktiviert, wird das Programm beim Start der Diashow in den Vollbild-Modus versetzt."
+#: mirage.py:1834
+msgid ""
+"If enabled, starting a slideshow will put the application in fullscreen mode."
+msgstr ""
+"Wenn aktiviert, wird das Programm beim Start der Diashow in den Vollbild-"
+"Modus versetzt."
 
-#: mirage.py:1844
+#: mirage.py:1851
 msgid "Image Editing"
 msgstr "Bildbearbeitung"
 
-#: mirage.py:1846
+#: mirage.py:1853
 msgid "Confirm image delete"
 msgstr "Bitte Löschen bestätigen"
 
-#: mirage.py:1849
+#: mirage.py:1856
 msgid "Scaling quality"
 msgstr "Skalierungsqualität"
 
-#: mirage.py:1851
+#: mirage.py:1858
 msgid "Nearest (Fastest)"
 msgstr "Nearest (Am schnellsten)"
 
-#: mirage.py:1852
+#: mirage.py:1859
 msgid "Tiles"
 msgstr "Kacheln"
 
-#: mirage.py:1853
+#: mirage.py:1860
 msgid "Bilinear"
 msgstr "Bilinear"
 
-#: mirage.py:1854
+#: mirage.py:1861
 msgid "Hyper (Best)"
 msgstr "Hyper (Am besten)"
 
-#: mirage.py:1859
+#: mirage.py:1866
 msgid "Modified images"
 msgstr "Modifizierte Bilder"
 
-#: mirage.py:1861
+#: mirage.py:1868
 msgid "Ignore Changes"
 msgstr "Änderungen ignorieren"
 
-#: mirage.py:1862
+#: mirage.py:1869
 msgid "Auto-Save"
 msgstr "Auto-Speichern"
 
-#: mirage.py:1863
+#: mirage.py:1870
 msgid "Prompt For Action"
 msgstr "Aktion nachfragen"
 
-#: mirage.py:1881
+#: mirage.py:1888
 msgid "Behavior"
 msgstr "Verhalten"
 
-#: mirage.py:1884
+#: mirage.py:1891
 msgid "Slideshow"
 msgstr "Diashow"
 
-#: mirage.py:1885
+#: mirage.py:1892
 msgid "Image"
 msgstr "Bild"
 
-#: mirage.py:1953
+#: mirage.py:1961
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: mirage.py:1957
+#: mirage.py:1972
 msgid "Enter the new name"
 msgstr "Bitte neuen Namen eingeben"
 
-#: mirage.py:1983
-#: mirage.py:1984
+#: mirage.py:1997 mirage.py:1998
 msgid "Unable to rename"
 msgstr "Umbenennen fehlgeschlagen"
 
-#: mirage.py:2003
+#: mirage.py:2017
 msgid "Are you sure you wish to permanently delete"
 msgstr "Sind sie sicher, dass sie das Bild wirklich löschen möchten"
 
-#: mirage.py:2060
-#: mirage.py:2061
+#: mirage.py:2074 mirage.py:2075
 msgid "Unable to delete"
 msgstr "Löschen fehlgeschlagen"
 
-#: mirage.py:2069
+#: mirage.py:2083
 msgid "Choose directory"
 msgstr "Verzeichnis wählen"
 
-#: mirage.py:2103
+#: mirage.py:2122
 msgid "A fast GTK+ Image Viewer."
 msgstr "Ein schneller GTK+ Bildbetrachter"
 
-#: mirage.py:2137
+#: mirage.py:2156
 msgid "Unable to launch a suitable browser."
 msgstr "Konnte keinen geeigneten Browser starten."
 
-#: mirage.py:2440
+#: mirage.py:2459
 msgid "Crop"
 msgstr "Ausschnitt"
 
-#: mirage.py:2480
-#: mirage.py:2642
+#: mirage.py:2501 mirage.py:2665
 msgid "Width"
 msgstr "Breite"
 
-#: mirage.py:2487
-#: mirage.py:2653
+#: mirage.py:2508 mirage.py:2676
 msgid "Height"
 msgstr "Höhe"
 
-#: mirage.py:2632
+#: mirage.py:2655
 msgid "Resize"
 msgstr "Größe ändern"
 
-#: mirage.py:2646
-#: mirage.py:2658
+#: mirage.py:2669 mirage.py:2681
 msgid "pixels"
 msgstr "pixel"
 
-#: mirage.py:2660
+#: mirage.py:2683
 msgid "Preserve aspect ratio"
 msgstr "Seitenverhältnis beibehalten"
 
-#: mirage.py:2739
-msgid "You are viewing the first image in the list. Wrap around to the last image?"
-msgstr "Sie sehen das erste Bild in der Liste. Möchten Sie mit dem letzten Bild fortfahren?"
+#: mirage.py:2774
+msgid ""
+"You are viewing the first image in the list. Wrap around to the last image?"
+msgstr ""
+"Sie sehen das erste Bild in der Liste. Möchten Sie mit dem letzten Bild "
+"fortfahren?"
 
-#: mirage.py:2740
-#: mirage.py:2800
-#: mirage.py:2865
+#: mirage.py:2775 mirage.py:2835 mirage.py:2900
 msgid "Wrap?"
 msgstr "Umbrechen?"
 
-#: mirage.py:2799
-msgid "You are viewing the last image in the list. Wrap around to the first image?"
-msgstr "Sie sehen das letzte Bild in der Liste. Möchten Sie mit dem ersten Bild fortfahren?"
+#: mirage.py:2834
+msgid ""
+"You are viewing the last image in the list. Wrap around to the first image?"
+msgstr ""
+"Sie sehen das letzte Bild in der Liste. Möchten Sie mit dem ersten Bild "
+"fortfahren?"
 
-#: mirage.py:2864
-msgid "All images have been viewed. Would you like to cycle through the images again?"
+#: mirage.py:2899
+msgid ""
+"All images have been viewed. Would you like to cycle through the images "
+"again?"
 msgstr "Alle Bilder wurden betrachtet. Möchten Sie die Diashow wiederholen?"
 
-#: mirage.py:3006
-#: mirage.py:3044
-#: mirage.py:3071
-#: mirage.py:3086
-#: mirage.py:3363
+#: mirage.py:3041 mirage.py:3079 mirage.py:3106 mirage.py:3127 mirage.py:3387
 msgid "Loading"
 msgstr "Lade..."
 
-#: mirage.py:3179
-#: mirage.py:3238
+#: mirage.py:3210 mirage.py:3262
 msgid "Preloading"
 msgstr "Lade..."
 
-#: mirage.py:3329
-#: mirage.py:3438
+#: mirage.py:3353 mirage.py:3462
 msgid "Found"
 msgstr "Gefunden"
 
 #~ msgid "Use mousewheel for imagelist navigation"
 #~ msgstr "Das Mausrad zur Navigation zwischen den Bilder verwenden"
+
 #~ msgid ""
 #~ "If enabled, mousewheel-down (up) will go to the next (previous) image."
 #~ msgstr ""
 #~ "Wenn aktiviert, kann mit dem Mausrad-runter (hoch) das nächste "
 #~ "(vorherige) Bild ausgewählt werden."
+
 #~ msgid "Do not ask again"
 #~ msgstr "Nicht wieder nachfragen"
+
 #~ msgid "Open in _Editor"
 #~ msgstr "In _Editor öffnen"
+
 #~ msgid "Open in Editor"
 #~ msgstr "In Editor öffnen"
+
 #~ msgid "  -h, --help                   Show this help and exit"
 #~ msgstr "  -h, --help                   diese Hilfe anzeigen und beenden"
+
 #~ msgid "  -s, --slideshow              Start in slideshow mode"
 #~ msgstr "  -s, --slideshow              Im Diashow-Modus starten"
+
 #~ msgid "  -f, --fullscreen             Start in fullscreen mode"
 #~ msgstr "  -f, --fullscreen             Im Vollbild-Modus starten"
+
 #~ msgid "Zoom Quality"
 #~ msgstr "Zoom-Qualitätsstufe"
+
 #~ msgid "Fastest"
 #~ msgstr "Gering (am schnellsten)"
+
 #~ msgid "Best"
 #~ msgstr "Am besten"
+
 #~ msgid ""
 #~ "Smart mode uses 1:1 for images smaller than the window and Fit To Window "
 #~ "for images larger."
 #~ msgstr ""
 #~ "Der intelligente Modus zeigt kleine Bilder in der Originalgröße und passt "
 #~ "große Bilder an die Fenstergröße an."
+
 #~ msgid "External Image Editor"
 #~ msgstr "Externes Bildbearbeitungsprogramm"
+
 #~ msgid ""
 #~ "The application specified below is used as the default editor. It is "
 #~ "assumed to be in the user's PATH or can be explicitly set (e.g., \"/usr/"
@@ -943,6 +943,6 @@ msgstr "Gefunden"
 #~ "Das angegebene Programm wird als Standard-Editor genutzt. Es wird "
 #~ "angenommen, dass  es sich im PATH des Benutzers befindet, kann aber auch "
 #~ "explizit angegeben werden (z.B. \"/usr/bin/gimp-remote\")"
+
 #~ msgid "Editor"
 #~ msgstr "Editor"
-

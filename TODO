@@ -1,8 +1,3 @@
-0.8
-+ Bug hunting
-+ Update docs
-+ remerge translations
-
 Future
 + Image effect - saturation
 + Highlight selected region of cropped image (or darken unselected region)
