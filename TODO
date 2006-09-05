@@ -1,6 +1,10 @@
-Future
+0.8.1
++ Allow zooming in crop dialog?
++ Add list of image names to custom actions (%L)
 + Image effect - saturation
-+ Highlight selected region of cropped image (or darken unselected region)
++ Try to highlight selected region of cropped image (or darken unselected region)
+
+Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
 	- delete thumbnail if image is deleted, update if image is moved

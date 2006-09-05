@@ -3,7 +3,7 @@
 # $HeadURL$
 # $Id$
 
-__version__ = "0.8"
+__version__ = "0.8.1"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -2016,6 +2016,7 @@ class Base:
 			if self.confirm_delete == True:
 				permlabel = gtk.Label(_('Are you sure you wish to permanently delete') + ' ' + os.path.split(self.currimg_name)[1] + '?')
 				permlabel.set_line_wrap(True)
+				permlabel.set_alignment(0, 0.1)
 				warningicon = gtk.Image()
 				warningicon.set_from_stock(gtk.STOCK_DIALOG_WARNING, gtk.ICON_SIZE_DIALOG)
 				hbox = gtk.HBox()
