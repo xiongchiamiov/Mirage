@@ -1,6 +1,5 @@
 0.8.1
 + Allow zooming in crop dialog?
-+ Add list of image names to custom actions (%L)
 + Image effect - saturation
 + Try to highlight selected region of cropped image (or darken unselected region)
 

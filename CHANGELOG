@@ -1,80 +1,80 @@
 v0.8.1 - Pending
+	+ Add list of image names to custom actions (%L)
 
 v0.8 - September 4, 2006
-	+ Editing capabilities: resize, crop, save, delete, rename (luzi/Bjoern Martensen)
-	+ Pref to preload images for faster navigation (enabled by default) (Mike Massonnet)
-	+ Implemented 'custom actions' framework, including batch actions (Thomas Güttler)
-	+ --onload or -o argument for performing actions on image loading (Thomas Güttler)
+	+ Editing capabilities: resize, crop, save, delete, rename
+	+ Pref to preload images for faster navigation (enabled by default)
+	+ Implemented 'custom actions' framework, including batch actions
+	+ --onload or -o argument for performing actions on image loading
 	+ Added File > Properties to display image properties
 	+ Show "Scanning..." in statusbar when scanning for images; Escape to abort
-	+ Reduce GTK+ requirement to 2.6.0 (William Rea)
-	+ Bug: Opening with 'load all images in dir' gives expected result (Bjoern Martensen)
+	+ Reduce GTK+ requirement to 2.6.0
+	+ Bug: Opening with 'load all images in dir' gives expected result
 	+ Bug: Cannot open folder while search process is active
 	+ Added French translation (Mike Massonnet)
 	+ Added Polish translation (Tomasz Dominikowski)
 	+ Added Russian translation (mavka)
 
 v0.7.3 - August 2, 2006
-	+ Fix crash when loading images in certain circumstances (Bjoern Martensen)
+	+ Fix crash when loading images in certain circumstances
 
 v0.7.2 - August 1, 2006
 	+ Preference to automatically start the slideshow in fullscreen mode
-	+ Background image search process to load image faster (Bjoern Martensen)
+	+ Background image search process to load image faster
 	+ Added cli argument: -s or --slideshow to start in slideshow mode
 	+ Added cli argument: -f or --fullscreen to start in fullscreen mode
-	+ Additional shortcuts: +/- for zooming in/out (Bjoern Martensen)
-	+ Fixed .desktop mimetypes (Eugenia Loli-Queru)
+	+ Additional shortcuts: +/- for zooming in/out
+	+ Fixed .desktop mimetypes
 	+ Added German translation (Bjoern Martensen)
 	+ Added Spanish translation (Isidro Arribas)
 
 v0.7.1 - July 9, 2006
-	+ Toolbar style follows gnome preference (requires optional gnome-python
-	  dependency) (Eugenia Loli-Queru)
+	+ Toolbar style follows gnome preference (optional gnome-python dependency)
 	+ Skip hidden files/dirs when loading images
-	+ Bug: Caps-lock breaks some shortcuts (Abisser T'khin)
+	+ Bug: Caps-lock breaks some shortcuts
 	+ Bug fixes
 
 v0.7 - June 20, 2006
 	+ Slideshow mode (delay time, randomize order, disable screensaver preferences)
 	+ Display animated images
 	+ Edit > Open in Editor
-	+ Image wrapping options: yes/no/prompt (Bjoern Martensen)
+	+ Image wrapping options: yes/no/prompt
 	+ Cleaned up menubar, preferences
 	+ Set go navigation items' sensitivities based on context
-	+ Bug: 1:1 images are sometimes incorrectly set to fit (Bjoern Martensen)
+	+ Bug: 1:1 images are sometimes incorrectly set to fit
 	+ Many bugfixes, interface tweaks
 
 v0.6 - May 29, 2006
 	+ In fullscreen mode, hide mouse cursor after 2 seconds of no movement
 	+ Option to wrap around imagelist
 	+ When in zoom-to-fit mode, fit the image when it's rotated
-	+ Show broken icon if image not found (i.e. deleted) (Bjoern Martensen)
+	+ Show broken icon if image not found (i.e. deleted)
 	+ Bug: Ensure that scrollbars don't show up unless needed
-	+ Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)
+	+ Bug: Don't resize an image if it's at 100% zoom
 	+ Other small bugfixes
 
 v0.5 - May 1, 2006
-	+ Make open image mode configurable: smart, fit, 1:1, last (Bjoern Martensen)
-	+ Option to navigate imagelist via mousewheel (default: on) (Bjoern Martensen)
-	+ Add maximum/minimum zoom levels (Bjoern Martensen)
-	+ Reduce border around image for fit mode (Bjoern Martensen)
+	+ Make open image mode configurable: smart, fit, 1:1, last
+	+ Option to navigate imagelist via mousewheel (default: on)
+	+ Add maximum/minimum zoom levels
+	+ Reduce border around image for fit mode
 	+ Have Go>Random not show images twice until all images have been shown once
-	+ Allow numpad keys as shortcuts (Bjoern Martensen)
-	+ Allow panning image additionally with left-click/drag (Bjoern Martensen)
+	+ Allow numpad keys as shortcuts
+	+ Allow panning image additionally with left-click/drag
 	+ Revert retaining state of images in list introduced in v0.4
 	+ Add hourglass feedback for loading images
-	+ Bug: Small images don't zoom-to-fit (Bjoern Martensen)
-	+ Bug: Some non-image files are thought to be images (Bjoern Martensen)
-	+ Bug: Files/folders with spaces don't open from file manager (Bjoern Martensen)
-	+ Bug: Some shortcuts don't work with numslock enabled (Bjoern Martensen)
+	+ Bug: Small images don't zoom-to-fit
+	+ Bug: Some non-image files are thought to be images
+	+ Bug: Files/folders with spaces don't open from file manager
+	+ Bug: Some shortcuts don't work with numslock enabled
 
 v0.4 - April 25, 2006
 	+ Removed <Alt> from navigational shortcuts
-	+ Default to alphabetically populating the image list (Michael Campbell)
+	+ Default to alphabetically populating the image list
 	+ Ability to go to first (Home) and last (End) image in list
 	+ Retain zoom/flip/rotate state of images in list
 	+ Additional preferences:
-		- Open all images in current directory (Ralph Wabel)
+		- Open all images in current directory
 		- Default directory for 'Open' dialog
 	+ Fullscreen hides menu/tool/status bars
 

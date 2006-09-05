@@ -766,6 +766,13 @@ class Base:
 			command = command.replace("%P", os.path.dirname(imagename) + "/")
 		if "%E" in command:
 			command = command.replace("%E", os.path.splitext(os.path.basename(imagename))[1])
+		if "%L" in command:
+			cmdstr = ""
+			for imgname in self.image_list:
+				cmdstr = cmdstr + " " + imgname
+			cmdstr = cmdstr[1:]
+			print cmdstr
+			command = command.replace("%L", cmdstr)
 		commands = string.split(command, ";")
 		for i in range(len(commands)):
 			commands[i] = string.lstrip(commands[i])
@@ -1441,7 +1448,7 @@ class Base:
 		gtk.Tooltips().set_tip(removebutton, _("Remove selected action."))
 		vbox_buttons = gtk.VBox()
 		propertyinfo = gtk.Label()
-		propertyinfo.set_markup('<small>' + _("Parameters") + ':\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '</small>')
+		propertyinfo.set_markup('<small>' + _("Parameters") + ':\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '\n<span font_family="Monospace">%L</span> - ' + _("List of files, space-separated") + '</small>')
 		propertyinfo.set_alignment(0, 0)
 		actioninfo = gtk.Label()
 		actioninfo.set_markup('<small>' + _("Operations") + ':\n<span font_family="Monospace">[NEXT]</span> - ' + _("Go to next image") + '\n<span font_family="Monospace">[PREV]</span> - ' + _("Go to previous image") +'</small>')
