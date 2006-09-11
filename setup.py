@@ -39,7 +39,7 @@ if install_app == True:
 			py_modules = ['mirage'],
 			ext_modules = [Extension('imgfuncs', ['imgfuncs.c'])],
 			scripts = ['mirage'],
-			data_files=[('share/mirage', ['README', 'COPYING', 'CHANGELOG', 'stock_shuffle.png', 'stock_leave-fullscreen.png', 'stock_fullscreen.png']),
+			data_files=[('share/mirage', ['README', 'COPYING', 'CHANGELOG', 'TODO', 'TRANSLATORS', 'stock_shuffle.png', 'stock_leave-fullscreen.png', 'stock_fullscreen.png']),
 				('share/applications', ['mirage.desktop']),
 				('share/pixmaps', ['mirage.png', 'mirage_large.png']),
 				('share/locale/ru/LC_MESSAGES', ['locale/ru/LC_MESSAGES/mirage.mo']),

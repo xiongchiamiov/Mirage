@@ -227,14 +227,14 @@ class Base:
 
 		# Define the main menubar and toolbar:
 		factory = gtk.IconFactory()
-		leave_fullscreen_icon_path = self.find_path('stock_leave-fullscreen.png')
 		iconname = 'stock_leave-fullscreen.png'
 		iconname2 = 'stock_fullscreen.png'
+		leave_fullscreen_icon_path = self.find_path(iconname)
 		pixbuf = gtk.gdk.pixbuf_new_from_file(leave_fullscreen_icon_path)
 		iconset = gtk.IconSet(pixbuf)
 		factory.add('leave-fullscreen', iconset)
 		factory.add_default()
-		fullscreen_icon_path = self.find_path('stock_fullscreen.png')
+		fullscreen_icon_path = self.find_path(iconname2)
 		pixbuf = gtk.gdk.pixbuf_new_from_file(fullscreen_icon_path)
 		iconset = gtk.IconSet(pixbuf)
 		factory.add('fullscreen', iconset)
@@ -461,30 +461,22 @@ class Base:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls = gtk.HBox()
 		self.ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
-		alignment = self.ss_back.get_children()[0]
-		hbox2 = alignment.get_children()[0]
-		image, label = hbox2.get_children()
+		image, label = self.ss_back.get_children()[0].get_children()[0].get_children()
 		label.set_text('')
 		self.ss_back.set_property('can-focus', False)
 		self.ss_back.connect('clicked', self.goto_prev_image)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
-		alignment = self.ss_start.get_children()[0]
-		hbox2 = alignment.get_children()[0]
-		image, label = hbox2.get_children()
+		image, label = self.ss_start.get_children()[0].get_children()[0].get_children()
 		label.set_text('')
 		self.ss_start.set_property('can-focus', False)
 		self.ss_start.connect('clicked', self.toggle_slideshow)
 		self.ss_stop = gtk.Button("", gtk.STOCK_MEDIA_STOP)
-		alignment = self.ss_stop.get_children()[0]
-		hbox2 = alignment.get_children()[0]
-		image, label = hbox2.get_children()
+		image, label = self.ss_stop.get_children()[0].get_children()[0].get_children()
 		label.set_text('')
 		self.ss_stop.set_property('can-focus', False)
 		self.ss_stop.connect('clicked', self.toggle_slideshow)
 		self.ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
-		alignment = self.ss_forward.get_children()[0]
-		hbox2 = alignment.get_children()[0]
-		image, label = hbox2.get_children()
+		image, label = self.ss_forward.get_children()[0].get_children()[0].get_children()
 		label.set_text('')
 		self.ss_forward.set_property('can-focus', False)
 		self.ss_forward.connect('clicked', self.goto_next_image)

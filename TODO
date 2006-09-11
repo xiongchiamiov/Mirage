@@ -2,6 +2,7 @@
 + Allow zooming in crop dialog?
 + Image effect - saturation
 + Try to highlight selected region of cropped image (or darken unselected region)
++ improve config handling (get rid of "try")
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
