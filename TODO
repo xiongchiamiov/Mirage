@@ -3,6 +3,8 @@
 + Image effect - saturation
 + Try to highlight selected region of cropped image (or darken unselected region)
 + improve config handling (get rid of "try")
++ use threading for preloading
++ why is light/dark grey no longer used for transparency?
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
