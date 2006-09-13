@@ -1397,17 +1397,18 @@ class Base:
 		table_actions = gtk.Table(13, 2, False)
 		table_actions.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		actionscrollwindow = gtk.ScrolledWindow()
-		self.actionstore = gtk.ListStore(gobject.TYPE_BOOLEAN, str, str)
+		self.actionstore = gtk.ListStore(str, str, str)
 		self.actionwidget = gtk.TreeView()
 		self.actionwidget.set_enable_search(False)
 		self.actionwidget.set_rules_hint(True)
+		self.actionwidget.connect('row-activated', self.edit_custom_action2)
 		actionscrollwindow.add(self.actionwidget)
 		actionscrollwindow.set_shadow_type(gtk.SHADOW_IN)
 		actionscrollwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		actionscrollwindow.set_size_request(500, 200)
 		self.actionwidget.set_model(self.actionstore)
 		self.cell = gtk.CellRendererText()
-		self.cellbool = gtk.CellRendererToggle()
+		self.cellbool = gtk.CellRendererPixbuf()
 		self.tvcolumn0 = gtk.TreeViewColumn(_("Batch"))
 		self.tvcolumn1 = gtk.TreeViewColumn(_("Action"), self.cell, markup=0)
 		self.tvcolumn2 = gtk.TreeViewColumn(_("Shortcut"))
@@ -1478,7 +1479,7 @@ class Base:
 		self.actions_dialog.destroy()
 
 	def add_custom_action(self, button):
-		(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog('', '', 'None', False)
+		(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(True, '', '', 'None', False)
 		if name !='' or command != '' or shortcut != '':
 			self.action_names.append(name)
 			self.action_commands.append(command)
@@ -1491,11 +1492,14 @@ class Base:
 			error_dialog.run()
 			error_dialog.destroy()
 
+	def edit_custom_action2(self, treeview, path, view_column):
+		self.edit_custom_action(None)
+
 	def edit_custom_action(self, button):
 		(model, iter) = self.actionwidget.get_selection().get_selected()
 		if iter != None:
 			(row, ) = self.actionstore.get_path(iter)
-			(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row])
+			(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(False, self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row])
 			if name != '' or command != '' or shortcut != '':
 				self.action_names[row] = name
 				self.action_commands[row] = command
@@ -1508,8 +1512,11 @@ class Base:
 				error_dialog.run()
 				error_dialog.destroy()
 
-	def open_custom_action_dialog(self, name, command, shortcut, batch):
-		self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+	def open_custom_action_dialog(self, add_call, name, command, shortcut, batch):
+		if add_call == True:
+			self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		else:
+			self.dialog_name = gtk.Dialog(_("Edit Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		table = gtk.Table(2, 4, False)
 		action_name_label = gtk.Label(_("Action Name") + ":")
 		action_name_label.set_alignment(0, 0.5)
@@ -1597,14 +1604,18 @@ class Base:
 	def populate_treeview(self):
 		self.actionstore.clear()
 		for i in range(len(self.action_names)):
-			self.actionstore.append([self.action_batch[i], '<big><b>' + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
+			if self.action_batch[i]:
+				pb = gtk.STOCK_APPLY
+			else:
+				pb = None
+			self.actionstore.append([pb, '<big><b>' + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
 		self.tvcolumn0.clear()
 		self.tvcolumn1.clear()
 		self.tvcolumn2.clear()
 		self.tvcolumn0.pack_start(self.cellbool)
 		self.tvcolumn1.pack_start(self.cell)
 		self.tvcolumn2.pack_start(self.cell)
-		self.tvcolumn0.add_attribute(self.cellbool, "active", 0)
+		self.tvcolumn0.add_attribute(self.cellbool, "stock-id", 0)
 		self.tvcolumn1.set_attributes(self.cell, markup=1)
 		self.tvcolumn2.set_attributes(self.cell, text=2)
 		self.tvcolumn1.set_expand(True)
