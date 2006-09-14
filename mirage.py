@@ -296,7 +296,9 @@ class Base:
 			('Ctrl-KP_Insert', None, '', '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
 			('Ctrl-KP_End', None, '', '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
 			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
-			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in)
+			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in),
+			('Ctrl-KP_0', None, '', '<Ctrl>KP_0', _('Fit'), self.zoom_to_fit_window_action),
+			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
@@ -394,6 +396,8 @@ class Base:
 			      <menuitem action="Ctrl-KP_End"/>
 			      <menuitem action="Ctrl-KP_Subtract"/>
 			      <menuitem action="Ctrl-KP_Add"/>
+			      <menuitem action="Ctrl-KP_0"/>
+			      <menuitem action="Ctrl-KP_1"/>
 			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
