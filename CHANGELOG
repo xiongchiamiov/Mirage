@@ -1,5 +1,6 @@
 v0.8.1 - Pending
 	+ Add list of image names to custom actions (%L)
+	+ Try gnome-open/exo-open first for opening help
 
 v0.8 - September 4, 2006
 	+ Editing capabilities: resize, crop, save, delete, rename

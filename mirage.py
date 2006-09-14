@@ -42,6 +42,7 @@ import gettext
 import locale
 import stat
 import time
+import subprocess
 try:
 	import gconf
 except:
@@ -2154,16 +2155,21 @@ class Base:
 		self.browser_load("http://mirageiv.berlios.de/docs.html")
 
 	def browser_load(self, docslink):
-		test = os.spawnlp(os.P_NOWAIT, "firefox", "firefox", docslink)
-		if test == 127:
-			test = os.spawnlp(os.P_NOWAIT, "mozilla", "mozilla", docslink)
-			if test == 127:
-				test = os.spawnlp(os.P_NOWAIT, "opera", "opera", docslink)
-				if test == 127:
-					test = os.spawnlp(os.P_NOWAIT, "konquerer", "konqueror", docslink)
-					if test == 127:
-						test = os.spawnlp(os.P_NOWAIT, "netscape", "netscape", docslink)
-						if test == 127:
+		try:
+			pid = subprocess.Popen(["gnome-open", docslink]).pid
+		except:
+			try:
+				pid = subprocess.Popen(["exo-open", docslink]).pid
+			except:
+				try:
+					pid = subprocess.Popen(["firefox", docslink]).pid
+				except:
+					try:
+						pid = subprocess.Popen(["mozilla", docslink]).pid
+					except:
+						try:
+							pid = subprocess.Popen(["opera", docslink]).pid
+						except:
 							error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to launch a suitable browser.'))
 							error_dialog.run()
 							error_dialog.destroy()
