@@ -2,9 +2,9 @@
 + Allow zooming in crop dialog?
 + Image effect - saturation
 + Try to highlight selected region of cropped image (or darken unselected region)
-+ improve config handling (get rid of "try")
-+ use threading for preloading
++ use threading for preloading (move timeout_io to end of the other?)
 + why is light/dark grey no longer used for transparency?
++ put custom actions into menu (right-click? edit? both?)
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)

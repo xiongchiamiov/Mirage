@@ -41,7 +41,7 @@ if install_app == True:
 			scripts = ['mirage'],
 			data_files=[('share/mirage', ['README', 'COPYING', 'CHANGELOG', 'TODO', 'TRANSLATORS', 'stock_shuffle.png', 'stock_leave-fullscreen.png', 'stock_fullscreen.png']),
 				('share/applications', ['mirage.desktop']),
-				('share/pixmaps', ['mirage.png', 'mirage_large.png']),
+				('share/pixmaps', ['mirage.png']),
 				('share/locale/ru/LC_MESSAGES', ['locale/ru/LC_MESSAGES/mirage.mo']),
 				('share/locale/pl/LC_MESSAGES', ['locale/pl/LC_MESSAGES/mirage.mo']),
 				('share/locale/fr/LC_MESSAGES', ['locale/fr/LC_MESSAGES/mirage.mo']),

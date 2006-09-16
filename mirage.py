@@ -2142,7 +2142,7 @@ class Base:
 		self.about_dialog.set_translator_credits('de - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\nru - mavka <mavka@justos.org>')
 		gtk.about_dialog_set_url_hook(self.show_website, "http://mirageiv.berlios.de")
 		self.about_dialog.set_website_label("http://mirageiv.berlios.de")
-		icon_path = self.find_path('mirage_large.png')
+		icon_path = self.find_path('mirage.png')
 		try:
 			icon_pixbuf = gtk.gdk.pixbuf_new_from_file(icon_path)
 			self.about_dialog.set_logo(icon_pixbuf)
