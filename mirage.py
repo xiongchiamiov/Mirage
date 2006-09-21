@@ -137,6 +137,8 @@ class Base:
 		self.image_zoomed = False
 		self.start_in_fullscreen = False
 		self.running_custom_actions = False
+		self.merge_id = None
+		self.actionGroupCustom = None
 
 		# Read any passed options/arguments:
 		try:
@@ -254,6 +256,7 @@ class Base:
 			('ViewMenu', None, _('_View')),
 			('GoMenu', None, _('_Go')),
 			('HelpMenu', None, _('_Help')),
+			('ActionSubMenu', None, _('_Custom Actions')),
 			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
 			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('_Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
@@ -286,7 +289,7 @@ class Base:
 			('Delete Image', gtk.STOCK_DELETE, _('_Delete...'), 'Delete', _('Delete Image'), self.delete_image),
 			('Rename Image', None, _('Re_name...'), 'F2', _('Rename Image'), self.rename_image),
 			('Properties', gtk.STOCK_PROPERTIES, _('_Properties...'), None, _('Properties'), self.show_properties),
-			('Custom Actions', None, _('Custom _Actions...'), None, _('Custom Actions'), self.show_custom_actions),
+			('Custom Actions', None, _('_Configure...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
 			('Escape', None, '', 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
 			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
@@ -322,9 +325,6 @@ class Base:
 			    <menuitem action="In"/>
 			    <menuitem action="1:1"/>
 			    <menuitem action="Fit"/>
-			    <separator name="FM2"/>
-			    <menuitem action="Rotate Left"/>
-			    <menuitem action="Rotate Right"/>
 			    <separator name="FM4"/>
 			    <menuitem action="Start Slideshow"/>
 			    <menuitem action="Stop Slideshow"/>
@@ -347,17 +347,19 @@ class Base:
 			    <menu action="EditMenu">
 			      <menuitem action="Rotate Left"/>
 			      <menuitem action="Rotate Right"/>
-			      <separator name="FM1"/>
 			      <menuitem action="Flip Vertically"/>
 			      <menuitem action="Flip Horizontally"/>
-			      <separator name="FM2"/>
+			      <separator name="FM1"/>
 			      <menuitem action="Crop"/>
 			      <menuitem action="Resize"/>
-			      <separator name="FM4"/>
+			      <separator name="FM2"/>
 			      <menuitem action="Rename Image"/>
 			      <menuitem action="Delete Image"/>
 			      <separator name="FM3"/>
-			      <menuitem action="Custom Actions"/>
+			      <menu action="ActionSubMenu">
+    			    <separator name="FM4" position="bot"/>
+    			    <menuitem action="Custom Actions" position="bot"/>
+			      </menu>
 			      <menuitem action="Preferences"/>
 			    </menu>
 			    <menu action="ViewMenu">
@@ -429,6 +431,7 @@ class Base:
 		actionGroup.add_toggle_actions(toggle_actions)
 		self.UIManager.insert_action_group(actionGroup, 0)
 		self.UIManager.add_ui_from_string(uiDescription)
+		self.refresh_custom_actions_menu()
 		self.window.add_accel_group(self.UIManager.get_accel_group())
 		self.menubar = self.UIManager.get_widget('/MainMenu')
 		vbox.pack_start(self.menubar, False, False, 0)
@@ -615,6 +618,29 @@ class Base:
 				if o in ("-s", "--slideshow"):
 					self.toggle_slideshow(None)
 
+	def refresh_custom_actions_menu(self):
+		if self.merge_id:
+			self.UIManager.remove_ui(self.merge_id)
+		if self.actionGroupCustom:
+			self.UIManager.remove_action_group(self.actionGroupCustom)
+		else:
+			self.actionGroupCustom = gtk.ActionGroup('CustomActions')
+		self.UIManager.ensure_update()
+		for i in range(len(self.action_names)):
+			action = [(self.action_names[i], None, self.action_names[i], self.action_shortcuts[i], None, self.custom_action_click)]
+			self.actionGroupCustom.add_actions(action)
+		uiDescription = """
+			<ui>
+			  <menubar name="MainMenu">
+			    <menu action="EditMenu">
+			      <menu action="ActionSubMenu">
+			"""
+		for i in range(len(self.action_names)):
+			uiDescription = uiDescription + """<menuitem action=\"""" + self.action_names[len(self.action_names)-i-1] + """\" position="top"/>"""
+		uiDescription = uiDescription + """</menu></menu></menubar></ui>"""
+		self.merge_id = self.UIManager.add_ui_from_string(uiDescription)
+		self.UIManager.insert_action_group(self.actionGroupCustom, 0)
+
 	def find_path(self, filename):
 		full_path = ''
 		if os.path.exists(filename):
@@ -672,15 +698,6 @@ class Base:
 				gtk.main_iteration()
 			self.update_title()
 			return
-		# Check if a custom action's shortcut was pressed:
-		if "<Mod2>" in shortcut:
-			shortcut = shortcut.replace("<Mod2>", "")
-		for i in range(len(self.action_shortcuts)):
-			try:
-				if shortcut == self.action_shortcuts[i]:
-					self.parse_action_command(self.action_commands[i], self.action_batch[i])
-			except:
-				pass
 
 	def parse_action_command(self, command, batchmode):
 		self.running_custom_actions = True
@@ -753,6 +770,14 @@ class Base:
 		else:
 			return True
 
+	def custom_action_click(self, action):
+		for i in range(len(self.action_shortcuts)):
+			try:
+				if action.get_name() == self.action_names[i]:
+					self.parse_action_command(self.action_commands[i], self.action_batch[i])
+			except:
+				pass
+
 	def parse_action_command2(self, command, imagename):
 		# First, replace any property keywords with their flags:
 		if "%F" in command:
@@ -819,8 +844,6 @@ class Base:
 		self.UIManager.get_widget('/MainToolbar/Fit').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/1:1').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Fit').set_sensitive(enable)
-		self.UIManager.get_widget('/Popup/Rotate Left').set_sensitive(enable)
-		self.UIManager.get_widget('/Popup/Rotate Right').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/FileMenu/Save As').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(False)
 		self.UIManager.get_widget('/MainMenu/FileMenu/Properties').set_sensitive(False)
@@ -830,6 +853,10 @@ class Base:
 			filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
 			if self.filetype_is_writable(filetype) == True:
 				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(enable)
+		if self.actionGroupCustom:
+			custom_actions = self.actionGroupCustom.list_actions()
+			for action in custom_actions:
+				self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).set_sensitive(enable)
 
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
@@ -1481,6 +1508,7 @@ class Base:
 		close_button = self.actions_dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 		close_button.grab_focus()
 		self.actions_dialog.run()
+		self.refresh_custom_actions_menu()
 		self.actions_dialog.destroy()
 
 	def add_custom_action(self, button):
