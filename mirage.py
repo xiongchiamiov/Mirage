@@ -771,12 +771,13 @@ class Base:
 			return True
 
 	def custom_action_click(self, action):
-		for i in range(len(self.action_shortcuts)):
-			try:
-				if action.get_name() == self.action_names[i]:
-					self.parse_action_command(self.action_commands[i], self.action_batch[i])
-			except:
-				pass
+		if self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).get_property('sensitive') == True:
+			for i in range(len(self.action_shortcuts)):
+				try:
+					if action.get_name() == self.action_names[i]:
+						self.parse_action_command(self.action_commands[i], self.action_batch[i])
+				except:
+					pass
 
 	def parse_action_command2(self, command, imagename):
 		# First, replace any property keywords with their flags:
