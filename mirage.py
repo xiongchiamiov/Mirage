@@ -645,22 +645,22 @@ class Base:
 		full_path = ''
 		if os.path.exists(filename):
 			full_path = filename
-		elif os.path.exists('../share/mirage/' + filename):
-			full_path = '../share/mirage/' + filename
 		elif os.path.exists('/usr/share/mirage/' + filename):
 			full_path = '/usr/share/mirage/' + filename
 		elif os.path.exists('/usr/local/share/mirage/' + filename):
 			full_path = '/usr/local/share/mirage/' + filename
 		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + filename):
 			full_path = os.path.dirname(__file__) + '/share/mirage/' + filename
-		elif os.path.exists('../share/pixmaps/' + filename):
-			full_path = '../share/pixmaps/' + filename
+		elif os.path.exists('../share/mirage/' + filename):
+			full_path = '../share/mirage/' + filename
 		elif os.path.exists('/usr/share/pixmaps/' + filename):
 			full_path = '/usr/share/pixmaps/' + filename
 		elif os.path.exists('/usr/local/share/pixmaps/' + filename):
 			full_path = '/usr/local/share/pixmaps/' + filename
 		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + filename):
 			full_path = os.path.dirname(__file__) + '/share/pixmaps/' + filename
+		elif os.path.exists('../share/pixmaps/' + filename):
+			full_path = '../share/pixmaps/' + filename
 		return full_path
 
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
@@ -1510,6 +1510,8 @@ class Base:
 		close_button.grab_focus()
 		self.actions_dialog.run()
 		self.refresh_custom_actions_menu()
+		if len(self.image_list) == 0:
+			self.set_image_sensitivities(False)
 		self.actions_dialog.destroy()
 
 	def add_custom_action(self, button):
