@@ -640,6 +640,7 @@ class Base:
 		uiDescription = uiDescription + """</menu></menu></menubar></ui>"""
 		self.merge_id = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupCustom, 0)
+		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 
 	def find_path(self, filename):
 		full_path = ''
