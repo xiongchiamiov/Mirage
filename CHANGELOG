@@ -3,6 +3,7 @@ v0.8.1 - Pending
 	+ Menu improvements; added Custom Actions to EditMenu
 	+ Try gnome-open/exo-open first for opening help, then fallback
 	+ Bug: Ctrl-0/1 shortcuts don't work from numpad with numlock on
+	+ Updated icon (William Rea)
 
 v0.8 - September 4, 2006
 	+ Editing capabilities: resize, crop, save, delete, rename

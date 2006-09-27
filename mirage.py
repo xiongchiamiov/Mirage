@@ -856,9 +856,8 @@ class Base:
 			if self.filetype_is_writable(filetype) == True:
 				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(enable)
 		if self.actionGroupCustom:
-			custom_actions = self.actionGroupCustom.list_actions()
-			for action in custom_actions:
-				self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).set_sensitive(enable)
+			for action in self.action_names:
+				self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action).set_sensitive(enable)
 
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
@@ -1451,13 +1450,15 @@ class Base:
 		self.actionwidget.append_column(self.tvcolumn1)
 		self.actionwidget.append_column(self.tvcolumn2)
 		self.populate_treeview()
+		if len(self.action_names) > 0:
+			self.actionwidget.get_selection().select_path(0)
 		vbox_actions = gtk.VBox()
 		addbutton = gtk.Button("", gtk.STOCK_ADD)
 		alignment = addbutton.get_children()[0]
 		hbox_temp = alignment.get_children()[0]
 		image, label = hbox_temp.get_children()
 		label.set_text('')
-		addbutton.connect('clicked', self.add_custom_action)
+		addbutton.connect('clicked', self.add_custom_action, self.actionwidget)
 		gtk.Tooltips().set_tip(addbutton, _("Add action"))
 		editbutton = gtk.Button("", gtk.STOCK_EDIT)
 		alignment = editbutton.get_children()[0]
@@ -1473,6 +1474,20 @@ class Base:
 		label.set_text('')
 		removebutton.connect('clicked', self.remove_custom_action)
 		gtk.Tooltips().set_tip(removebutton, _("Remove selected action."))
+		upbutton = gtk.Button("", gtk.STOCK_GO_UP)
+		alignment = upbutton.get_children()[0]
+		hbox_temp = alignment.get_children()[0]
+		image, label = hbox_temp.get_children()
+		label.set_text('')
+		upbutton.connect('clicked', self.custom_action_move_up, self.actionwidget)
+		gtk.Tooltips().set_tip(upbutton, _("Move selected action up."))
+		downbutton = gtk.Button("", gtk.STOCK_GO_DOWN)
+		alignment = downbutton.get_children()[0]
+		hbox_temp = alignment.get_children()[0]
+		image, label = hbox_temp.get_children()
+		label.set_text('')
+		downbutton.connect('clicked', self.custom_action_move_down, self.actionwidget)
+		gtk.Tooltips().set_tip(downbutton, _("Move selected action down."))
 		vbox_buttons = gtk.VBox()
 		propertyinfo = gtk.Label()
 		propertyinfo.set_markup('<small>' + _("Parameters") + ':\n<span font_family="Monospace">%F</span> - ' + _("File path, name, and extension") + '\n<span font_family="Monospace">%P</span> - ' + _("File path") + '\n<span font_family="Monospace">%N</span> - ' + _("File name without file extension") + '\n<span font_family="Monospace">%E</span> - ' + _("File extension (i.e. \".png\")") + '\n<span font_family="Monospace">%L</span> - ' + _("List of files, space-separated") + '</small>')
@@ -1485,7 +1500,9 @@ class Base:
 		hbox_info.pack_start(actioninfo, False, False, 15)
 		vbox_buttons.pack_start(addbutton, False, False, 5)
 		vbox_buttons.pack_start(editbutton, False, False, 5)
-		vbox_buttons.pack_start(removebutton, False, False, 0)
+		vbox_buttons.pack_start(removebutton, False, False, 5)
+		vbox_buttons.pack_start(upbutton, False, False, 5)
+		vbox_buttons.pack_start(downbutton, False, False, 0)
 		hbox_top = gtk.HBox()
 		hbox_top.pack_start(actionscrollwindow, True, True, 5)
 		hbox_top.pack_start(vbox_buttons, False, False, 5)
@@ -1511,11 +1528,13 @@ class Base:
 		close_button.grab_focus()
 		self.actions_dialog.run()
 		self.refresh_custom_actions_menu()
+		while gtk.events_pending():
+			gtk.main_iteration()
 		if len(self.image_list) == 0:
 			self.set_image_sensitivities(False)
 		self.actions_dialog.destroy()
 
-	def add_custom_action(self, button):
+	def add_custom_action(self, button, treeview):
 		(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(True, '', '', 'None', False)
 		if name !='' or command != '' or shortcut != '':
 			self.action_names.append(name)
@@ -1523,6 +1542,18 @@ class Base:
 			self.action_shortcuts.append(shortcut)
 			self.action_batch.append(batch)
 			self.populate_treeview()
+			rownum = len(self.action_names)-1
+			treeview.get_selection().select_path(rownum)
+			while gtk.events_pending():
+				gtk.main_iteration()
+			# Keep item in visible rect:
+			visible_rect = treeview.get_visible_rect()
+			row_rect = treeview.get_background_area(rownum, self.tvcolumn1)
+			if row_rect.y + row_rect.height > visible_rect.height:
+				top_coord = (row_rect.y + row_rect.height - visible_rect.height) + visible_rect.y
+				treeview.scroll_to_point(-1, top_coord)
+			elif row_rect.y < 0:
+				treeview.scroll_to_cell(rownum)
 		elif canceled == False:
 			error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
 			error_dialog.set_title(_("Invalid Custom Action"))
@@ -1592,6 +1623,76 @@ class Base:
 				return ('', '', '', False, False)
 		self.dialog_name.destroy()
 		return ('', '', '', False, True)
+
+	def custom_action_move_down(self, button, treeview):
+		iter = None
+		selection = treeview.get_selection()
+		model, iter = selection.get_selected()
+		if iter:
+			rownum = int(model.get_string_from_iter(iter))
+			if rownum < len(self.action_names)-1:
+				# Move item down:
+				temp_name = self.action_names[rownum]
+				temp_shortcut = self.action_shortcuts[rownum]
+				temp_command = self.action_commands[rownum]
+				temp_batch = self.action_batch[rownum]
+				self.action_names[rownum] = self.action_names[rownum+1]
+				self.action_shortcuts[rownum] = self.action_shortcuts[rownum+1]
+				self.action_commands[rownum] = self.action_commands[rownum+1]
+				self.action_batch[rownum] =  self.action_batch[rownum+1]
+				self.action_names[rownum+1] = temp_name
+				self.action_shortcuts[rownum+1] = temp_shortcut
+				self.action_commands[rownum+1] = temp_command
+				self.action_batch[rownum+1] = temp_batch
+				# Repopulate treeview and keep item selected:
+				self.populate_treeview()
+				selection.select_path((rownum+1,))
+				while gtk.events_pending():
+					gtk.main_iteration()
+				# Keep item in visible rect:
+				rownum = rownum + 1
+				visible_rect = treeview.get_visible_rect()
+				row_rect = treeview.get_background_area(rownum, self.tvcolumn1)
+				if row_rect.y + row_rect.height > visible_rect.height:
+					top_coord = (row_rect.y + row_rect.height - visible_rect.height) + visible_rect.y
+					treeview.scroll_to_point(-1, top_coord)
+				elif row_rect.y < 0:
+					treeview.scroll_to_cell(rownum)
+
+	def custom_action_move_up(self, button, treeview):
+		iter = None
+		selection = treeview.get_selection()
+		model, iter = selection.get_selected()
+		if iter:
+			rownum = int(model.get_string_from_iter(iter))
+			if rownum > 0:
+				# Move item down:
+				temp_name = self.action_names[rownum]
+				temp_shortcut = self.action_shortcuts[rownum]
+				temp_command = self.action_commands[rownum]
+				temp_batch = self.action_batch[rownum]
+				self.action_names[rownum] = self.action_names[rownum-1]
+				self.action_shortcuts[rownum] = self.action_shortcuts[rownum-1]
+				self.action_commands[rownum] = self.action_commands[rownum-1]
+				self.action_batch[rownum] =  self.action_batch[rownum-1]
+				self.action_names[rownum-1] = temp_name
+				self.action_shortcuts[rownum-1] = temp_shortcut
+				self.action_commands[rownum-1] = temp_command
+				self.action_batch[rownum-1] = temp_batch
+				# Repopulate treeview and keep item selected:
+				self.populate_treeview()
+				selection.select_path((rownum-1,))
+				while gtk.events_pending():
+					gtk.main_iteration()
+				# Keep item in visible rect:
+				rownum = rownum - 1
+				visible_rect = treeview.get_visible_rect()
+				row_rect = treeview.get_background_area(rownum, self.tvcolumn1)
+				if row_rect.y + row_rect.height > visible_rect.height:
+					top_coord = (row_rect.y + row_rect.height - visible_rect.height) + visible_rect.y
+					treeview.scroll_to_point(-1, top_coord)
+				elif row_rect.y < 0:
+					treeview.scroll_to_cell(rownum)
 
 	def shortcut_clicked(self, widget):
 		self.dialog_shortcut = gtk.Dialog(_("Action Shortcut"), self.dialog_name, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
