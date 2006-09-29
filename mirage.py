@@ -176,25 +176,39 @@ class Base:
 		elif os.path.isfile(os.path.expanduser('~/.miragerc')):
 			conf.read(os.path.expanduser('~/.miragerc'))
 			os.remove(os.path.expanduser('~/.miragerc'))
-		try:
+		if conf.has_option('window', 'w'):
 			width = conf.getint('window', 'w')
+		if conf.has_option('window', 'h'):
 			height = conf.getint('window', 'h')
+		if conf.has_option('window', 'toolbar'):
 			self.toolbar_show = conf.getboolean('window', 'toolbar')
+		if conf.has_option('window', 'statusbar'):
 			self.statusbar_show = conf.getboolean('window', 'statusbar')
+		if conf.has_option('prefs', 'bgcolor-red'):
 			bgr = conf.getint('prefs', 'bgcolor-red')
 			bgg = conf.getint('prefs', 'bgcolor-green')
 			bgb = conf.getint('prefs', 'bgcolor-blue')
 			bgcolor_found = True
 			self.bgcolor = gtk.gdk.Color(red=bgr, green=bgg, blue=bgb)
+		if conf.has_option('prefs', 'use_last_dir'):
 			self.use_last_dir = conf.getboolean('prefs', 'use_last_dir')
+		if conf.has_option('prefs', 'last_dir'):
 			self.last_dir = conf.get('prefs', 'last_dir')
+		if conf.has_option('prefs', 'fixed_dir'):
 			self.fixed_dir = conf.get('prefs', 'fixed_dir')
+		if conf.has_option('prefs', 'open_all'):
 			self.open_all_images = conf.getboolean('prefs', 'open_all')
+		if conf.has_option('prefs', 'open_mode'):
 			self.open_mode = conf.getint('prefs', 'open_mode')
+		if conf.has_option('prefs', 'last_mode'):
 			self.last_mode = conf.getint('prefs', 'last_mode')
+		if conf.has_option('prefs', 'listwrap_mode'):
 			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
+		if conf.has_option('prefs', 'slideshow_delay'):
 			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
+		if conf.has_option('prefs', 'slideshow_random'):
 			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
+		if conf.has_option('prefs', 'zoomquality'):
 			self.zoomvalue = conf.getint('prefs', 'zoomquality')
 			if int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
@@ -204,9 +218,13 @@ class Base:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
 			elif int(round(self.zoomvalue, 0)) == 4:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
+		if conf.has_option('prefs', 'disable_screensaver'):
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
+		if conf.has_option('prefs', 'slideshow_in_fullscreen'):
 			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
+		if conf.has_option('prefs', 'preloading_images'):
 			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
+		if conf.has_option('actions', 'num_actions'):
 			num_actions = conf.getint('actions', 'num_actions')
 			self.action_names = []
 			self.action_commands = []
@@ -217,11 +235,12 @@ class Base:
 				self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
 				self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
 				self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
+		if conf.has_option('prefs', 'savemode'):
 			self.savemode = conf.getint('prefs', 'savemode')
+		if conf.has_option('prefs', 'start_in_fullscreen'):
 			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
+		if conf.has_option('prefs', 'confirm_delete'):
 			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
-		except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
-			pass
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
