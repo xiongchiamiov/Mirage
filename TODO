@@ -1,15 +1,13 @@
-0.8.1
+Next
 + Allow zooming in crop dialog?
-+ update website favicon
++ Try to highlight selected region of cropped image (or darken unselected region)
++ why is light/dark grey no longer used for transparency? (argh)
++ Image effect - saturation
 
 Future
-+ Image effect - saturation
-+ Try to highlight selected region of cropped image (or darken unselected region)
-+ why is light/dark grey no longer used for transparency?
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
 	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
 	- delete thumbnail if image is deleted, update if image is moved
-+ Bookmarks (Bookmark Image, Bookmark List, Manage (to create files))?
 + Sorting options (case sensitivity, file10 vs file9, hidden files)? (Michael Campbell)
 + Recent files in file menu (requires new pygtk and gtk 2.10)
 	- Recent *viewed* files, not opened
