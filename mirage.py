@@ -916,6 +916,9 @@ class Base:
 	def set_last_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/Last Image').set_sensitive(enable)
 
+	def set_random_image_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainMenu/GoMenu/Random Image').set_sensitive(enable)
+
 	def set_slideshow_sensitivities(self):
 		if len(self.image_list) <=1:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').show()
@@ -3126,6 +3129,7 @@ class Base:
 			self.set_first_image_sensitivities(False)
 			self.set_next_image_sensitivities(False)
 			self.set_last_image_sensitivities(False)
+			self.set_random_image_sensitivities(False)
 		elif self.curr_img_in_list == 0:
 			if self.listwrap_mode == 0:
 				self.set_previous_image_sensitivities(False)
@@ -3134,6 +3138,7 @@ class Base:
 			self.set_first_image_sensitivities(False)
 			self.set_next_image_sensitivities(True)
 			self.set_last_image_sensitivities(True)
+			self.set_random_image_sensitivities(True)
 		elif self.curr_img_in_list == len(self.image_list)-1:
 			self.set_previous_image_sensitivities(True)
 			self.set_first_image_sensitivities(True)
@@ -3142,11 +3147,13 @@ class Base:
 			else:
 				self.set_next_image_sensitivities(True)
 			self.set_last_image_sensitivities(False)
+			self.set_random_image_sensitivities(True)
 		else:
 			self.set_previous_image_sensitivities(True)
 			self.set_first_image_sensitivities(True)
 			self.set_next_image_sensitivities(True)
 			self.set_last_image_sensitivities(True)
+			self.set_random_image_sensitivities(True)
 
 	def reinitialize_randomlist(self):
 		self.randomlist = []

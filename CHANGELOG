@@ -1,7 +1,7 @@
 v0.8.1 - Pending
 	+ Add list of image names to custom actions (%L)
-	+ Menu improvements; added Custom Actions to EditMenu
 	+ Improved preloading/navigation handling
+	+ Menu improvements; added Custom Actions to EditMenu
 	+ Try gnome-open/exo-open first for opening help, then fallback
 	+ Bug: Next/brevious buttons block with mouse over it
 	+ Bug: Ctrl-0/1 shortcuts don't work from numpad with numlock on
