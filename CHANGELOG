@@ -1,4 +1,4 @@
-v0.8.1 - October 14, 2006
+v0.8.1 - October 19, 2006
 	+ Add list of image names to custom actions (%L)
 	+ Improved preloading/navigation handling
 	+ Menu improvements; added Custom Actions to EditMenu
@@ -6,6 +6,7 @@ v0.8.1 - October 14, 2006
 	+ Bug: Next/brevious buttons block with mouse over it
 	+ Bug: Ctrl-0/1 shortcuts don't work from numpad with numlock on
 	+ Bug: Custom actions don't execute when using --verbose
+	+ Bug: Cannot install when X server isn't running
 	+ Updated icon (William Rea)
 
 v0.8 - September 4, 2006

@@ -48,6 +48,13 @@ try:
 except:
 	pass
 
+if gtk.gtk_version < (2, 6, 0):
+	sys.stderr.write("Mirage requires GTK+ 2.6.0 or newer..\n")
+	sys.exit(1)
+if gtk.pygtk_version < (2, 6, 0):
+	sys.stderr.write("Mirage requires PyGTK 2.6.0 or newer.\n")
+	sys.exit(1)
+
 class Base:
 
 	def __init__(self):
