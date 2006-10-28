@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # $HeadURL$
 # $Id$
 
@@ -1502,7 +1500,7 @@ class Base:
 		hbox_temp = alignment.get_children()[0]
 		image, label = hbox_temp.get_children()
 		label.set_text('')
-		editbutton.connect('clicked', self.edit_custom_action)
+		editbutton.connect('clicked', self.edit_custom_action, self.actionwidget)
 		gtk.Tooltips().set_tip(editbutton, _("Edit selected action."))
 		removebutton = gtk.Button("", gtk.STOCK_REMOVE)
 		alignment = removebutton.get_children()[0]
@@ -1572,56 +1570,23 @@ class Base:
 		self.actions_dialog.destroy()
 
 	def add_custom_action(self, button, treeview):
-		(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(True, '', '', 'None', False)
-		if name !='' or command != '' or shortcut != '':
-			self.action_names.append(name)
-			self.action_commands.append(command)
-			self.action_shortcuts.append(shortcut)
-			self.action_batch.append(batch)
-			self.populate_treeview()
-			rownum = len(self.action_names)-1
-			treeview.get_selection().select_path(rownum)
-			while gtk.events_pending():
-				gtk.main_iteration()
-			# Keep item in visible rect:
-			visible_rect = treeview.get_visible_rect()
-			row_rect = treeview.get_background_area(rownum, self.tvcolumn1)
-			if row_rect.y + row_rect.height > visible_rect.height:
-				top_coord = (row_rect.y + row_rect.height - visible_rect.height) + visible_rect.y
-				treeview.scroll_to_point(-1, top_coord)
-			elif row_rect.y < 0:
-				treeview.scroll_to_cell(rownum)
-		elif canceled == False:
-			error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
-			error_dialog.set_title(_("Invalid Custom Action"))
-			error_dialog.run()
-			error_dialog.destroy()
+		self.open_custom_action_dialog(True, '', '', 'None', False, treeview)
 
 	def edit_custom_action2(self, treeview, path, view_column):
-		self.edit_custom_action(None)
+		self.edit_custom_action(None, treeview)
 
-	def edit_custom_action(self, button):
+	def edit_custom_action(self, button, treeview):
 		(model, iter) = self.actionwidget.get_selection().get_selected()
 		if iter != None:
 			(row, ) = self.actionstore.get_path(iter)
-			(name, command, shortcut, batch, canceled) = self.open_custom_action_dialog(False, self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row])
-			if name != '' or command != '' or shortcut != '':
-				self.action_names[row] = name
-				self.action_commands[row] = command
-				self.action_shortcuts[row] = shortcut
-				self.action_batch[row] = batch
-				self.populate_treeview()
-			elif canceled == False:
-				error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
-				error_dialog.set_title(_("Invalid Custom Action"))
-				error_dialog.run()
-				error_dialog.destroy()
+			self.open_custom_action_dialog(False, self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row], treeview)
 
-	def open_custom_action_dialog(self, add_call, name, command, shortcut, batch):
+	def open_custom_action_dialog(self, add_call, name, command, shortcut, batch, treeview):
 		if add_call == True:
 			self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		else:
 			self.dialog_name = gtk.Dialog(_("Edit Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+		self.dialog_name.set_modal(True)
 		table = gtk.Table(2, 4, False)
 		action_name_label = gtk.Label(_("Action Name") + ":")
 		action_name_label.set_alignment(0, 0.5)
@@ -1646,20 +1611,41 @@ class Base:
 		table.attach(batchmode, 0, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		self.dialog_name.vbox.pack_start(table, False, False, 5)
 		self.dialog_name.vbox.show_all()
-		response = self.dialog_name.run()
+		self.dialog_name.connect('response', self.dialog_name_response, action_name, action_command, self.shortcut, batchmode, treeview)
+		self.dialog_name.run()
+
+	def dialog_name_response(self, dialog, response, action_name, action_command, shortcut, batchmode, treeview):
 		if response == gtk.RESPONSE_ACCEPT:
 			if not (action_command.get_text() == "" or action_name.get_text() == "" or self.shortcut.get_label() == "None"):
 				name = action_name.get_text()
 				command = action_command.get_text()
-				shortcut = self.shortcut.get_label()
+				shortcut = shortcut.get_label()
 				batch = batchmode.get_active()
-				self.dialog_name.destroy()
-				return (name, command, shortcut, batch, False)
+				dialog.destroy()
+				self.action_names.append(name)
+				self.action_commands.append(command)
+				self.action_shortcuts.append(shortcut)
+				self.action_batch.append(batch)
+				self.populate_treeview()
+				rownum = len(self.action_names)-1
+				treeview.get_selection().select_path(rownum)
+				while gtk.events_pending():
+					gtk.main_iteration()
+				# Keep item in visible rect:
+				visible_rect = treeview.get_visible_rect()
+				row_rect = treeview.get_background_area(rownum, self.tvcolumn1)
+				if row_rect.y + row_rect.height > visible_rect.height:
+					top_coord = (row_rect.y + row_rect.height - visible_rect.height) + visible_rect.y
+					treeview.scroll_to_point(-1, top_coord)
+				elif row_rect.y < 0:
+					treeview.scroll_to_cell(rownum)
 			else:
-				self.dialog_name.destroy()
-				return ('', '', '', False, False)
-		self.dialog_name.destroy()
-		return ('', '', '', False, True)
+				error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Incomplete custom action specified.'))
+				error_dialog.set_title(_("Invalid Custom Action"))
+				error_dialog.run()
+				error_dialog.destroy()
+		else:
+			dialog.destroy()
 
 	def custom_action_move_down(self, button, treeview):
 		iter = None
