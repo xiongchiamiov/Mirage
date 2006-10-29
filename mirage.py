@@ -34,7 +34,6 @@ import gc
 import random
 import imgfuncs
 import urllib
-import sets
 import gobject
 import gettext
 import locale
@@ -259,6 +258,10 @@ class Base:
 		self.curr_slideshow_delay = self.slideshow_delay
 		# Same for randomization:
 		self.curr_slideshow_random = self.slideshow_random
+
+		# Read accel_map file, if it exists
+		if os.path.isfile(os.path.expanduser('~/.config/mirage/accel_map')):
+			gtk.accel_map_load(os.path.expanduser('~/.config/mirage/accel_map'))
 
 		# Define the main menubar and toolbar:
 		factory = gtk.IconFactory()
@@ -1096,6 +1099,10 @@ class Base:
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/mirage/'))
 		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
+
+		# Also, save accel_map:
+		gtk.accel_map_save(os.path.expanduser('~/.config/mirage/accel_map'))
+
 		return
 
 	def delete_event(self, widget, event, data=None):
