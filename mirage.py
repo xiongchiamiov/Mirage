@@ -3803,6 +3803,9 @@ class Base:
 			else:
 				self.ss_start.set_no_show_all(False)
 				self.ss_stop.set_no_show_all(True)
+			screen = self.window.get_screen()
+			self.slideshow_window.set_screen(screen)
+			self.slideshow_window2.set_screen(screen)
 			self.slideshow_window.show_all()
 			self.slideshow_window2.show_all()
 			if not self.closing_app:

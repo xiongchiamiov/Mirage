@@ -6,6 +6,7 @@ Next
 + mirage --add to add image to current instance instead of opening
   new window
 + Saving image with transparency is messed up
++ jpeg exif suff?
 
 Future
 + Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
