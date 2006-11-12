@@ -1,6 +1,8 @@
 v0.9 - Pending
 	+ Save/load accel_map in case user edits any gtk accelerators
 	+ Bug: Fullscreen controls can be on wrong screen with Xinerama
+	+ Bug: Scrollbars don't appear correctly on window resizes
+	+ Bug: Panning images doesn't always work properly
 
 v0.8.1 - October 19, 2006
 	+ Add list of image names to custom actions (%L)

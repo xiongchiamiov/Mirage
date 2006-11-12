@@ -1053,6 +1053,7 @@ class Base:
 				else:
 					self.center_image()
 				self.load_new_image_stop_now()
+				self.show_scrollbars_if_needed()
 				# Also, regenerate preloaded image for new window size:
 				self.preload_when_idle = gobject.idle_add(self.preload_next_image, True)
 				self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, True)
@@ -2358,6 +2359,9 @@ class Base:
 			state = event.state
 		x, y = event.x_root, event.y_root
 		if (state & gtk.gdk.BUTTON2_MASK) or (state & gtk.gdk.BUTTON1_MASK):
+			# Prevent self.expose_event() from potentially further changing the
+			# adjustments upon the adjustment value changes
+			self.updating_adjustments = True
 			xadjust = self.layout.get_hadjustment()
 			newx = xadjust.value + (self.prevmousex - x)
 			if newx >= xadjust.lower and newx <= xadjust.upper - xadjust.page_size:
@@ -2368,6 +2372,7 @@ class Base:
 			if newy >= yadjust.lower and newy <= yadjust.upper - yadjust.page_size:
 				yadjust.set_value(newy)
 				self.layout.set_vadjustment(yadjust)
+			self.updating_adjustments = False
 		self.prevmousex = x
 		self.prevmousey = y
 		if self.fullscreen_mode == True:
