@@ -2888,13 +2888,7 @@ class Base:
 			pixelheight = height.get_value_as_int()
 			pixelwidth = width.get_value_as_int()
 			dialog.destroy()
-			if self.currimg_pixbuf_original.get_has_alpha() == False:
-				self.currimg_pixbuf_original = self.currimg_pixbuf_original.scale_simple(pixelwidth, pixelheight, self.zoom_quality)
-			else:
-				colormap = self.imageview.get_colormap()
-				light_grey = colormap.alloc_color('#666666', True, True)
-				dark_grey = colormap.alloc_color('#999999', True, True)
-				self.currimg_pixbuf_original = self.currimg_pixbuf_original.composite_color_simple(pixelwidth, pixelheight, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+			self.currimg_pixbuf_original = self.currimg_pixbuf_original.scale_simple(pixelwidth, pixelheight, self.zoom_quality)
 			self.load_new_image2(False, True, False, False)
 			self.image_modified = True
 		else:
