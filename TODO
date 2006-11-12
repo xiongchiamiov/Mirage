@@ -3,7 +3,6 @@ Next
   the user can essentially 'crop visible' by clicking ok right away
 + Try to highlight selected region of cropped image (or darken unselected region)
 + why is light/dark grey no longer used for transparency? (argh)
-+ Image effect - saturation
 + mirage --add to add image to current instance instead of opening
   new window
 + jpeg exif suff?

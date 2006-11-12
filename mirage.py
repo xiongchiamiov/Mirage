@@ -298,6 +298,7 @@ class Base:
 			('Save As', gtk.STOCK_SAVE, _('Save Image _As...'), '<Shift><Ctrl>S', _('Save Image As'), self.save_image_as),
 			('Crop', None, _('_Crop...'), None, _('Crop Image'), self.crop_image),
 			('Resize', None, _('Re_size...'), None, _('Resize Image'), self.resize_image),
+			('Saturation', None, _('Saturation...'), None, _('Modify saturation'), self.saturation),
 			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
 			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.goto_prev_image),
 			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.goto_next_image),
@@ -387,6 +388,7 @@ class Base:
 			      <separator name="FM1"/>
 			      <menuitem action="Crop"/>
 			      <menuitem action="Resize"/>
+			      <menuitem action="Saturation"/>
 			      <separator name="FM2"/>
 			      <menuitem action="Rename Image"/>
 			      <menuitem action="Delete Image"/>
@@ -876,6 +878,7 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/EditMenu/Rename Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Crop').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Resize').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Saturation').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/1:1').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Fit').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/1:1').set_sensitive(enable)
@@ -2826,6 +2829,48 @@ class Base:
 		x, y, state = event.window.get_pointer()
 		if not (state & gtk.gdk.BUTTON1_MASK):
 			self.drawing_crop_rectangle = False
+
+	def saturation(self, action):
+		dialog = gtk.Dialog(_("Saturation"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		resizebutton = dialog.add_button(_("Saturate"), gtk.RESPONSE_ACCEPT)
+		resizeimage = gtk.Image()
+		resizeimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+		resizebutton.set_image(resizeimage)
+		scale = gtk.HScale()
+		scale.set_draw_value(False)
+		scale.set_update_policy(gtk.UPDATE_DISCONTINUOUS)
+		scale.set_range(0, 2)
+		scale.set_increments(0.1, 0.5)
+		scale.set_value(1)
+		scale.connect('value-changed', self.saturation_preview)
+		hbox = gtk.HBox()
+		hbox.pack_start(scale, True, True, 10)
+		dialog.vbox.pack_start(hbox, True, True, 10)
+		dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+		dialog.vbox.show_all()
+		response = dialog.run()
+		if response == gtk.RESPONSE_ACCEPT:
+			self.currimg_pixbuf_original.saturate_and_pixelate(self.currimg_pixbuf_original, scale.get_value(), False)
+			self.currimg_pixbuf.saturate_and_pixelate(self.currimg_pixbuf, scale.get_value(), False)
+			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
+			self.image_modified = True
+			dialog.destroy()
+		else:
+			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
+			dialog.destroy()
+
+	def saturation_preview(self, range):
+		while gtk.events_pending():
+			gtk.main_iteration()
+		try:
+			bak = self.currimg_pixbuf.copy()
+			self.currimg_pixbuf.saturate_and_pixelate(self.currimg_pixbuf, range.get_value(), False)
+			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
+			self.currimg_pixbuf = bak.copy()
+			del bak
+		except:
+			pass
+		gc.collect()
 
 	def resize_image(self, action):
 		dialog = gtk.Dialog(_("Resize Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
