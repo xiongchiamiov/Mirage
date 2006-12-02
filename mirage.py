@@ -151,6 +151,9 @@ class Base:
 		self.running_custom_actions = False
 		self.merge_id = None
 		self.actionGroupCustom = None
+		self.merge_id_recent = None
+		self.actionGroupRecent = None
+		self.recentfiles = [[''], [''], [''], [''], ['']]
 
 		# Read any passed options/arguments:
 		try:
@@ -222,13 +225,13 @@ class Base:
 			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
 		if conf.has_option('prefs', 'zoomquality'):
 			self.zoomvalue = conf.getint('prefs', 'zoomquality')
-			if int(round(self.zoomvalue, 0)) == 1:
+			if int(round(self.zoomvalue, 0)) == 0:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif int(round(self.zoomvalue, 0)) == 2:
+			elif int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif int(round(self.zoomvalue, 0)) == 3:
+			elif int(round(self.zoomvalue, 0)) == 2:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif int(round(self.zoomvalue, 0)) == 4:
+			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 		if conf.has_option('prefs', 'disable_screensaver'):
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
@@ -253,6 +256,15 @@ class Base:
 			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
 		if conf.has_option('prefs', 'confirm_delete'):
 			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
+		if conf.has_option('recent', 'num_recent'):
+			num_recent = conf.getint('recent', 'num_recent')
+			self.recentfiles = []
+			for i in range(num_recent):
+				num = conf.getint('recent', 'num[' + str(i) + ']')
+				urls = []
+				for j in range(num):
+					urls.append(conf.get('recent', 'urls[' + str(i) + ',' + str(j) + ']'))
+				self.recentfiles.append(urls)
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
@@ -378,6 +390,9 @@ class Base:
 			      <separator name="FM3"/>
 			      <menuitem action="Properties"/>
 			      <separator name="FM1"/>
+			      <placeholder name="Recent Files">
+			      </placeholder>
+			      <separator name="FM4"/>
 			      <menuitem action="Quit"/>
 			    </menu>
 			    <menu action="EditMenu">
@@ -469,6 +484,7 @@ class Base:
 		self.UIManager.insert_action_group(actionGroup, 0)
 		self.UIManager.add_ui_from_string(uiDescription)
 		self.refresh_custom_actions_menu()
+		self.refresh_recent_files_menu()
 		self.window.add_accel_group(self.UIManager.get_accel_group())
 		self.menubar = self.UIManager.get_widget('/MainMenu')
 		vbox.pack_start(self.menubar, False, False, 0)
@@ -655,6 +671,44 @@ class Base:
 				if o in ("-s", "--slideshow"):
 					self.toggle_slideshow(None)
 
+	def refresh_recent_files_menu(self):
+		if self.merge_id_recent:
+			self.UIManager.remove_ui(self.merge_id_recent)
+		if self.actionGroupRecent:
+			self.UIManager.remove_action_group(self.actionGroupRecent)
+		else:
+			self.actionGroupRecent = gtk.ActionGroup('RecentFiles')
+		self.UIManager.ensure_update()
+		for i in range(len(self.recentfiles)):
+			first_filename = self.recentfiles[i][0].split("/")[-1]
+			if len(first_filename) > 0:
+				if len(first_filename) > 27:
+					# Replace end of file name (excluding extension) with ..
+					try:
+						menu_name = first_filename[:25] + '..' + os.path.splitext(first_filename)[1]
+					except:
+						menu_name = first_filename[0]
+				else:
+					menu_name = first_filename
+				menu_name = menu_name.replace('_','__')
+				if len(self.recentfiles[i]) > 1:
+					menu_name = menu_name + '  [' + _('list') + ']'
+				action = [(str(i), None, menu_name, '<Alt>' + str(i+1), None, self.recent_action_click)]
+				self.actionGroupRecent.add_actions(action)
+		uiDescription = """
+			<ui>
+			  <menubar name="MainMenu">
+			    <menu action="FileMenu">
+			      <placeholder name="Recent Files">
+			"""
+		for i in range(len(self.recentfiles)):
+			if len(self.recentfiles[i][0]) > 0:
+				uiDescription = uiDescription + """<menuitem action=\"""" + str(i) + """\"/>"""
+		uiDescription = uiDescription + """</placeholder></menu></menubar></ui>"""
+		self.merge_id_recent = self.UIManager.add_ui_from_string(uiDescription)
+		self.UIManager.insert_action_group(self.actionGroupRecent, 0)
+		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
+
 	def refresh_custom_actions_menu(self):
 		if self.merge_id:
 			self.UIManager.remove_ui(self.merge_id)
@@ -807,6 +861,41 @@ class Base:
 			return False
 		else:
 			return True
+
+	def recent_action_click(self, action):
+		self.stop_now = True
+		while gtk.events_pending():
+			gtk.main_iteration()
+		cancel = self.autosave_image()
+		if cancel == True:
+			return
+		index = int(action.get_name())
+		self.expand_filelist_and_load_image(self.recentfiles[index])
+
+	def recent_file_add_and_refresh(self):
+		# Compile list:
+		addlist = []
+		for i in self.image_list:
+			addlist.append(i)
+		# First check if the filename is already in the list:
+		for i in range(len(self.recentfiles)):
+			if len(self.recentfiles[i][0]) > 0:
+				if addlist == self.recentfiles[i]:
+					# If found in list, put to position 1 and decrement the rest:
+					j = i
+					while j > 0:
+						self.recentfiles[j] = self.recentfiles[j-1]
+						j = j - 1
+					self.recentfiles[0] = addlist
+					self.refresh_recent_files_menu()
+					return
+		# If not found, put to position 1, decrement the rest:
+		j = len(self.recentfiles)-1
+		while j > 0:
+			self.recentfiles[j] = self.recentfiles[j-1]
+			j = j - 1
+		self.recentfiles[0] = addlist
+		self.refresh_recent_files_menu()
 
 	def custom_action_click(self, action):
 		if self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).get_property('sensitive') == True:
@@ -1098,6 +1187,12 @@ class Base:
 			conf.set('actions', 'commands[' + str(i) + ']', self.action_commands[i])
 			conf.set('actions', 'shortcuts[' + str(i) + ']', self.action_shortcuts[i])
 			conf.set('actions', 'batch[' + str(i) + ']', self.action_batch[i])
+		conf.add_section('recent')
+		conf.set('recent', 'num_recent', len(self.recentfiles))
+		for i in range(len(self.recentfiles)):
+			conf.set('recent', 'num[' + str(i) + ']', len(self.recentfiles[i]))
+			for j in range(len(self.recentfiles[i])):
+				conf.set('recent', 'urls[' + str(i) + ',' + str(j) + ']', self.recentfiles[i][j])
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
 			os.mkdir(os.path.expanduser('~/.config/'))
 		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
@@ -1217,7 +1312,7 @@ class Base:
 		if response == gtk.RESPONSE_OK:
 			filename = dialog.get_filename()
 			dialog.destroy()
-			fileext = os.path.splitext(os.path.basename(filename))[1]
+			fileext = os.path.splitext(os.path.basename(filename))[1].lower
 			if len(fileext) > 0:
 				fileext = fileext[1:]
 			# Override filetype if user typed a filename with a different extension:
@@ -2084,13 +2179,13 @@ class Base:
 		response = self.prefs_dialog.run()
 		if response == gtk.RESPONSE_CLOSE or response == gtk.RESPONSE_DELETE_EVENT:
 			self.zoomvalue = zoomcombo.get_active()
-			if int(round(self.zoomvalue, 0)) == 1:
+			if int(round(self.zoomvalue, 0)) == 0:
 				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif int(round(self.zoomvalue, 0)) == 2:
+			elif int(round(self.zoomvalue, 0)) == 1:
 				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif int(round(self.zoomvalue, 0)) == 3:
+			elif int(round(self.zoomvalue, 0)) == 2:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif int(round(self.zoomvalue, 0)) == 4:
+			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.open_all_images = openallimages.get_active()
 			if openpref1.get_active() == True:
@@ -3696,6 +3791,7 @@ class Base:
 		self.set_go_navigation_sensitivities(False)
 		if not self.closing_app:
 			self.change_cursor(None)
+		self.recent_file_add_and_refresh()
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
