@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-14 14:08-0600\n"
+"POT-Creation-Date: 2006-12-02 22:13-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,686 +16,698 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: mirage.py:281
+#: mirage.py:301
 msgid "_File"
 msgstr ""
 
-#: mirage.py:282
+#: mirage.py:302
 msgid "_Edit"
 msgstr ""
 
-#: mirage.py:283
+#: mirage.py:303
 msgid "_View"
 msgstr ""
 
-#: mirage.py:284
+#: mirage.py:304
 msgid "_Go"
 msgstr ""
 
-#: mirage.py:285
+#: mirage.py:305
 msgid "_Help"
 msgstr ""
 
-#: mirage.py:286
+#: mirage.py:306
 msgid "_Custom Actions"
 msgstr ""
 
-#: mirage.py:287
+#: mirage.py:307
 msgid "_Open Image..."
 msgstr ""
 
-#: mirage.py:287
+#: mirage.py:307
 msgid "Open Image"
 msgstr ""
 
-#: mirage.py:288
+#: mirage.py:308
 msgid "Open _Folder..."
 msgstr ""
 
-#: mirage.py:288
+#: mirage.py:308
 msgid "Open Folder"
 msgstr ""
 
-#: mirage.py:289
+#: mirage.py:309
 msgid "_Save Image"
 msgstr ""
 
-#: mirage.py:289
+#: mirage.py:309
 msgid "Save Image"
 msgstr ""
 
-#: mirage.py:290
+#: mirage.py:310
 msgid "Save Image _As..."
 msgstr ""
 
-#: mirage.py:290
+#: mirage.py:310
 msgid "Save Image As"
 msgstr ""
 
-#: mirage.py:291
+#: mirage.py:311
 msgid "_Crop..."
 msgstr ""
 
-#: mirage.py:291 mirage.py:2630
+#: mirage.py:311 mirage.py:2733
 msgid "Crop Image"
 msgstr ""
 
-#: mirage.py:292
+#: mirage.py:312
 msgid "Re_size..."
 msgstr ""
 
-#: mirage.py:292 mirage.py:2826
+#: mirage.py:312 mirage.py:2971
 msgid "Resize Image"
 msgstr ""
 
-#: mirage.py:293
-msgid "_Quit"
-msgstr ""
-
-#: mirage.py:293
-msgid "Quit"
-msgstr ""
-
-#: mirage.py:294
-msgid "_Previous Image"
-msgstr ""
-
-#: mirage.py:294
-msgid "Previous Image"
-msgstr ""
-
-#: mirage.py:295
-msgid "_Next Image"
-msgstr ""
-
-#: mirage.py:295
-msgid "Next Image"
-msgstr ""
-
-#: mirage.py:296
-msgid "_Previous"
-msgstr ""
-
-#: mirage.py:296
-msgid "Previous"
-msgstr ""
-
-#: mirage.py:297
-msgid "_Next"
-msgstr ""
-
-#: mirage.py:297 mirage.py:325
-msgid "Next"
-msgstr ""
-
-#: mirage.py:298
-msgid "_Random Image"
-msgstr ""
-
-#: mirage.py:298
-msgid "Random Image"
-msgstr ""
-
-#: mirage.py:299
-msgid "_First Image"
-msgstr ""
-
-#: mirage.py:299
-msgid "First Image"
-msgstr ""
-
-#: mirage.py:300
-msgid "_Last Image"
-msgstr ""
-
-#: mirage.py:300
-msgid "Last Image"
-msgstr ""
-
-#: mirage.py:301
-msgid "Zoom _In"
-msgstr ""
-
-#: mirage.py:301 mirage.py:323 mirage.py:324 mirage.py:329
-msgid "Zoom In"
-msgstr ""
-
-#: mirage.py:302
-msgid "Zoom _Out"
-msgstr ""
-
-#: mirage.py:302 mirage.py:322 mirage.py:328
-msgid "Zoom Out"
-msgstr ""
-
-#: mirage.py:303
-msgid "Zoom To _Fit"
-msgstr ""
-
-#: mirage.py:303 mirage.py:326 mirage.py:330
-msgid "Fit"
-msgstr ""
-
-#: mirage.py:304
-msgid "_1:1"
-msgstr ""
-
-#: mirage.py:304 mirage.py:327 mirage.py:331
-msgid "1:1"
-msgstr ""
-
-#: mirage.py:305
-msgid "Rotate _Left"
-msgstr ""
-
-#: mirage.py:305
-msgid "Rotate Left"
-msgstr ""
-
-#: mirage.py:306
-msgid "Rotate _Right"
-msgstr ""
-
-#: mirage.py:306
-msgid "Rotate Right"
-msgstr ""
-
-#: mirage.py:307
-msgid "Flip _Vertically"
-msgstr ""
-
-#: mirage.py:307
-msgid "Flip Vertically"
-msgstr ""
-
-#: mirage.py:308
-msgid "Flip _Horizontally"
-msgstr ""
-
-#: mirage.py:308
-msgid "Flip Horizontally"
-msgstr ""
-
-#: mirage.py:309
-msgid "_About"
-msgstr ""
-
-#: mirage.py:309
-msgid "About"
-msgstr ""
-
-#: mirage.py:310
-msgid "_Contents"
-msgstr ""
-
-#: mirage.py:310
-msgid "Contents"
-msgstr ""
-
-#: mirage.py:311
-msgid "_Preferences..."
-msgstr ""
-
-#: mirage.py:311
-msgid "Preferences"
-msgstr ""
-
-#: mirage.py:312
-msgid "_Full Screen"
-msgstr ""
-
-#: mirage.py:312
-msgid "Full Screen"
+#: mirage.py:313
+msgid "Saturation..."
 msgstr ""
 
 #: mirage.py:313
-msgid "E_xit Full Screen"
-msgstr ""
-
-#: mirage.py:313 mirage.py:321
-msgid "Exit Full Screen"
+msgid "Modify saturation"
 msgstr ""
 
 #: mirage.py:314
-msgid "_Start Slideshow"
+msgid "_Quit"
 msgstr ""
 
 #: mirage.py:314
-msgid "Start Slideshow"
+msgid "Quit"
 msgstr ""
 
 #: mirage.py:315
-msgid "_Stop Slideshow"
+msgid "_Previous Image"
 msgstr ""
 
 #: mirage.py:315
-msgid "Stop Slideshow"
+msgid "Previous Image"
 msgstr ""
 
 #: mirage.py:316
-msgid "_Delete..."
+msgid "_Next Image"
 msgstr ""
 
-#: mirage.py:316 mirage.py:2193
-msgid "Delete Image"
+#: mirage.py:316
+msgid "Next Image"
 msgstr ""
 
 #: mirage.py:317
-msgid "Re_name..."
+msgid "_Previous"
 msgstr ""
 
-#: mirage.py:317 mirage.py:2133
-msgid "Rename Image"
+#: mirage.py:317
+msgid "Previous"
 msgstr ""
 
 #: mirage.py:318
+msgid "_Next"
+msgstr ""
+
+#: mirage.py:318 mirage.py:346
+msgid "Next"
+msgstr ""
+
+#: mirage.py:319
+msgid "_Random Image"
+msgstr ""
+
+#: mirage.py:319
+msgid "Random Image"
+msgstr ""
+
+#: mirage.py:320
+msgid "_First Image"
+msgstr ""
+
+#: mirage.py:320
+msgid "First Image"
+msgstr ""
+
+#: mirage.py:321
+msgid "_Last Image"
+msgstr ""
+
+#: mirage.py:321
+msgid "Last Image"
+msgstr ""
+
+#: mirage.py:322
+msgid "Zoom _In"
+msgstr ""
+
+#: mirage.py:322 mirage.py:344 mirage.py:345 mirage.py:350
+msgid "Zoom In"
+msgstr ""
+
+#: mirage.py:323
+msgid "Zoom _Out"
+msgstr ""
+
+#: mirage.py:323 mirage.py:343 mirage.py:349
+msgid "Zoom Out"
+msgstr ""
+
+#: mirage.py:324
+msgid "Zoom To _Fit"
+msgstr ""
+
+#: mirage.py:324 mirage.py:347 mirage.py:351
+msgid "Fit"
+msgstr ""
+
+#: mirage.py:325
+msgid "_1:1"
+msgstr ""
+
+#: mirage.py:325 mirage.py:348 mirage.py:352
+msgid "1:1"
+msgstr ""
+
+#: mirage.py:326
+msgid "Rotate _Left"
+msgstr ""
+
+#: mirage.py:326
+msgid "Rotate Left"
+msgstr ""
+
+#: mirage.py:327
+msgid "Rotate _Right"
+msgstr ""
+
+#: mirage.py:327
+msgid "Rotate Right"
+msgstr ""
+
+#: mirage.py:328
+msgid "Flip _Vertically"
+msgstr ""
+
+#: mirage.py:328
+msgid "Flip Vertically"
+msgstr ""
+
+#: mirage.py:329
+msgid "Flip _Horizontally"
+msgstr ""
+
+#: mirage.py:329
+msgid "Flip Horizontally"
+msgstr ""
+
+#: mirage.py:330
+msgid "_About"
+msgstr ""
+
+#: mirage.py:330
+msgid "About"
+msgstr ""
+
+#: mirage.py:331
+msgid "_Contents"
+msgstr ""
+
+#: mirage.py:331
+msgid "Contents"
+msgstr ""
+
+#: mirage.py:332
+msgid "_Preferences..."
+msgstr ""
+
+#: mirage.py:332
+msgid "Preferences"
+msgstr ""
+
+#: mirage.py:333
+msgid "_Full Screen"
+msgstr ""
+
+#: mirage.py:333
+msgid "Full Screen"
+msgstr ""
+
+#: mirage.py:334
+msgid "E_xit Full Screen"
+msgstr ""
+
+#: mirage.py:334 mirage.py:342
+msgid "Exit Full Screen"
+msgstr ""
+
+#: mirage.py:335
+msgid "_Start Slideshow"
+msgstr ""
+
+#: mirage.py:335
+msgid "Start Slideshow"
+msgstr ""
+
+#: mirage.py:336
+msgid "_Stop Slideshow"
+msgstr ""
+
+#: mirage.py:336
+msgid "Stop Slideshow"
+msgstr ""
+
+#: mirage.py:337
+msgid "_Delete..."
+msgstr ""
+
+#: mirage.py:337 mirage.py:2292
+msgid "Delete Image"
+msgstr ""
+
+#: mirage.py:338
+msgid "Re_name..."
+msgstr ""
+
+#: mirage.py:338 mirage.py:2232
+msgid "Rename Image"
+msgstr ""
+
+#: mirage.py:339
 msgid "_Properties..."
 msgstr ""
 
-#: mirage.py:318 mirage.py:1792
+#: mirage.py:339 mirage.py:1891
 msgid "Properties"
 msgstr ""
 
-#: mirage.py:319
+#: mirage.py:340
 msgid "_Configure..."
 msgstr ""
 
-#: mirage.py:319
+#: mirage.py:340
 msgid "Custom Actions"
 msgstr ""
 
-#: mirage.py:334
+#: mirage.py:355
 msgid "_Status Bar"
 msgstr ""
 
-#: mirage.py:334
+#: mirage.py:355
 msgid "Status Bar"
 msgstr ""
 
-#: mirage.py:335
+#: mirage.py:356
 msgid "_Toolbar"
 msgstr ""
 
-#: mirage.py:335
+#: mirage.py:356
 msgid "Toolbar"
 msgstr ""
 
-#: mirage.py:550 mirage.py:551 mirage.py:552 mirage.py:553 mirage.py:554
-#: mirage.py:555 mirage.py:1997 mirage.py:1998 mirage.py:1999 mirage.py:2000
-#: mirage.py:2001 mirage.py:2002
+#: mirage.py:576 mirage.py:577 mirage.py:578 mirage.py:579 mirage.py:580
+#: mirage.py:581 mirage.py:2096 mirage.py:2097 mirage.py:2098 mirage.py:2099
+#: mirage.py:2100 mirage.py:2101
 msgid "seconds"
 msgstr ""
 
-#: mirage.py:830 mirage.py:1476
+#: mirage.py:695
+msgid "list"
+msgstr ""
+
+#: mirage.py:929 mirage.py:1587
 msgid "Action"
 msgstr ""
 
-#: mirage.py:838
+#: mirage.py:937
 msgid "Unable to launch"
 msgstr ""
 
-#: mirage.py:838
+#: mirage.py:937
 msgid "Please specify a valid command from Edit > Custom Actions."
 msgstr ""
 
-#: mirage.py:839 mirage.py:1589 mirage.py:1609
+#: mirage.py:938 mirage.py:1750
 msgid "Invalid Custom Action"
 msgstr ""
 
-#: mirage.py:958
+#: mirage.py:1058
 msgid "Version: Mirage"
 msgstr ""
 
-#: mirage.py:959
+#: mirage.py:1059
 msgid "Website: http://mirageiv.berlios.de"
 msgstr ""
 
-#: mirage.py:964
+#: mirage.py:1064
 msgid "Usage: mirage [OPTION]... FILES|FOLDERS..."
 msgstr ""
 
-#: mirage.py:966
+#: mirage.py:1066
 msgid "Options"
 msgstr ""
 
-#: mirage.py:967
+#: mirage.py:1067
 msgid "Show this help and exit"
 msgstr ""
 
-#: mirage.py:968
+#: mirage.py:1068
 msgid "Show version information and exit"
 msgstr ""
 
-#: mirage.py:969
+#: mirage.py:1069
 msgid "Show more detailed information"
 msgstr ""
 
-#: mirage.py:970
+#: mirage.py:1070
 msgid "Recursively include all images found in"
 msgstr ""
 
-#: mirage.py:971
+#: mirage.py:1071
 msgid "subdirectories of FOLDERS"
 msgstr ""
 
-#: mirage.py:972
+#: mirage.py:1072
 msgid "Start in slideshow mode"
 msgstr ""
 
-#: mirage.py:973
+#: mirage.py:1073
 msgid "Start in fullscreen mode"
 msgstr ""
 
-#: mirage.py:974
+#: mirage.py:1074
 msgid "Execute 'cmd' when an image is loaded"
 msgstr ""
 
-#: mirage.py:975
+#: mirage.py:1075
 msgid "(uses same syntax as custom actions,"
 msgstr ""
 
-#: mirage.py:976
+#: mirage.py:1076
 msgid "i.e. mirage -o 'echo file is %F')"
 msgstr ""
 
-#: mirage.py:1193
+#: mirage.py:1304
 msgid "Save As"
 msgstr ""
 
-#: mirage.py:1230
+#: mirage.py:1341
 msgid "The"
 msgstr ""
 
-#: mirage.py:1231 mirage.py:1242
+#: mirage.py:1342 mirage.py:1353
 msgid "Save"
 msgstr ""
 
-#: mirage.py:1241
+#: mirage.py:1352
 msgid "Unable to save "
 msgstr ""
 
-#: mirage.py:1256
+#: mirage.py:1367
 msgid "The current image has been modified. Save changes?"
 msgstr ""
 
-#: mirage.py:1260
+#: mirage.py:1371
 msgid "Save?"
 msgstr ""
 
-#: mirage.py:1298
+#: mirage.py:1409
 msgid "Open"
 msgstr ""
 
-#: mirage.py:1301
+#: mirage.py:1412
 msgid "Images"
 msgstr ""
 
-#: mirage.py:1305
+#: mirage.py:1416
 msgid "All files"
 msgstr ""
 
-#: mirage.py:1314
+#: mirage.py:1425
 msgid "Include images in subdirectories"
 msgstr ""
 
-#: mirage.py:1447
+#: mirage.py:1558
 msgid "Cannot load image."
 msgstr ""
 
-#: mirage.py:1451
+#: mirage.py:1562
 msgid "Custom actions"
 msgstr ""
 
-#: mirage.py:1451 mirage.py:3788
+#: mirage.py:1562 mirage.py:3928
 msgid "of"
 msgstr ""
 
-#: mirage.py:1453
+#: mirage.py:1564
 msgid "Scanning"
 msgstr ""
 
-#: mirage.py:1457
+#: mirage.py:1568
 msgid "Configure Custom Actions"
 msgstr ""
 
-#: mirage.py:1475
+#: mirage.py:1586
 msgid "Batch"
 msgstr ""
 
-#: mirage.py:1477 mirage.py:1623
+#: mirage.py:1588 mirage.py:1701
 msgid "Shortcut"
 msgstr ""
 
-#: mirage.py:1492
+#: mirage.py:1603
 msgid "Add action"
 msgstr ""
 
-#: mirage.py:1499
+#: mirage.py:1610
 msgid "Edit selected action."
 msgstr ""
 
-#: mirage.py:1506
+#: mirage.py:1617
 msgid "Remove selected action."
 msgstr ""
 
-#: mirage.py:1513
+#: mirage.py:1624
 msgid "Move selected action up."
 msgstr ""
 
-#: mirage.py:1520
+#: mirage.py:1631
 msgid "Move selected action down."
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "Parameters"
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "File path, name, and extension"
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "File path"
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "File name without file extension"
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "File extension (i.e. \".png\")"
 msgstr ""
 
-#: mirage.py:1523
+#: mirage.py:1634
 msgid "List of files, space-separated"
 msgstr ""
 
-#: mirage.py:1526
+#: mirage.py:1637
 msgid "Operations"
 msgstr ""
 
-#: mirage.py:1526
+#: mirage.py:1637
 msgid "Go to next image"
 msgstr ""
 
-#: mirage.py:1526
+#: mirage.py:1637
 msgid "Go to previous image"
 msgstr ""
 
-#: mirage.py:1545
+#: mirage.py:1656
 msgid ""
 "Here you can define custom actions with shortcuts. Actions use the built-in "
 "parameters and operations listed below and can have multiple statements "
 "separated by a semicolon. Batch actions apply to all images in the list."
 msgstr ""
 
-#: mirage.py:1588 mirage.py:1608
-msgid "Incomplete custom action specified."
-msgstr ""
-
-#: mirage.py:1615
+#: mirage.py:1692
 msgid "Add Custom Action"
 msgstr ""
 
-#: mirage.py:1617
+#: mirage.py:1694
 msgid "Edit Custom Action"
 msgstr ""
 
-#: mirage.py:1619
+#: mirage.py:1697
 msgid "Action Name"
 msgstr ""
 
-#: mirage.py:1621
+#: mirage.py:1699
 msgid "Command"
 msgstr ""
 
-#: mirage.py:1637
+#: mirage.py:1715
 msgid "Perform action on all images (Batch)"
 msgstr ""
 
-#: mirage.py:1728
+#: mirage.py:1749
+msgid "Incomplete custom action specified."
+msgstr ""
+
+#: mirage.py:1827
 msgid "Action Shortcut"
 msgstr ""
 
-#: mirage.py:1729
+#: mirage.py:1828
 msgid "Press the desired shortcut for the action."
 msgstr ""
 
-#: mirage.py:1746 mirage.py:1753
+#: mirage.py:1845 mirage.py:1852
 msgid "The shortcut "
 msgstr ""
 
-#: mirage.py:1746 mirage.py:1753
+#: mirage.py:1845 mirage.py:1852
 msgid " is already used for "
 msgstr ""
 
-#: mirage.py:1747 mirage.py:1754
+#: mirage.py:1846 mirage.py:1853
 msgid "Invalid Shortcut"
 msgstr ""
 
-#: mirage.py:1804
+#: mirage.py:1903
 msgid "File name"
 msgstr ""
 
-#: mirage.py:1806
+#: mirage.py:1905
 msgid "File date"
 msgstr ""
 
-#: mirage.py:1808
+#: mirage.py:1907
 msgid "Dimensions"
 msgstr ""
 
-#: mirage.py:1810
+#: mirage.py:1909
 msgid "File size"
 msgstr ""
 
-#: mirage.py:1812
+#: mirage.py:1911
 msgid "File type"
 msgstr ""
 
-#: mirage.py:1814
+#: mirage.py:1913
 msgid "Transparency"
 msgstr ""
 
-#: mirage.py:1816
+#: mirage.py:1915
 msgid "Animation"
 msgstr ""
 
-#: mirage.py:1818
+#: mirage.py:1917
 msgid "Bits per sample"
 msgstr ""
 
-#: mirage.py:1820
+#: mirage.py:1919
 msgid "Channels"
 msgstr ""
 
-#: mirage.py:1839 mirage.py:1845 mirage.py:1973
+#: mirage.py:1938 mirage.py:1944 mirage.py:2072
 msgid "Yes"
 msgstr ""
 
-#: mirage.py:1841 mirage.py:1843 mirage.py:1972
+#: mirage.py:1940 mirage.py:1942 mirage.py:2071
 msgid "No"
 msgstr ""
 
-#: mirage.py:1879
+#: mirage.py:1978
 msgid "Mirage Preferences"
 msgstr ""
 
-#: mirage.py:1885 mirage.py:2068
+#: mirage.py:1984 mirage.py:2167
 msgid "Interface"
 msgstr ""
 
-#: mirage.py:1888
+#: mirage.py:1987
 msgid "Background color"
 msgstr ""
 
-#: mirage.py:1892
+#: mirage.py:1991
 msgid "Sets the background color for the application."
 msgstr ""
 
-#: mirage.py:1896
+#: mirage.py:1995
 msgid "Open Mirage in fullscreen mode"
 msgstr ""
 
-#: mirage.py:1913
+#: mirage.py:2012
 msgid "Open Behavior"
 msgstr ""
 
-#: mirage.py:1916
+#: mirage.py:2015
 msgid "Open new image in"
 msgstr ""
 
-#: mirage.py:1918
+#: mirage.py:2017
 msgid "Smart Mode"
 msgstr ""
 
-#: mirage.py:1919
+#: mirage.py:2018
 msgid "Zoom To Fit Mode"
 msgstr ""
 
-#: mirage.py:1920
+#: mirage.py:2019
 msgid "1:1 Mode"
 msgstr ""
 
-#: mirage.py:1921
+#: mirage.py:2020
 msgid "Last Active Mode"
 msgstr ""
 
-#: mirage.py:1924
+#: mirage.py:2023
 msgid "Load all images in current directory"
 msgstr ""
 
-#: mirage.py:1926
+#: mirage.py:2025
 msgid ""
 "If enabled, opening an image in Mirage will automatically load all images "
 "found in that image's directory."
 msgstr ""
 
-#: mirage.py:1928
+#: mirage.py:2027
 msgid "Use last chosen directory"
 msgstr ""
 
-#: mirage.py:1929
+#: mirage.py:2028
 msgid "The default 'Open' directory will be the last directory used."
 msgstr ""
 
-#: mirage.py:1930
+#: mirage.py:2029
 msgid "Use this fixed directory"
 msgstr ""
 
-#: mirage.py:1932
+#: mirage.py:2031
 msgid "The default 'Open' directory will be this specified directory."
 msgstr ""
 
-#: mirage.py:1964 mirage.py:2067
+#: mirage.py:2063 mirage.py:2166
 msgid "Navigation"
 msgstr ""
 
-#: mirage.py:1966
+#: mirage.py:2065
 msgid "Preload images for faster navigation"
 msgstr ""
 
-#: mirage.py:1968
+#: mirage.py:2067
 msgid ""
 "If enabled, the next and previous images in the list will be preloaded "
 "during idle time. Note that the speed increase comes at the expense of "
@@ -703,190 +715,198 @@ msgid ""
 "limited ram."
 msgstr ""
 
-#: mirage.py:1970
+#: mirage.py:2069
 msgid "Wrap around imagelist"
 msgstr ""
 
-#: mirage.py:1974
+#: mirage.py:2073
 msgid "Prompt User"
 msgstr ""
 
-#: mirage.py:1992 mirage.py:3790
+#: mirage.py:2091 mirage.py:3930
 msgid "Slideshow Mode"
 msgstr ""
 
-#: mirage.py:1995
+#: mirage.py:2094
 msgid "Delay between images"
 msgstr ""
 
-#: mirage.py:2005
+#: mirage.py:2104
 msgid "Randomize order of images"
 msgstr ""
 
-#: mirage.py:2007
+#: mirage.py:2106
 msgid ""
 "If enabled, a random image will be chosen during slideshow mode (without "
 "loading any image twice)."
 msgstr ""
 
-#: mirage.py:2008
+#: mirage.py:2107
 msgid "Disable screensaver in slideshow mode"
 msgstr ""
 
-#: mirage.py:2010
+#: mirage.py:2109
 msgid ""
 "If enabled, xscreensaver will be temporarily disabled during slideshow mode."
 msgstr ""
 
-#: mirage.py:2011
+#: mirage.py:2110
 msgid "Always start in fullscreen mode"
 msgstr ""
 
-#: mirage.py:2012
+#: mirage.py:2111
 msgid ""
 "If enabled, starting a slideshow will put the application in fullscreen mode."
 msgstr ""
 
-#: mirage.py:2029
+#: mirage.py:2128
 msgid "Image Editing"
 msgstr ""
 
-#: mirage.py:2031
+#: mirage.py:2130
 msgid "Confirm image delete"
 msgstr ""
 
-#: mirage.py:2034
+#: mirage.py:2133
 msgid "Scaling quality"
 msgstr ""
 
-#: mirage.py:2036
+#: mirage.py:2135
 msgid "Nearest (Fastest)"
 msgstr ""
 
-#: mirage.py:2037
+#: mirage.py:2136
 msgid "Tiles"
 msgstr ""
 
-#: mirage.py:2038
+#: mirage.py:2137
 msgid "Bilinear"
 msgstr ""
 
-#: mirage.py:2039
+#: mirage.py:2138
 msgid "Hyper (Best)"
 msgstr ""
 
-#: mirage.py:2044
+#: mirage.py:2143
 msgid "Modified images"
 msgstr ""
 
-#: mirage.py:2046
+#: mirage.py:2145
 msgid "Ignore Changes"
 msgstr ""
 
-#: mirage.py:2047
+#: mirage.py:2146
 msgid "Auto-Save"
 msgstr ""
 
-#: mirage.py:2048
+#: mirage.py:2147
 msgid "Prompt For Action"
 msgstr ""
 
-#: mirage.py:2066
+#: mirage.py:2165
 msgid "Behavior"
 msgstr ""
 
-#: mirage.py:2069
+#: mirage.py:2168
 msgid "Slideshow"
 msgstr ""
 
-#: mirage.py:2070
+#: mirage.py:2169
 msgid "Image"
 msgstr ""
 
-#: mirage.py:2139
+#: mirage.py:2238
 msgid "Rename"
 msgstr ""
 
-#: mirage.py:2150
+#: mirage.py:2249
 msgid "Enter the new name"
 msgstr ""
 
-#: mirage.py:2175 mirage.py:2176
+#: mirage.py:2274 mirage.py:2275
 msgid "Unable to rename"
 msgstr ""
 
-#: mirage.py:2195
+#: mirage.py:2294
 msgid "Are you sure you wish to permanently delete"
 msgstr ""
 
-#: mirage.py:2241 mirage.py:2242
+#: mirage.py:2340 mirage.py:2341
 msgid "Unable to delete"
 msgstr ""
 
-#: mirage.py:2250
+#: mirage.py:2349
 msgid "Choose directory"
 msgstr ""
 
-#: mirage.py:2289
+#: mirage.py:2388
 msgid "A fast GTK+ Image Viewer."
 msgstr ""
 
-#: mirage.py:2328
+#: mirage.py:2427
 msgid "Unable to launch a suitable browser."
 msgstr ""
 
-#: mirage.py:2631
+#: mirage.py:2734
 msgid "Crop"
 msgstr ""
 
-#: mirage.py:2673 mirage.py:2837
+#: mirage.py:2776 mirage.py:2982
 msgid "Width"
 msgstr ""
 
-#: mirage.py:2680 mirage.py:2848
+#: mirage.py:2783 mirage.py:2993
 msgid "Height"
 msgstr ""
 
-#: mirage.py:2827
+#: mirage.py:2929
+msgid "Saturation"
+msgstr ""
+
+#: mirage.py:2930
+msgid "Saturate"
+msgstr ""
+
+#: mirage.py:2972
 msgid "Resize"
 msgstr ""
 
-#: mirage.py:2841 mirage.py:2853
+#: mirage.py:2986 mirage.py:2998
 msgid "pixels"
 msgstr ""
 
-#: mirage.py:2855
+#: mirage.py:3000
 msgid "Preserve aspect ratio"
 msgstr ""
 
-#: mirage.py:2942
+#: mirage.py:3081
 msgid ""
 "You are viewing the first image in the list. Wrap around to the last image?"
 msgstr ""
 
-#: mirage.py:2943 mirage.py:2993 mirage.py:3048
+#: mirage.py:3082 mirage.py:3132 mirage.py:3187
 msgid "Wrap?"
 msgstr ""
 
-#: mirage.py:2992
+#: mirage.py:3131
 msgid ""
 "You are viewing the last image in the list. Wrap around to the first image?"
 msgstr ""
 
-#: mirage.py:3047
+#: mirage.py:3186
 msgid ""
 "All images have been viewed. Would you like to cycle through the images "
 "again?"
 msgstr ""
 
-#: mirage.py:3167 mirage.py:3278 mirage.py:3295 mirage.py:3352 mirage.py:3611
+#: mirage.py:3306 mirage.py:3417 mirage.py:3434 mirage.py:3491 mirage.py:3750
 msgid "Loading"
 msgstr ""
 
-#: mirage.py:3431 mirage.py:3483
+#: mirage.py:3570 mirage.py:3622
 msgid "Preloading"
 msgstr ""
 
-#: mirage.py:3577 mirage.py:3686
+#: mirage.py:3716 mirage.py:3826
 msgid "Found"
 msgstr ""

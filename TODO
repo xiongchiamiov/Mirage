@@ -1,19 +1,17 @@
-Next
+0.9
 + Allow zooming in crop dialog (default to same view as main window so that
   the user can essentially 'crop visible' by clicking ok right away)
-+ Try to highlight selected region of cropped image (or darken unselected region)
-+ why is light/dark grey no longer used for transparency? (argh)
++ Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
 + mirage --add to add image to current instance instead of opening
   new window
-+ Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
-+ Recent files in file menu (requires new pygtk and gtk 2.10)
-	- Recent *viewed* files, not opened
++ Pane for thumbnails of all images in list (use .thumbnails?)
+	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
+	- delete thumbnail if image is deleted, update if image is moved, etc
++ Try to highlight selected region of cropped image (or darken unselected region)
 
 Future
-+ Side/bottom pane for thumbnails of all images in list (use .thumbnails?)
-	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
-	- delete thumbnail if image is deleted, update if image is moved
 + Sorting options (case sensitivity, file10 vs file9, hidden files)? (Michael Campbell)
 + Remove gcc requirement (requires new pygtk)
 + Test on Windows/Mac? (requires new pygtk)
 + Try to make zooming smoother (is this even possible with pygtk?)
++ why is light/dark grey no longer used for transparency? (argh)
