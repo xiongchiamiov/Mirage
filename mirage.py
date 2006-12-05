@@ -3769,6 +3769,10 @@ class Base:
 						print _("Loading") + ":", self.currimg_name
 					try:
 						self.load_new_image2(False, False, True, True)
+						# Calling load_new_image2 will reset the following two vars
+						# to 0, so ensure they are -1 again (no images preloaded)
+						self.preloadimg_prev_in_list = -1
+						self.preloadimg_next_in_list = -1
 						if self.currimg_is_animation == False:
 							self.previmg_width = self.currimg_pixbuf.get_width()
 						else:
@@ -3791,7 +3795,6 @@ class Base:
 						self.image_list.append(first_image)
 					self.image_list.append(second_image)
 					self.preload_next_image(False)
-					self.preloadimg_prev_in_list = -1
 					self.image_list = temp
 		if first_image_found == True:
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
