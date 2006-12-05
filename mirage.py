@@ -890,10 +890,10 @@ class Base:
 		self.recentfiles[len(self.recentfiles)-1] = ['']
 		self.refresh_recent_files_menu()
 
-	def recent_file_add_and_refresh(self):
+	def recent_file_add_and_refresh(self, list):
 		# Compile list:
 		addlist = []
-		for i in self.image_list:
+		for i in list:
 			addlist.append(i)
 		# First check if the filename is already in the list:
 		for i in range(len(self.recentfiles)):
@@ -3651,6 +3651,7 @@ class Base:
 	def expand_filelist_and_load_image(self, inputlist):
 		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found
+		passed_list = inputlist
 		self.images_found = 0
 		self.stop_now = True # Make sure that any previous search process is stopped
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -3814,7 +3815,7 @@ class Base:
 		self.set_slideshow_sensitivities()
 		if not self.closing_app:
 			self.change_cursor(None)
-		self.recent_file_add_and_refresh()
+		self.recent_file_add_and_refresh(passed_list)
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
