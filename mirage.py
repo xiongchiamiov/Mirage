@@ -680,21 +680,22 @@ class Base:
 			self.actionGroupRecent = gtk.ActionGroup('RecentFiles')
 		self.UIManager.ensure_update()
 		for i in range(len(self.recentfiles)):
-			first_filename = self.recentfiles[i][0].split("/")[-1]
-			if len(first_filename) > 0:
-				if len(first_filename) > 27:
-					# Replace end of file name (excluding extension) with ..
-					try:
-						menu_name = first_filename[:25] + '..' + os.path.splitext(first_filename)[1]
-					except:
-						menu_name = first_filename[0]
-				else:
-					menu_name = first_filename
-				menu_name = menu_name.replace('_','__')
-				if len(self.recentfiles[i]) > 1:
-					menu_name = menu_name + '  [' + _('list') + ']'
-				action = [(str(i), None, menu_name, '<Alt>' + str(i+1), None, self.recent_action_click)]
-				self.actionGroupRecent.add_actions(action)
+			if len(self.recentfiles[i]) > 0:
+				first_filename = self.recentfiles[i][0].split("/")[-1]
+				if len(first_filename) > 0:
+					if len(first_filename) > 27:
+						# Replace end of file name (excluding extension) with ..
+						try:
+							menu_name = first_filename[:25] + '..' + os.path.splitext(first_filename)[1]
+						except:
+							menu_name = first_filename[0]
+					else:
+						menu_name = first_filename
+					menu_name = menu_name.replace('_','__')
+					if len(self.recentfiles[i]) > 1:
+						menu_name = menu_name + '  [' + _('list') + ']'
+					action = [(str(i), None, menu_name, '<Alt>' + str(i+1), None, self.recent_action_click)]
+					self.actionGroupRecent.add_actions(action)
 		uiDescription = """
 			<ui>
 			  <menubar name="MainMenu">
@@ -702,8 +703,9 @@ class Base:
 			      <placeholder name="Recent Files">
 			"""
 		for i in range(len(self.recentfiles)):
-			if len(self.recentfiles[i][0]) > 0:
-				uiDescription = uiDescription + """<menuitem action=\"""" + str(i) + """\"/>"""
+			if len(self.recentfiles[i]) > 0:
+				if len(self.recentfiles[i][0]) > 0:
+					uiDescription = uiDescription + """<menuitem action=\"""" + str(i) + """\"/>"""
 		uiDescription = uiDescription + """</placeholder></menu></menubar></ui>"""
 		self.merge_id_recent = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupRecent, 0)
@@ -870,7 +872,23 @@ class Base:
 		if cancel == True:
 			return
 		index = int(action.get_name())
-		self.expand_filelist_and_load_image(self.recentfiles[index])
+		if not os.path.isfile(self.recentfiles[index][0]):
+			self.image_list = []
+			self.curr_img_in_list = 0
+			self.image_list.append(self.recentfiles[index][0])
+			self.image_load_failed(False)
+			self.recent_file_remove_and_refresh(index)
+		else:
+			self.expand_filelist_and_load_image(self.recentfiles[index])
+
+	def recent_file_remove_and_refresh(self, index_num):
+		i = index_num
+		while i < len(self.recentfiles)-1:
+			self.recentfiles[i] = self.recentfiles[i+1]
+			i = i + 1
+		# Set last item empty:
+		self.recentfiles[len(self.recentfiles)-1] = ['']
+		self.refresh_recent_files_menu()
 
 	def recent_file_add_and_refresh(self):
 		# Compile list:
@@ -879,16 +897,17 @@ class Base:
 			addlist.append(i)
 		# First check if the filename is already in the list:
 		for i in range(len(self.recentfiles)):
-			if len(self.recentfiles[i][0]) > 0:
-				if addlist == self.recentfiles[i]:
-					# If found in list, put to position 1 and decrement the rest:
-					j = i
-					while j > 0:
-						self.recentfiles[j] = self.recentfiles[j-1]
-						j = j - 1
-					self.recentfiles[0] = addlist
-					self.refresh_recent_files_menu()
-					return
+			if len(self.recentfiles[i]) > 0:
+				if len(self.recentfiles[i][0]) > 0:
+					if addlist == self.recentfiles[i]:
+						# If found in list, put to position 1 and decrement the rest:
+						j = i
+						while j > 0:
+							self.recentfiles[j] = self.recentfiles[j-1]
+							j = j - 1
+						self.recentfiles[0] = addlist
+						self.refresh_recent_files_menu()
+						return
 		# If not found, put to position 1, decrement the rest:
 		j = len(self.recentfiles)-1
 		while j > 0:
