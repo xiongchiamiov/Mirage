@@ -3811,6 +3811,7 @@ class Base:
 		self.searching_for_images = False
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
+		self.set_slideshow_sensitivities()
 		if not self.closing_app:
 			self.change_cursor(None)
 		self.recent_file_add_and_refresh()
