@@ -8,6 +8,7 @@
 	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
 	- delete thumbnail if image is deleted, update if image is moved, etc
 + Try to highlight selected region of cropped image (or darken unselected region)
++ Open remote files (mirage http://blah)
 
 Future
 + Sorting options (case sensitivity, file10 vs file9, hidden files)? (Michael Campbell)
