@@ -154,6 +154,7 @@ class Base:
 		self.merge_id_recent = None
 		self.actionGroupRecent = None
 		self.recentfiles = [[''], [''], [''], [''], ['']]
+		self.recentfiles_recurse = [False, False, False, False, False]
 
 		# Read any passed options/arguments:
 		try:
@@ -259,8 +260,13 @@ class Base:
 		if conf.has_option('recent', 'num_recent'):
 			num_recent = conf.getint('recent', 'num_recent')
 			self.recentfiles = []
+			self.recentfiles_recurse = []
 			for i in range(num_recent):
 				num = conf.getint('recent', 'num[' + str(i) + ']')
+				if conf.has_option('recent', 'recurse[' + str(i) + ']'):
+					self.recentfiles_recurse.append(conf.getboolean('recent', 'recurse[' + str(i) + ']'))
+				else:
+					self.recentfiles_recurse.append(False)
 				urls = []
 				for j in range(num):
 					urls.append(conf.get('recent', 'urls[' + str(i) + ',' + str(j) + ']'))
@@ -872,22 +878,25 @@ class Base:
 		if cancel == True:
 			return
 		index = int(action.get_name())
-		if not os.path.isfile(self.recentfiles[index][0]):
+		if os.path.isfile(self.recentfiles[index][0]) or os.path.exists(self.recentfiles[index][0]):
+			self.recursive = self.recentfiles_recurse[index]
+			self.expand_filelist_and_load_image(self.recentfiles[index])
+		else:
 			self.image_list = []
 			self.curr_img_in_list = 0
 			self.image_list.append(self.recentfiles[index][0])
 			self.image_load_failed(False)
 			self.recent_file_remove_and_refresh(index)
-		else:
-			self.expand_filelist_and_load_image(self.recentfiles[index])
 
 	def recent_file_remove_and_refresh(self, index_num):
 		i = index_num
 		while i < len(self.recentfiles)-1:
 			self.recentfiles[i] = self.recentfiles[i+1]
+			self.recentfiles_recurse[i] = self.recentfiles_recurse[i+1]
 			i = i + 1
 		# Set last item empty:
 		self.recentfiles[len(self.recentfiles)-1] = ['']
+		self.recentfiles_recurse[len(self.recentfiles)-1] = False
 		self.refresh_recent_files_menu()
 
 	def recent_file_add_and_refresh(self, list):
@@ -904,16 +913,20 @@ class Base:
 						j = i
 						while j > 0:
 							self.recentfiles[j] = self.recentfiles[j-1]
+							self.recentfiles_recurse[j] = self.recentfiles_recurse[j-1]
 							j = j - 1
 						self.recentfiles[0] = addlist
+						self.recentfiles_recurse[0] = self.recursive
 						self.refresh_recent_files_menu()
 						return
 		# If not found, put to position 1, decrement the rest:
 		j = len(self.recentfiles)-1
 		while j > 0:
 			self.recentfiles[j] = self.recentfiles[j-1]
+			self.recentfiles_recurse[j] = self.recentfiles_recurse[j-1]
 			j = j - 1
 		self.recentfiles[0] = addlist
+		self.recentfiles_recurse[0] = self.recursive
 		self.refresh_recent_files_menu()
 
 	def custom_action_click(self, action):
@@ -1210,6 +1223,7 @@ class Base:
 		conf.set('recent', 'num_recent', len(self.recentfiles))
 		for i in range(len(self.recentfiles)):
 			conf.set('recent', 'num[' + str(i) + ']', len(self.recentfiles[i]))
+			conf.set('recent', 'recurse[' + str(i) + ']', self.recentfiles_recurse[i])
 			for j in range(len(self.recentfiles[i])):
 				conf.set('recent', 'urls[' + str(i) + ',' + str(j) + ']', self.recentfiles[i][j])
 		if os.path.exists(os.path.expanduser('~/.config/')) == False:
@@ -3816,6 +3830,7 @@ class Base:
 		if not self.closing_app:
 			self.change_cursor(None)
 		self.recent_file_add_and_refresh(passed_list)
+		self.recursive = False
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
