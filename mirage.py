@@ -527,9 +527,8 @@ class Base:
 		# Slideshow control:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls = gtk.HBox()
-		self.ss_back = gtk.Button("", gtk.STOCK_GO_BACK)
-		image, label = self.ss_back.get_children()[0].get_children()[0].get_children()
-		label.set_text('')
+		self.ss_back = gtk.Button()
+		self.ss_back.add(gtk.image_new_from_stock(gtk.STOCK_GO_BACK, gtk.ICON_SIZE_BUTTON))
 		self.ss_back.set_property('can-focus', False)
 		self.ss_back.connect('clicked', self.goto_prev_image)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
