@@ -532,18 +532,15 @@ class Base:
 		self.ss_back.set_property('can-focus', False)
 		self.ss_back.connect('clicked', self.goto_prev_image)
 		self.ss_start = gtk.Button("", gtk.STOCK_MEDIA_PLAY)
-		image, label = self.ss_start.get_children()[0].get_children()[0].get_children()
-		label.set_text('')
+		self.ss_start.get_child().get_child().get_children()[1].set_text('')
 		self.ss_start.set_property('can-focus', False)
 		self.ss_start.connect('clicked', self.toggle_slideshow)
 		self.ss_stop = gtk.Button("", gtk.STOCK_MEDIA_STOP)
-		image, label = self.ss_stop.get_children()[0].get_children()[0].get_children()
-		label.set_text('')
+		self.ss_stop.get_child().get_child().get_children()[1].set_text('')
 		self.ss_stop.set_property('can-focus', False)
 		self.ss_stop.connect('clicked', self.toggle_slideshow)
 		self.ss_forward = gtk.Button("", gtk.STOCK_GO_FORWARD)
-		image, label = self.ss_forward.get_children()[0].get_children()[0].get_children()
-		label.set_text('')
+		self.ss_forward.get_child().get_child().get_children()[1].set_text('')
 		self.ss_forward.set_property('can-focus', False)
 		self.ss_forward.connect('clicked', self.goto_next_image)
 		self.slideshow_controls.pack_start(self.ss_back, False, False, 0)
@@ -556,10 +553,7 @@ class Base:
 		self.slideshow_controls2 = gtk.HBox()
 		try:
 			self.ss_exit = gtk.Button("", gtk.STOCK_LEAVE_FULLSCREEN)
-			alignment = self.ss_exit.get_children()[0]
-			hbox2 = alignment.get_children()[0]
-			image, label = hbox2.get_children()
-			label.set_text('')
+			self.ss_exit.get_child().get_child().get_children()[1].set_text('')
 		except:
 			self.ss_exit = gtk.Button()
 			self.ss_exit.set_image(gtk.image_new_from_stock('leave-fullscreen', gtk.ICON_SIZE_MENU))
@@ -573,7 +567,6 @@ class Base:
 			factory.add('stock-shuffle', iconset)
 			factory.add_default()
 			self.ss_randomize.set_image(gtk.image_new_from_stock('stock-shuffle', gtk.ICON_SIZE_MENU))
-			self.ss_randomize.set_size_request(self.ss_back.size_request()[0], -1)
 		except:
 			self.ss_randomize.set_label("Rand")
 		self.ss_randomize.connect('toggled', self.random_changed)
@@ -650,9 +643,10 @@ class Base:
 			self.toolbar.set_no_show_all(True)
 			self.menubar.set_no_show_all(True)
 		self.window.show_all()
+		self.ss_exit.set_size_request(self.ss_start.size_request()[0], self.ss_stop.size_request()[1])
+		self.ss_randomize.set_size_request(self.ss_start.size_request()[0], -1)
 		self.ss_start.set_size_request(self.ss_start.size_request()[0]*2, -1)
 		self.ss_stop.set_size_request(self.ss_stop.size_request()[0]*2, -1)
-		self.ss_exit.set_size_request(self.ss_back.size_request()[0], self.ss_stop.size_request()[1])
 		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
@@ -1627,38 +1621,23 @@ class Base:
 			self.actionwidget.get_selection().select_path(0)
 		vbox_actions = gtk.VBox()
 		addbutton = gtk.Button("", gtk.STOCK_ADD)
-		alignment = addbutton.get_children()[0]
-		hbox_temp = alignment.get_children()[0]
-		image, label = hbox_temp.get_children()
-		label.set_text('')
+		addbutton.get_child().get_child().get_children()[1].set_text('')
 		addbutton.connect('clicked', self.add_custom_action, self.actionwidget)
 		gtk.Tooltips().set_tip(addbutton, _("Add action"))
 		editbutton = gtk.Button("", gtk.STOCK_EDIT)
-		alignment = editbutton.get_children()[0]
-		hbox_temp = alignment.get_children()[0]
-		image, label = hbox_temp.get_children()
-		label.set_text('')
+		editbutton.get_child().get_child().get_children()[1].set_text('')
 		editbutton.connect('clicked', self.edit_custom_action, self.actionwidget)
 		gtk.Tooltips().set_tip(editbutton, _("Edit selected action."))
 		removebutton = gtk.Button("", gtk.STOCK_REMOVE)
-		alignment = removebutton.get_children()[0]
-		hbox_temp = alignment.get_children()[0]
-		image, label = hbox_temp.get_children()
-		label.set_text('')
+		removebutton.get_child().get_child().get_children()[1].set_text('')
 		removebutton.connect('clicked', self.remove_custom_action)
 		gtk.Tooltips().set_tip(removebutton, _("Remove selected action."))
 		upbutton = gtk.Button("", gtk.STOCK_GO_UP)
-		alignment = upbutton.get_children()[0]
-		hbox_temp = alignment.get_children()[0]
-		image, label = hbox_temp.get_children()
-		label.set_text('')
+		upbutton.get_child().get_child().get_children()[1].set_text('')
 		upbutton.connect('clicked', self.custom_action_move_up, self.actionwidget)
 		gtk.Tooltips().set_tip(upbutton, _("Move selected action up."))
 		downbutton = gtk.Button("", gtk.STOCK_GO_DOWN)
-		alignment = downbutton.get_children()[0]
-		hbox_temp = alignment.get_children()[0]
-		image, label = hbox_temp.get_children()
-		label.set_text('')
+		downbutton.get_child().get_child().get_children()[1].set_text('')
 		downbutton.connect('clicked', self.custom_action_move_down, self.actionwidget)
 		gtk.Tooltips().set_tip(downbutton, _("Move selected action down."))
 		vbox_buttons = gtk.VBox()
