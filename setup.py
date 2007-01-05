@@ -29,5 +29,6 @@ setup(name='Mirage',
 			('share/locale/pl/LC_MESSAGES', ['locale/pl/LC_MESSAGES/mirage.mo']),
 			('share/locale/fr/LC_MESSAGES', ['locale/fr/LC_MESSAGES/mirage.mo']),
 			('share/locale/es/LC_MESSAGES', ['locale/es/LC_MESSAGES/mirage.mo']),
-			('share/locale/de/LC_MESSAGES', ['locale/de/LC_MESSAGES/mirage.mo'])],
+			('share/locale/de/LC_MESSAGES', ['locale/de/LC_MESSAGES/mirage.mo']),
+			('share/locale/it/LC_MESSAGES', ['locale/it/LC_MESSAGES/mirage.mo'])],
 		)
