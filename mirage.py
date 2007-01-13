@@ -107,6 +107,7 @@ class Base:
 		self.preloadimg_prev_is_animation = False
 		# Settings, misc:
 		self.toolbar_show = True
+		self.thumbnails_show = False
 		self.statusbar_show = True
 		self.fullscreen_mode = False
 		self.opendialogpath = ""
@@ -360,6 +361,7 @@ class Base:
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
 			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),
+			('Thumbnails', None, _('Thumbnails'), None, _('Thumbnails'), self.toggle_thumbnails, self.thumbnails_show),
 				)
 
 		# Populate keys[]:
@@ -430,6 +432,7 @@ class Base:
 			      <menuitem action="Status Bar"/>
 			      <separator name="FM1"/>
 			      <menuitem action="Full Screen"/>
+	  			  <menuitem action="Thumbnails"/>
 			   </menu>
 			    <menu action="GoMenu">
 			      <menuitem action="Next Image"/>
@@ -512,6 +515,23 @@ class Base:
 		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.imageview = gtk.Image()
 		self.layout.add(self.imageview)
+
+		# Thumbnail view
+		self.thumb_view_inited = False # init on first use
+		self.thumb_model = gtk.ListStore(gtk.gdk.Pixbuf, bool)
+		self.thumb_view = gtk.IconView()
+		self.thumb_view.set_model(self.thumb_model)
+		self.thumb_view.set_pixbuf_column(0)
+		self.thumb_window = gtk.ScrolledWindow()
+		self.thumb_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		self.thumb_window.add(self.thumb_view)
+		self.thumb_window.show_all() # show all children
+		self.thumb_window.set_no_show_all(True)
+		self.thumb_window.hide() # hide again
+		vbox.add(self.thumb_window)
+		# TODO: connect a function to the "item-activated" signal of the icon view
+		# that switches back to "single image mode" and jumps to the image clicked
+
 		self.statusbar = gtk.Statusbar()
 		self.statusbar2 = gtk.Statusbar()
 		self.statusbar.set_has_resize_grip(False)
@@ -524,6 +544,7 @@ class Base:
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(width,height)
+		
 		# Slideshow control:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls = gtk.HBox()
@@ -1336,9 +1357,10 @@ class Base:
 		dialog.set_do_overwrite_confirmation(True)
 		response = dialog.run()
 		if response == gtk.RESPONSE_OK:
+			prev_name = self.currimg_name
 			filename = dialog.get_filename()
 			dialog.destroy()
-			fileext = os.path.splitext(os.path.basename(filename))[1].lower
+			fileext = os.path.splitext(os.path.basename(filename))[1].lower()
 			if len(fileext) > 0:
 				fileext = fileext[1:]
 			# Override filetype if user typed a filename with a different extension:
@@ -1346,6 +1368,15 @@ class Base:
 				if fileext in i['extensions']:
 					filetype = i['name']
 			self.save_image_now(filename, filetype)
+			# Update recent file list:
+			for i in range(len(self.recentfiles[0])):
+				if self.recentfiles[0][i] == prev_name:
+					self.recentfiles[0][i] = self.currimg_name
+					templist = self.recentfiles[0]
+					if i == 0:
+						self.recent_file_remove_and_refresh(0)
+						self.recent_file_add_and_refresh(templist)
+					break
 		else:
 			dialog.destroy()
 
@@ -1572,6 +1603,73 @@ class Base:
 				self.zoom_to_fit_or_1_to_1(None, False, False)
 			else:
 				self.zoom_to_fit_window(None, False, False)
+
+	def toggle_thumbnails(self, action):
+		# toggle between thumbnail view and single image view
+		if self.table.get_property('visible') == True:
+			self.table.hide()
+			if not self.thumb_view_inited:
+				self.init_thumb_view()
+			self.thumb_window.show()
+			self.thumbnails_show = True
+		else:
+			self.thumb_window.hide()
+			self.table.show()
+			self.thumbnails_show = False
+
+	def init_thumb_view(self):
+		# this method intializes the thumbnail view - called once
+		self.thumb_view_inited = True
+		self.thumb_view.set_item_width(128)
+		self.thumb_view.set_selection_mode(gtk.SELECTION_BROWSE)
+		icon = self.thumb_view.render_icon('gtk-new', gtk.ICON_SIZE_DIALOG)
+
+		for i in range(len(self.image_list)):
+			iter = self.thumb_model.append()
+			self.thumb_model.set(iter, 0, icon, 1, False)
+			if i == self.curr_img_in_list:
+				path = self.thumb_model.get_path(iter)
+				self.thumb_view.select_path(path)
+
+		self.thumb_iter = 0             # item to thumbnail next
+		self.thumb_iter_start = -1      # start iter for thumbnailing
+		gobject.idle_add(self.on_idle_thumbs, self)
+
+	def on_idle_thumbs(gobject, self):
+		# this handler loads the thumbnails on the idle event
+
+		# check range
+		range = self.thumb_view.get_visible_range()
+		iter_start = int(range[0][0])
+		# !? expected "int(range[0].to_string())" to be correct
+		if not iter_start == self.thumb_iter_start:
+			# user scrolled to other position
+			# continue thumbnailing at new position
+			self.thumb_iter_start = iter_start
+			self.thumb_iter = iter_start
+		elif self.thumb_iter == self.thumb_iter_start:
+			# we are back where we started - done
+			return False
+
+		# check iter
+		i = self.thumb_iter
+		self.thumb_iter += 1
+		if self.thumb_iter >= len(self.image_list):
+			self.thumb_iter = 0 # wrap around
+
+		iter = self.thumb_model.get_iter_from_string(str(i))
+		if self.thumb_model.get_value(iter, 1):
+			# item is already thumbnailed
+			return True
+
+		# make the thumbnail
+		file = self.image_list[i]
+		try:
+			pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(file, 128, 128)
+		except:
+			pixbuf = self.thumb_view.render_icon('gtk-missing-image', gtk.ICON_SIZE_DIALOG)
+		self.thumb_model.set(iter, 0, pixbuf, 1, True)
+		return True
 
 	def update_statusbar(self):
 		# Update status bar:
