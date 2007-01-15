@@ -337,7 +337,7 @@ class Base:
 			('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.show_about),
 			('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1', _('Contents'), self.show_help),
 			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), None, _('Preferences'), self.show_prefs),
-			('Full Screen', fullscreen_icon, _('_Full Screen'), '<Shift>Return', _('Full Screen'), self.enter_fullscreen),
+			('Full Screen', fullscreen_icon, _('_Full Screen'), 'F11', _('Full Screen'), self.enter_fullscreen),
 			('Exit Full Screen', leave_fullscreen_icon, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
@@ -356,12 +356,12 @@ class Base:
 			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
 			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in),
 			('Ctrl-KP_0', None, '', '<Ctrl>KP_0', _('Fit'), self.zoom_to_fit_window_action),
-			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action)
+			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action),
+			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
-			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),
-			('Thumbnails', None, _('Thumbnails'), None, _('Thumbnails'), self.toggle_thumbnails, self.thumbnails_show),
+			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show)
 				)
 
 		# Populate keys[]:
@@ -432,7 +432,6 @@ class Base:
 			      <menuitem action="Status Bar"/>
 			      <separator name="FM1"/>
 			      <menuitem action="Full Screen"/>
-	  			  <menuitem action="Thumbnails"/>
 			   </menu>
 			    <menu action="GoMenu">
 			      <menuitem action="Next Image"/>
@@ -461,6 +460,7 @@ class Base:
 			      <menuitem action="Ctrl-KP_Add"/>
 			      <menuitem action="Ctrl-KP_0"/>
 			      <menuitem action="Ctrl-KP_1"/>
+			      <menuitem action="Full Screen Key"/>
 			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
