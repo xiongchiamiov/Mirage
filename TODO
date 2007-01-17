@@ -12,7 +12,6 @@
 + Screenshots (a la gsnapshot)
 + test with setup.py install --prefix=...
 + use same self.find_path as sonata (and locales)
-+ python 2.5
 
 Future
 + Ability to specify save compression level?

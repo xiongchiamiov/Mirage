@@ -1,5 +1,6 @@
-v0.8.3 - Pending
+v0.8.3 - January 17, 2006
 	+ Use F11 for fullscreen like most applications
+	+ Use 'kfmclient' to launch browser in kde
 	+ Added Italian translation (Daniele Maggio)
 	+ Bug: Save As doesn't work
 
