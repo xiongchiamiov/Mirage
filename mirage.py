@@ -40,6 +40,7 @@ import locale
 import stat
 import time
 import subprocess
+import shutil
 try:
 	import gconf
 except:
@@ -2376,7 +2377,7 @@ class Base:
 			if response == gtk.RESPONSE_ACCEPT:
 				try:
 					new_filename = os.path.dirname(self.currimg_name) + "/" + self.rename_txt.get_text()
-					os.rename(self.currimg_name, new_filename)
+					shutil.move(self.currimg_name, new_filename)
 					self.currimg_name = new_filename
 					self.update_title()
 				except:
