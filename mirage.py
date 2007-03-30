@@ -757,26 +757,21 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 
 	def find_path(self, filename):
-		full_path = ''
-		if os.path.exists(filename):
-			full_path = filename
-		elif os.path.exists('/usr/share/mirage/' + filename):
-			full_path = '/usr/share/mirage/' + filename
-		elif os.path.exists('/usr/local/share/mirage/' + filename):
-			full_path = '/usr/local/share/mirage/' + filename
-		elif os.path.exists(os.path.dirname(__file__) + '/share/mirage/' + filename):
-			full_path = os.path.dirname(__file__) + '/share/mirage/' + filename
-		elif os.path.exists('../share/mirage/' + filename):
-			full_path = '../share/mirage/' + filename
-		elif os.path.exists('/usr/share/pixmaps/' + filename):
-			full_path = '/usr/share/pixmaps/' + filename
-		elif os.path.exists('/usr/local/share/pixmaps/' + filename):
-			full_path = '/usr/local/share/pixmaps/' + filename
-		elif os.path.exists(os.path.dirname(__file__) + '/share/pixmaps/' + filename):
-			full_path = os.path.dirname(__file__) + '/share/pixmaps/' + filename
-		elif os.path.exists('../share/pixmaps/' + filename):
-			full_path = '../share/pixmaps/' + filename
-		return full_path
+		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
+			full_filename = os.path.join(sys.prefix, 'share', 'pixmaps', filename)
+		elif os.path.exists(os.path.join(sys.prefix, 'share', 'mirage', filename)):
+			full_filename = os.path.join(sys.prefix, 'share', 'mirage', filename)
+		elif os.path.exists(os.path.join(os.path.split(__file__)[0], filename)):
+			full_filename = os.path.join(os.path.split(__file__)[0], filename)
+		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'pixmaps', filename)):
+			full_filename = os.path.join(os.path.split(__file__)[0], 'pixmaps', filename)
+		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'share', filename)):
+ 			full_filename = os.path.join(os.path.split(__file__)[0], 'share', filename)
+		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'share', 'mirage', filename)):
+ 			full_filename = os.path.join(os.path.split(__file__)[0], 'share', 'mirage', filename)
+		elif os.path.exists(os.path.join(__file__.split('/lib')[0], 'share', 'pixmaps', filename)):
+ 			full_filename = os.path.join(__file__.split('/lib')[0], 'share', 'pixmaps', filename)
+		return full_filename
 
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
 		if entry.value.type == gconf.VALUE_STRING:
@@ -2770,26 +2765,14 @@ class Base:
 				self.update_statusbar()
 
 	def rotate_left(self, action):
-		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').get_property('sensitive') == True:
-			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, 90)
-			if self.last_image_action_was_fit == True:
-				if self.last_image_action_was_smart_fit == True:
-					self.zoom_to_fit_or_1_to_1(None, False, False)
-				else:
-					self.zoom_to_fit_window(None, False, False)
-			else:
-				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
-				self.layout.set_size(self.currimg_width, self.currimg_height)
-				self.currimg_pixbuf = self.image_rotate(self.currimg_pixbuf, 90)
-				self.imageview.set_from_pixbuf(self.currimg_pixbuf)
-				self.show_scrollbars_if_needed()
-				self.center_image()
-				self.update_statusbar()
-			self.image_modified = True
+		self.rotate_left_or_right(self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left'), 90)
 
 	def rotate_right(self, action):
-		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').get_property('sensitive') == True:
-			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, 270)
+		self.rotate_left_or_right(self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right'), 270)
+	
+	def rotate_left_or_right(self, widget, angle):
+		if self.currimg_name != "" and widget.get_property('sensitive') == True:
+			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, angle)
 			if self.last_image_action_was_fit == True:
 				if self.last_image_action_was_smart_fit == True:
 					self.zoom_to_fit_or_1_to_1(None, False, False)
@@ -2798,27 +2781,27 @@ class Base:
 			else:
 				self.currimg_width, self.currimg_height = self.currimg_height, self.currimg_width
 				self.layout.set_size(self.currimg_width, self.currimg_height)
-				self.currimg_pixbuf = self.image_rotate(self.currimg_pixbuf, 270)
+				self.currimg_pixbuf = self.image_rotate(self.currimg_pixbuf, angle)
 				self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 				self.show_scrollbars_if_needed()
 				self.center_image()
 				self.update_statusbar()
 			self.image_modified = True
+		
 
 	def flip_image_vert(self, action):
-		if self.currimg_name != ""  and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').get_property('sensitive') == True:
-			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, True)
-			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, True)
-			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
-			self.image_modified = True
+		self.flip_image_vert_or_horiz(self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically'), True)
 
 	def flip_image_horiz(self, action):
-		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').get_property('sensitive') == True:
-			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, False)
-			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, False)
+		self.flip_image_vert_or_horiz(self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally'), False)
+			
+	def flip_image_vert_or_horiz(self, widget, vertical):
+		if self.currimg_name != "" and widget.get_property('sensitive') == True:
+			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, vertical)
+			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, vertical)
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 			self.image_modified = True
-
+		
 	def get_pixbuf_of_size(self, pixbuf, size):
 		# Creates a pixbuf that fits in the specified square of sizexsize
 		# while preserving the aspect ratio

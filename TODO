@@ -10,13 +10,12 @@
 + Try to highlight selected region of cropped image (or darken unselected region)
 + Open remote files (mirage http://blah)
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
-+ test with setup.py install --prefix=...
-+ use same self.find_path as sonata (and locales)
++ code cleanup... (goto_*, check_preloadimg_*, preload_*, animtest stuff, rename funcs)
 
 Future
 + Ability to specify save compression level?
 + Sorting options (case sensitivity, file10 vs file9, hidden files)? (Michael Campbell)
-+ Remove gcc requirement (requires new pygtk)
++ Make gcc requirement optional
 + Test on Windows/Mac? (requires new pygtk)
 + Try to make zooming smoother (is this even possible with pygtk?)
 + why is light/dark grey no longer used for transparency? (argh)
