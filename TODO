@@ -10,7 +10,7 @@
 + Try to highlight selected region of cropped image (or darken unselected region)
 + Open remote files (mirage http://blah)
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
-+ code cleanup... (goto_*, check_preloadimg_*, preload_*, animtest stuff, rename funcs)
++ code cleanup... (check_preloadimg_*, preload_*, animtest stuff, rename funcs)
 
 Future
 + Ability to specify save compression level?
