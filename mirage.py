@@ -41,6 +41,8 @@ import stat
 import time
 import subprocess
 import shutil
+import md5
+import filecmp
 try:
 	import gconf
 except:
@@ -313,6 +315,7 @@ class Base:
 			('HelpMenu', None, _('_Help')),
 			('ActionSubMenu', None, _('_Custom Actions')),
 			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
+			('Open Remote Image', gtk.STOCK_NETWORK, _('_Open Remote image...'), None, _('Open Remote Image'), self.open_file_remote),
 			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('_Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
 			('Save As', gtk.STOCK_SAVE, _('Save Image _As...'), '<Shift><Ctrl>S', _('Save Image As'), self.save_image_as),
@@ -393,6 +396,7 @@ class Base:
 			    <menu action="FileMenu">
 			      <menuitem action="Open Image"/>
 			      <menuitem action="Open Folder"/>
+			      <menuitem action="Open Remote Image"/>
 			      <separator name="FM2"/>
 			      <menuitem action="Save"/>
 			      <menuitem action="Save As"/>
@@ -888,9 +892,12 @@ class Base:
 		if cancel == True:
 			return
 		index = int(action.get_name())
-		if os.path.isfile(self.recentfiles[index][0]) or os.path.exists(self.recentfiles[index][0]):
+		if os.path.isfile(self.recentfiles[index][0]) or os.path.exists(self.recentfiles[index][0]) or self.recentfiles[index][0].startswith('http://') or self.recentfiles[index][0].startswith('ftp://'):
+			filelist = []
+			for item in self.recentfiles[index]:
+				filelist.append(item)
 			self.recursive = self.recentfiles_recurse[index]
-			self.expand_filelist_and_load_image(self.recentfiles[index])
+			self.expand_filelist_and_load_image(filelist)
 		else:
 			self.image_list = []
 			self.curr_img_in_list = 0
@@ -1364,18 +1371,15 @@ class Base:
 				if fileext in i['extensions']:
 					filetype = i['name']
 			self.save_image_now(filename, filetype)
-			# Update recent file list:
-			for i in range(len(self.recentfiles[0])):
-				if self.recentfiles[0][i] == prev_name:
-					self.recentfiles[0][i] = self.currimg_name
-					templist = self.recentfiles[0]
-					if i == 0:
-						self.recent_file_remove_and_refresh(0)
-						self.recent_file_add_and_refresh(templist)
-					break
+			recentfile_found = self.update_filename_in_first_recentfiles_item(prev_name, self.currimg_name)
+			if not recentfile_found:
+				# Add to list:
+				templist = []
+				templist.append(self.currimg_name)
+				self.recent_file_add_and_refresh(templist)
 		else:
 			dialog.destroy()
-
+			
 	def save_image_now(self, dest_name, filetype):
 		try:
 			self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -1433,6 +1437,18 @@ class Base:
 				elif response != gtk.RESPONSE_NO:
 					return True
 
+	def update_filename_in_first_recentfiles_item(self, prevname, currname):
+		# Returns True if prevname is found
+		for i in range(len(self.recentfiles[0])):
+			if self.recentfiles[0][i] == prevname:
+				self.recentfiles[0][i] = currname
+				templist = self.recentfiles[0]
+				if i == 0:
+					self.recent_file_remove_and_refresh(0)
+					self.recent_file_add_and_refresh(templist)
+				return True
+		return False		
+
 	def filetype_is_writable(self, filetype):
 		# Determine if filetype is a writable format
 		filetype_is_writable = True
@@ -1447,6 +1463,29 @@ class Base:
 		while gtk.events_pending():
 			gtk.main_iteration()
 		self.open_file_or_folder(action, True)
+	
+	def open_file_remote(self, action):
+		# Prompt user for the url:
+		dialog = gtk.Dialog(_("Open Remote"), self.window, gtk.DIALOG_MODAL, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+		location = gtk.Entry()
+		location.set_size_request(300, -1)
+		location.set_activates_default(True)
+		hbox = gtk.HBox()
+		hbox.pack_start(gtk.Label(_("Image Location (URL)") + ":"), False, False, 5)
+		hbox.pack_start(location, True, True, 5)
+		dialog.vbox.pack_start(hbox, True, True, 10)
+		dialog.set_default_response(gtk.RESPONSE_OK)
+		dialog.vbox.show_all()
+		response = dialog.run()
+		if response == gtk.RESPONSE_OK:
+			filenames = []
+			filenames.append(location.get_text())
+			dialog.destroy()
+			while gtk.events_pending():
+				gtk.main_iteration()
+			getfiles = gobject.idle_add(self.expand_filelist_and_load_image, filenames)
+		else:
+			dialog.destroy()
 
 	def open_folder(self, action):
 		self.stop_now = True
@@ -2132,7 +2171,7 @@ class Base:
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		gtk.Tooltips().set_tip(openpref1, _("The default 'Open' directory will be the last directory used."))
 		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory") + ":")
-		openpref2.connect('toggled', self.use_fixed_dir_clicked)
+		openpref2.connect('toggled', self.prefs_use_fixed_dir_clicked)
 		gtk.Tooltips().set_tip(openpref2, _("The default 'Open' directory will be this specified directory."))
 		hbox_defaultdir = gtk.HBox()
 		self.defaultdir = gtk.Button()
@@ -2323,7 +2362,7 @@ class Base:
 				self.preloadimg_next_in_list = -1
 				self.preloadimg_prev_in_list = -1
 
-	def use_fixed_dir_clicked(self, button):
+	def prefs_use_fixed_dir_clicked(self, button):
 		if button.get_active() == True:
 			self.defaultdir.set_sensitive(True)
 		else:
@@ -2373,6 +2412,7 @@ class Base:
 				try:
 					new_filename = os.path.dirname(self.currimg_name) + "/" + self.rename_txt.get_text()
 					shutil.move(self.currimg_name, new_filename)
+					recentfile_found = self.update_filename_in_first_recentfiles_item(self.currimg_name, new_filename)
 					self.currimg_name = new_filename
 					self.update_title()
 				except:
@@ -3315,8 +3355,12 @@ class Base:
 			self.randomlist.append(False)
 		self.randomlist[self.curr_img_in_list] = True
 
-	def image_load_failed(self, reset_cursor):
-		self.currimg_name = str(self.image_list[self.curr_img_in_list])
+	def image_load_failed(self, reset_cursor, filename=""):
+		# If a filename is provided, use it for display:
+		if len(filename) == 0:
+			self.currimg_name = str(self.image_list[self.curr_img_in_list])
+		else:
+			self.currmg_name = filename
 		if self.verbose == True and self.currimg_name != "":
 			print _("Loading") + ":", self.currimg_name
 		self.update_title()
@@ -3647,7 +3691,11 @@ class Base:
 	def expand_filelist_and_load_image(self, inputlist):
 		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found
-		passed_list = inputlist
+		recentfiles_list = []
+		passed_list = []
+		for item in inputlist:
+			passed_list.append(item)
+		first_image_loaded_successfully = False
 		self.images_found = 0
 		self.stop_now = True # Make sure that any previous search process is stopped
 		self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
@@ -3685,7 +3733,34 @@ class Base:
 			# Strip off trailing "/" if it exists:
 			if inputlist[itemnum][len(inputlist[itemnum])-1] == "/":
 				inputlist[itemnum] = inputlist[itemnum][:(len(inputlist[itemnum])-1)]
-			inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
+			if not (inputlist[itemnum].startswith('http://') or inputlist[itemnum].startswith('ftp://')):
+				inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
+			else:
+				try:
+					# Remote file. Save as /tmp/mirage-<hash>
+					tmpfile = "/tmp/mirage-"+md5.new(inputlist[itemnum]).hexdigest()
+					urllib.urlretrieve(inputlist[itemnum], tmpfile)
+					destfile = "/tmp/" + os.path.basename(inputlist[itemnum])
+					suffix_num = 1
+					destfile_set = False
+					# Increment destination filename (i.e. /tmp/<name><num>.<ext>) until
+					# it either doesn't exist or is an exact copy of the image. This
+					# will keep everything nice and tidy if the user tries to remotely
+					# get the same image again.
+					while not destfile_set:
+						if os.path.exists(destfile):
+							if filecmp.cmp(tmpfile, destfile):
+								shutil.move(tmpfile, destfile)
+								destfile_set = True
+							else:
+								suffix_num = suffix_num + 1
+								destfile = "/tmp/" + os.path.splitext(os.path.basename(inputlist[itemnum]))[0] + str(suffix_num) + "." + os.path.splitext(os.path.basename(inputlist[itemnum]))[1]
+						else:
+							shutil.move(tmpfile, destfile)
+							destfile_set = True
+					inputlist[itemnum] = destfile
+				except:
+					pass
 		init_image = os.path.abspath(inputlist[0])
 		# If open all images in dir...
 		if self.open_all_images == True:
@@ -3775,11 +3850,11 @@ class Base:
 						else:
 							self.previmg_width = self.currimg_pixbuf.get_static_image().get_width()
 						self.image_loaded = True
+						first_image_loaded_successfully = True
 						if not self.closing_app:
 							while gtk.events_pending():
 								gtk.main_iteration(True)
 					except:
-						self.image_load_failed(False)
 						pass
 					if first_image_came_from_dir == True:
 						self.image_list = []
@@ -3805,13 +3880,18 @@ class Base:
 			if not self.closing_app:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
+		if first_image_loaded_successfully:
+			for item in passed_list:
+				recentfiles_list.append(item)
+		else:
+			self.image_load_failed(False, inputlist[0])
 		self.searching_for_images = False
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
 		self.set_slideshow_sensitivities()
 		if not self.closing_app:
 			self.change_cursor(None)
-		self.recent_file_add_and_refresh(passed_list)
+		self.recent_file_add_and_refresh(recentfiles_list)
 		self.recursive = False
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
