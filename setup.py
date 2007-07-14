@@ -3,7 +3,42 @@
 # $HeadURL$
 # $Id$
 
+import os
+
 from distutils.core import setup, Extension
+
+def removeall(path):
+	if not os.path.isdir(path):
+		return
+
+	files=os.listdir(path)
+
+	for x in files:
+		fullpath=os.path.join(path, x)
+		if os.path.isfile(fullpath):
+			f=os.remove
+			rmgeneric(fullpath, f)
+		elif os.path.isdir(fullpath):
+			removeall(fullpath)
+			f=os.rmdir
+			rmgeneric(fullpath, f)
+
+def rmgeneric(path, __func__):
+	try:
+		__func__(path)
+	except OSError, (errno, strerror):
+		pass
+
+# Create mo files:
+if not os.path.exists("mo/"):
+	os.mkdir("mo/")
+for lang in ('it', 'de', 'pl', 'es', 'fr', 'ru'):
+	pofile = "po/" + lang + ".po"
+	mofile = "mo/" + lang + "/mirage.mo"
+	if not os.path.exists("mo/" + lang + "/"):
+		os.mkdir("mo/" + lang + "/")
+	print "generating", mofile
+	os.system("msgfmt %s -o %s" % (pofile, mofile))
 
 setup(name='Mirage',
 		version='0.8.3',
@@ -25,10 +60,30 @@ setup(name='Mirage',
 		data_files=[('share/mirage', ['README', 'COPYING', 'CHANGELOG', 'TODO', 'TRANSLATORS', 'stock_shuffle.png', 'stock_leave-fullscreen.png', 'stock_fullscreen.png']),
 			('share/applications', ['mirage.desktop']),
 			('share/pixmaps', ['mirage.png']),
-			('share/locale/ru/LC_MESSAGES', ['locale/ru/LC_MESSAGES/mirage.mo']),
-			('share/locale/pl/LC_MESSAGES', ['locale/pl/LC_MESSAGES/mirage.mo']),
-			('share/locale/fr/LC_MESSAGES', ['locale/fr/LC_MESSAGES/mirage.mo']),
-			('share/locale/es/LC_MESSAGES', ['locale/es/LC_MESSAGES/mirage.mo']),
-			('share/locale/de/LC_MESSAGES', ['locale/de/LC_MESSAGES/mirage.mo']),
-			('share/locale/it/LC_MESSAGES', ['locale/it/LC_MESSAGES/mirage.mo'])],
+			('share/locale/ru/LC_MESSAGES', ['mo/ru/mirage.mo']),
+			('share/locale/pl/LC_MESSAGES', ['mo/pl/mirage.mo']),
+			('share/locale/fr/LC_MESSAGES', ['mo/fr/mirage.mo']),
+			('share/locale/es/LC_MESSAGES', ['mo/es/mirage.mo']),
+			('share/locale/de/LC_MESSAGES', ['mo/de/mirage.mo']),
+			('share/locale/it/LC_MESSAGES', ['mo/it/mirage.mo'])],
 		)
+
+# Cleanup (remove /build, /mo, and *.pyc files:
+print "Cleaning up..."
+try:
+	removeall("build/")
+	os.rmdir("build/")
+except:
+	pass
+try:
+	removeall("mo/")
+	os.rmdir("mo/")
+except:
+	pass
+try:
+	for f in os.listdir("."):
+		if os.path.isfile(f):
+			if os.path.splitext(os.path.basename(f))[1] == ".pyc":
+				os.remove(f)
+except:
+	pass

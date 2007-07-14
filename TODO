@@ -8,7 +8,7 @@
 	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
 	- delete thumbnail if image is deleted, update if image is moved, etc
 + Try to highlight selected region of cropped image (or darken unselected region)
-+ Open remote files - use threading...
++ Open remote files - use threading... (tempfile.mkdtemp)
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
 + code cleanup... (preload_*, animtest stuff, rename funcs)
 

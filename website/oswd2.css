@@ -1,0 +1,273 @@
+@charset "utf-8";
+
+html,body {
+	height: 96%;
+}
+body {
+	margin-top: 2%;
+	margin-bottom: 2%;
+	background-color: #FFFFFF;
+	font-family: Georgia, Geneva, "Trebuchet MS", Monaco, Calibri, sans-serif;
+	font-size: small/100%;
+	color: #6d6d6d;
+}
+
+
+#container {
+	width: 680px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid #DEDEDE;
+}
+#header {
+	width: auto;
+	height: auto;
+	text-align: right;
+	padding: 3% 4%;
+	background: url(diags.jpg) top left repeat-x;
+}
+	#header h1, #header a:link, #header a:visited {
+		font-size: 150%;
+		color: #DD8200;
+		display: inline;
+		letter-spacing: 4px;
+		text-decoration: none;
+	}
+	#header h2 {
+		position: relative;
+		display: inline;
+		vertical-align: center;
+		font-size: 70%;
+		font-weight: 100;
+		text-transform: uppercase;
+		color: #00ACF4;
+		letter-spacing: 1px;
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+	}
+
+#core_container {
+	width: 100%;
+	background-color: #FFFFFF;
+}
+
+#core_left {
+	width: 180px;
+	float: left;
+	padding: 12px;
+	_padding: 6px;
+	height: auto;
+	background-color: #FFFFFF;
+}
+	#core_left img {
+		border: 0;
+	}
+	#core_left p {
+		font-size: 70%;
+	}
+	#core_left a:link, #core_left a:visited {
+		color: #2E668B;
+		text-decoration: underline;
+	}
+	#core_left a:hover {
+		color: #000000;
+		text-decoration: underline;
+	}
+	#core_left h3, #core_left h4 {
+		position: relative;
+		display: inline;
+		vertical-align: center;
+		font-size: 90%;
+		font-weight: 500;
+		text-transform: uppercase;
+		color: #00ACF4;
+		letter-spacing: 1px;
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+	}
+	#core_left li {
+		font-size: 10px;
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+	}
+	.litxt {
+		padding-bottom: 10px;
+		width: 95%;
+		padding-left: 5%;
+	}
+	#core_left ul {
+		list-style: none;
+		padding-left: 0px;
+		margin-left: 0;
+	}
+
+
+#core_right {
+	width: 466px;
+	float: left;
+	margin: 0;
+	padding: 0;
+	background-color: #FFFFFF;
+}
+	#core_right h5, #core_right h6 {
+		position: relative;
+		vertical-align: center;
+		font-size: 90%;
+		font-weight: 500;
+		text-transform: uppercase;
+		color: #00ACF4;
+		letter-spacing: 1px;
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+	}
+	#core_right p, #core_right h5, #core_right h6  {
+		padding-left: 5%;
+	}
+	#core_right a:link, #core_right a:visited {
+		color: #2E668B;
+		text-decoration: underline;
+	}
+	#core_right a:hover {
+		color: #000000;
+		text-decoration: underline;
+	}
+	#core_right p, #core_right table {
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+		font-size: 80%;
+		line-height: 20px;
+	}
+	#core_right ul, #core_right li {
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+		font-size: 80%;
+		line-height: 20px;
+	}
+	#core_right img {
+		border: 0;
+	}
+
+#core_total {
+	width: 670px;
+	float: left;
+	margin: 0;
+	padding: 0;
+	background-color: #FFFFFF;
+}
+	#core_total h5, #core_total h6 {
+		position: relative;
+		vertical-align: center;
+		font-size: 90%;
+		font-weight: 500;
+		text-transform: uppercase;
+		color: #00ACF4;
+		letter-spacing: 1px;
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+	}
+	#core_total p, #core_total h5, #core_total h6  {
+		padding-left: 5%;
+	}
+	#core_total a:link, #core_total a:visited {
+		color: #2E668B;
+		text-decoration: underline;
+	}
+	#core_total a:hover {
+		color: #000000;
+		text-decoration: underline;
+	}
+	#core_total p, #core_total table {
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+		font-size: 80%;
+		line-height: 20px;
+	}
+	#core_total ul, #core_total li {
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+		font-size: 80%;
+		line-height: 20px;
+	}
+	#core_total img {
+		border: 0;
+	}
+
+.bottom_ul {
+	list-style: none;
+	padding-left: 20px;
+	width: 420px;
+	height: 12px;
+	margin: 0;
+}
+	.bottom_ul li {
+		padding: 0px 10px;
+		background-color:#FFFFFF;
+	}
+	.bottom_ul a {
+		font-size: 70%;
+		display: block;
+		padding: 3px;
+		width: 420px;
+		color: #AAAAAA;
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+	}
+	.bottom_ul a:hover {
+		color: #00ACF4;
+		width: 420px;
+		background: #F8F8F8 url(arrow_right.jpg) 98% 50% no-repeat;
+	}
+
+#footer {
+	clear: both;
+	width: 680px;
+	height: 20px;
+	text-align: right;
+	margin: 0;
+}
+	#footer p {
+		text-transform: uppercase;
+		background: #FFFFFF url(diags.jpg)  0% 30% repeat-x;
+		font-size: 60%;
+		color: #777777;
+		letter-spacing: 1px;
+		font-family: "Trebuchet MS", Verdana, sans-serif;
+	}
+	#footer a {
+		text-decoration: none;
+		color: #777777;
+	}
+
+#navcontainer {
+text-align: right;
+margin-top: 3px;
+}
+
+ul#navlist {
+	margin-left: 0;
+	padding-left: 0;
+	white-space: nowrap;
+}
+
+#navlist li {
+	display: inline;
+	list-style-type: none;
+}
+#current {
+	border-top: 1px dashed #DD8200;
+	text-decoration: none;
+}
+#navlist a {
+	padding: 3px 10px;
+	font-size: 11px;
+	font: Verdana, Arial, Helvetica, sans-serif;
+	text-decoration: none;
+}
+
+#navlist a:link, #navlist a:visited {
+	color: #2E668B;
+	background-color: #FFFFFF;
+	text-decoration: none;
+}
+
+#navlist a:hover {
+	color: #fff;
+	background-color: #DD8200;
+	text-decoration: none;
+}
+
+#navlist a:active {
+	color: #fff;
+	background-color: #DD8200;
+	text-decoration: none;
+}

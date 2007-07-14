@@ -942,9 +942,10 @@ class Base:
 			self.recentfiles[j] = self.recentfiles[j-1]
 			self.recentfiles_recurse[j] = self.recentfiles_recurse[j-1]
 			j = j - 1
-		self.recentfiles[0] = addlist
-		self.recentfiles_recurse[0] = self.recursive
-		self.refresh_recent_files_menu()
+		if len(self.recentfiles) > 0:
+			self.recentfiles[0] = addlist
+			self.recentfiles_recurse[0] = self.recursive
+			self.refresh_recent_files_menu()
 
 	def custom_action_click(self, action):
 		if self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).get_property('sensitive') == True:

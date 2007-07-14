@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Mirage Image Viewer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="oswd2.css" rel="stylesheet" type="text/css" title="OSWD2 Style" />
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+<div id="container"> <!-- <DIV #1> -->
+
+	<div id="header"> <!-- <DIV #2> -->
+		<h1><a href="index.html">Mirage</a></h1><br />
+		<h2>A fast and simple image viewer</h2>
+	</div>
+
+	<div id="core_container"> <!-- <DIV #3> -->
+
+	  <div id="core_total"> <!-- <DIV #5> -->
+		<div id="navcontainer">
+			<ul id="navlist">
+			<li><a href="index.html">Home</a></li>
+			<li><a href="screenshots.html">Screenshots</a></li>
+			<li><a href="download.html">Download</a></li>
+			<li><a href="docs.html">Documentation</a></li>
+			<li><a href="changelog.html" id="current">Changelog</a></li>
+			<li><a href="support.html">Support</a></li>
+			</ul>
+		</div>
+
+	  	<h5>Changelog</h5>
+			<p>January 17, 2007 (Version 0.8.3):<br />
+			<ul>
+			<li>Use F11 for fullscreen like most applications</li>
+			<li>Use 'kfmclient' to launch browser in kde</li>
+			<li>Added Italian translation (Daniele Maggio)</li>
+			<li>Bug: Save As doesn't work</li>
+			</ul>
+
+			<p>December 7, 2006 (Version 0.8.2):<br />
+			<ul>
+			<li>Ability to modify image saturation</li>
+			<li>Recent file/list menu</li>
+			<li>Save/load accel_map in case user edits any gtk accelerators</li>
+			<li>Bug: Fullscreen controls can be on wrong screen with Xinerama</li>
+			<li>Bug: Scrollbars don't appear correctly on window resizes</li>
+			<li>Bug: Panning images doesn't always work properly</li>
+			<li>Bug: Alpha channel is lost when resizing image with transparency</li>
+			<li>Bug: Allow saving files when file extension isn't lowercase</li>
+			<li>Bug: Specified image scaling method isn't properly used</li>
+			</ul>
+
+			<p>October 19, 2006 (Version 0.8.1):<br />
+			<ul>
+			<li>Add list of image names to custom actions (%L)</li>
+			<li>Improved preloading/navigation handling</li>
+			<li>Menu improvements; added Custom Actions to EditMenu</li>
+			<li>Try gnome-open/exo-open first for opening help, then fallback</li>
+			<li>Bug: Next/brevious buttons block with mouse over it</li>
+			<li>Bug: Ctrl-0/1 shortcuts don't work from numpad with numlock on</li>
+			<li>Bug: Custom actions don't execute when using --verbose</li>
+			<li>Bug: Cannot install when X server isn't running</li>
+			<li>Updated icon (William Rea)</li>
+			</ul>
+
+			<p>September 4, 2006 (Version 0.8):<br />
+			<ul>
+			<li>Editing capabilities: resize, crop, save, delete, rename (luzi/Bjoern Martensen)</li>
+			<li>Pref to preload images for faster navigation (enabled by default) (Mike Massonnet)</li>
+			<li>Implemented 'custom actions' framework, including batch actions (Thomas Güttler)</li>
+			<li>--onload or -o argument for performing actions on image loading (Thomas Güttler)</li>
+			<li>Added File > Properties to display image properties</li>
+			<li>Show "Scanning..." in statusbar when scanning for images; Escape to abort</li>
+			<li>Reduce GTK+ requirement to 2.6.0 (William Rea)</li>
+			<li>Bug: Opening with 'load all images in dir' gives expected result (Bjoern Martensen)</li>
+			<li>Bug: Cannot open folder while search process is active</li>
+			<li>Added French translation (Mike Massonnet)</li>
+			<li>Added Polish translation (Tomasz Dominikowski)</li>
+			<li>Added Russian translation (mavka)</li>
+			</ul>
+
+			<p>August 2, 2006 (Version 0.7.3):<br />
+		    <ul>
+		    <li>Fix crash when loading images in certain circumstances</li>
+		    </ul>
+
+		    <p>August 1, 2006 (Version 0.7.2):
+		    <ul>
+		    <li>Preference to automatically start the slideshow in fullscreen mode</li>
+		    <li>Background image search process to load image faster (Bjoern Martensen)</li>
+		    <li>Added cli argument: -s or --slideshow to start in slideshow mode</li>
+		    <li>Added cli argument: -f or --fullscreen to start in fullscreen mode</li>
+		    <li>Additional shortcuts: +/- for zooming in/out (Bjoern Martensen)</li>
+		    <li>Fixed .desktop mimetypes (Eugenia Loli-Queru)</li>
+		    <li>Added German translation (Bjoern Martensen)</li>
+		    <li>Added Spanish translation (Isidro Arribas)</li>
+		    </ul>
+
+		    <p>July 9, 2006 (Version 0.7.1):
+		    <ul>
+		    <li>Toolbar style follows gnome preference (requires optional gnome-python</li>
+		    <li>dependency) (Eugenia Loli-Queru)</li>
+		    <li>Skip hidden files/dirs when loading images</li>
+		    <li>Bug: Caps-lock breaks some shortcuts (Abisser T'khin)</li>
+		    <li>Bug fixes</li>
+		    </ul>
+
+		    <p>June 20, 2006 (Version 0.7):
+		    <ul>
+		    <li>Slideshow mode (delay time, randomize order, disable screensaver preferences)</li>
+		    <li>Display animated images</li>
+		    <li>Edit > Open in Editor</li>
+		    <li>Image wrapping options: yes/no/prompt (Bjoern Martensen)</li>
+		    <li>Cleaned up menubar, preferences</li>
+		    <li>Set go navigation items' sensitivities based on context</li>
+		    <li>Bug: 1:1 images are sometimes incorrectly set to fit (Bjoern Martensen)</li>
+		    <li>Many bugfixes, interface tweaks</li>
+		    </ul>
+
+		    <p>May 29, 2006 (Version 0.6):
+		    <ul>
+		    <li>In fullscreen mode, hide mouse cursor after 2 seconds of no movement</li>
+		    <li>Option to wrap around imagelist</li>
+		    <li>When in zoom-to-fit mode, fit the image when it's rotated</li>
+		    <li>Show broken icon if image not found (i.e. deleted) (Bjoern Martensen)</li>
+		    <li>Bug: Ensure that scrollbars don't show up unless needed</li>
+		    <li>Bug: Don't resize an image if it's at 100% zoom (David Shakaryan)</li>
+		    <li>Other small bugfixes</li>
+		    </ul>
+
+		    <p>May 1, 2006 (Version 0.5):
+		    <ul>
+		    <li>Make open image mode configurable: smart, fit, 1:1, last (Bjoern Martensen)</li>
+		    <li>Option to navigate imagelist via mousewheel (default: on) (Bjoern Martensen)</li>
+		    <li>Add maximum/minimum zoom levels (Bjoern Martensen)</li>
+		    <li>Reduce border around image for fit mode (Bjoern Martensen)</li>
+		    <li>Have Go>Random not show images twice until all images have been shown once</li>
+		    <li>Allow numpad keys as shortcuts (Bjoern Martensen)</li>
+		    <li>Allow panning image additionally with left-click/drag (Bjoern Martensen)</li>
+		    <li>Revert retaining state of images in list introduced in v0.4</li>
+		    <li>Add hourglass feedback for loading images</li>
+		    <li>Bug: Small images don't zoom-to-fit (Bjoern Martensen)</li>
+		    <li>Bug: Some non-image files are thought to be images (Bjoern Martensen)</li>
+		    <li>Bug: Files/folders with spaces don't open from file manager (Bjoern Martensen)</li>
+		    <li>Bug: Some shortcuts don't work with numslock enabled (Bjoern Martensen)</li>
+		    </ul>
+
+		    <p>April 25, 2006 (Verion 0.4):
+		    <ul>
+		    <li>Removed &lt;Alt&gt; from navigational shortcuts</li>
+		    <li>Default to alphabetically populating the image list (Michael Campbell)</li>
+		    <li>Ability to go to first (Home) and last (End) image in list</li>
+		    <li>Retain zoom/flip/rotate state of images in list
+		    <li>Pref: Open all images in current directory (Ralph Wabel)</li>
+		    <li>Pref: Default directory for 'Open' dialog</li>
+		    <li>Fullscreen hides menu/tool/status bars</li>
+		    </ul>
+
+            <p>April 4, 2006 (Version 0.3.1):
+            <ul>
+		    <li>Fixed inability to open a file from a file manager.</li>
+		    </ul>
+
+            <p>April 4, 2006 (Version 0.3):
+            <ul>
+            <li>Speed improvements for zooming and rotating images</li>
+		    <li>Allow drag-and-drop of images/folders from file managers</li>
+		    <li>Flip images vertically/horizontally</li>
+		    <li>Go > Random Image</li>
+		    <li>Ability to recursively load images found in all subdirectories</li>
+		    <li>Right-click menu on image</li>
+		    <li>"mirage --help" information.</li>
+		    <li>Fixed .desktop bug</li>
+		    </ul>
+
+            <p>March 29, 2006 (Version 0.2):
+            <ul>
+		    <li>Allow multiple files/folders to be passed as arguments or opened directly</li>
+		    <li>MiddleMouseButton-Drag to pan the image (like GIMP)</li>
+		    <li>Add Tools > Options for scaling quality, background color</li>
+		    <li>Retain center of user-view when zooming</li>
+		    <li>Display a broken image in the window instead of an error popup message</li>
+		    <li>Improve handling of which images Mirage can successfully display</li>
+		    </ul>
+
+            <p>March 22, 2006 (Version 0.1):
+            <ul>
+            <li>Fast scaling/rotating of images</li>
+            <li>Displays 'checkerboard' for transparency</li>
+            <li>Ctrl-MouseScrollDown to zoom out, Ctrl-MouseScrollUp to zoom in (like GIMP)</li>
+			</ul>
+
+            </p>
+
+
+			<p>&nbsp;
+
+			</p>
+
+	  </div>
+	</div>
+	<div id="footer">
+		<p>Webdesign by <a href="http://jaspervandermeer.net" title="Homepage Webdesigner">Jasper van der Meer webdesignstudio</a> | <a href="http://validator.w3.org/check?uri=referer" title="Check for XHTML validity.">XHTML</a></p>
+	</div>
+</div>
+</body>
+</html>
