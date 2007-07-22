@@ -1,6 +1,7 @@
 0.9
 + Allow zooming in crop dialog (default to same view as main window so that
   the user can essentially 'crop visible' by clicking ok right away?)
++ pref for opening hidden files
 + Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
 + mirage --add to add image to current instance instead of opening
   new window

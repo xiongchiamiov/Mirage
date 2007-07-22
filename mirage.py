@@ -159,6 +159,7 @@ class Base:
 		self.actionGroupRecent = None
 		self.recentfiles = [[''], [''], [''], [''], ['']]
 		self.recentfiles_recurse = [False, False, False, False, False]
+		self.open_hidden_files = False
 
 		# Read any passed options/arguments:
 		try:
@@ -218,6 +219,8 @@ class Base:
 			self.fixed_dir = conf.get('prefs', 'fixed_dir')
 		if conf.has_option('prefs', 'open_all'):
 			self.open_all_images = conf.getboolean('prefs', 'open_all')
+		if conf.has_option('prefs', 'hidden'):
+			self.open_hidden_files = conf.getboolean('prefs', 'hidden')
 		if conf.has_option('prefs', 'open_mode'):
 			self.open_mode = conf.getint('prefs', 'open_mode')
 		if conf.has_option('prefs', 'last_mode'):
@@ -1215,6 +1218,7 @@ class Base:
 		conf.set('prefs', 'bgcolor-green', self.bgcolor.green)
 		conf.set('prefs', 'bgcolor-blue', self.bgcolor.blue)
 		conf.set('prefs', 'open_all', self.open_all_images)
+		conf.set('prefs', 'hidden', self.open_hidden_files)
 		conf.set('prefs', 'use_last_dir', self.use_last_dir)
 		conf.set('prefs', 'last_dir', self.last_dir)
 		conf.set('prefs', 'fixed_dir', self.fixed_dir)
@@ -2124,7 +2128,7 @@ class Base:
 		self.prefs_dialog.set_has_separator(False)
 		self.prefs_dialog.set_resizable(False)
 		# "Interface" prefs:
-		table_settings = gtk.Table(13, 3, False)
+		table_settings = gtk.Table(14, 3, False)
 		bglabel = gtk.Label()
 		bglabel.set_markup('<b>' + _('Interface') + '</b>')
 		bglabel.set_alignment(0, 1)
@@ -2151,8 +2155,9 @@ class Base:
 		table_settings.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 13, 14,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# "Behavior" tab:
-		table_behavior = gtk.Table(13, 2, False)
+		table_behavior = gtk.Table(14, 2, False)
 		openlabel = gtk.Label()
 		openlabel.set_markup('<b>' + _('Open Behavior') + '</b>')
 		openlabel.set_alignment(0, 1)
@@ -2165,9 +2170,12 @@ class Base:
 		combobox.append_text(_("Last Active Mode"))
 		combobox.set_active(self.open_mode)
 		hbox_openmode.pack_start(combobox, False, False, 5)
-		openallimages = gtk.CheckButton(label=_("Load all images in current directory"), use_underline=False)
+		openallimages = gtk.CheckButton(_("Load all images in current directory"))
 		openallimages.set_active(self.open_all_images)
 		gtk.Tooltips().set_tip(openallimages, _("If enabled, opening an image in Mirage will automatically load all images found in that image's directory."))
+		hiddenimages = gtk.CheckButton(_("Allow loading hidden files"))
+		hiddenimages.set_active(self.open_hidden_files)
+		gtk.Tooltips().set_tip(openallimages, _("If checked, opening, Mirage will open hidden files. Otherwise, hidden files will be ignored."))
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		gtk.Tooltips().set_tip(openpref1, _("The default 'Open' directory will be the last directory used."))
@@ -2197,13 +2205,14 @@ class Base:
 		table_behavior.attach(hbox_openmode, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_behavior.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_behavior.attach(openallimages, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(gtk.Label(), 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_behavior.attach(openpref1, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(openpref2, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(hbox_defaultdir, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
-		table_behavior.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_behavior.attach(hiddenimages, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_behavior.attach(openpref1, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(openpref2, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(hbox_defaultdir, 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
+		table_behavior.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
 		# "Navigation" tab:
-		table_navigation = gtk.Table(13, 2, False)
+		table_navigation = gtk.Table(14, 2, False)
 		navlabel = gtk.Label()
 		navlabel.set_markup('<b>' + _('Navigation') + '</b>')
 		navlabel.set_alignment(0, 1)
@@ -2230,8 +2239,9 @@ class Base:
 		table_navigation.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_navigation.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_navigation.attach(gtk.Label(), 1, 2, 13, 14, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# "Slideshow" tab:
-		table_slideshow = gtk.Table(13, 2, False)
+		table_slideshow = gtk.Table(14, 2, False)
 		slideshowlabel = gtk.Label()
 		slideshowlabel.set_markup('<b>' + _('Slideshow Mode') + '</b>')
 		slideshowlabel.set_alignment(0, 1)
@@ -2267,8 +2277,9 @@ class Base:
 		table_slideshow.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_slideshow.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_slideshow.attach(gtk.Label(), 1, 2, 13, 14, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		# "Image" tab:
-		table_image = gtk.Table(13, 2, False)
+		table_image = gtk.Table(14, 2, False)
 		imagelabel = gtk.Label()
 		imagelabel.set_markup('<b>' + _('Image Editing') + '</b>')
 		imagelabel.set_alignment(0, 1)
@@ -2305,6 +2316,7 @@ class Base:
 		table_image.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 13, 14,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
 		notebook.append_page(table_behavior, gtk.Label(str=_("Behavior")))
@@ -2333,6 +2345,7 @@ class Base:
 			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.open_all_images = openallimages.get_active()
+			self.open_hidden_files = hiddenimages.get_active()
 			if openpref1.get_active():
 				self.use_last_dir = True
 			else:
@@ -3762,6 +3775,27 @@ class Base:
 					inputlist[itemnum] = destfile
 				except:
 					pass
+		# Remove hidden files from list:
+		if not self.open_hidden_files:
+			tmplist = []
+			for item in inputlist:
+				if os.path.basename(item)[0] != '.':
+					tmplist.append(item)
+				elif self.verbose:
+					print _("Skipping") + ":", item
+			inputlist = tmplist
+			if len(inputlist) == 0:
+				# All files/dirs were hidden, exit..
+				self.currimg_name = ""
+				self.searching_for_images = False
+				self.set_go_navigation_sensitivities(False)
+				self.set_slideshow_sensitivities()
+				if not self.closing_app:
+					self.change_cursor(None)
+				self.recursive = False
+				self.put_error_image_to_window()
+				self.update_title()
+				return
 		init_image = os.path.abspath(inputlist[0])
 		# If open all images in dir...
 		if self.open_all_images:
@@ -3901,8 +3935,9 @@ class Base:
 			folderlist = list(set(folderlist))
 			for item in folderlist:
 				if not self.closing_app:
-					self.stop_now = False
-					self.expand_directory(item, False, go_buttons_enabled, True, True)
+					if (not self.open_hidden_files and os.path.basename(item)[0] != '.') or self.open_hidden_files:
+						self.stop_now = False
+						self.expand_directory(item, False, go_buttons_enabled, True, True)
 
 	def do_image_list_stuff(self, first_image, second_image):
 		if len(self.image_list) > 0:
@@ -3920,14 +3955,17 @@ class Base:
 				if not self.closing_app and not self.stop_now:
 					item2 = item + "/" + item2
 					item_fullpath2 = os.path.abspath(item2)
-					if os.path.isfile(item_fullpath2):
-						if self.valid_image(item_fullpath2):
-							filelist.append(item2)
-							if self.verbose and print_found_msg:
-								self.images_found += 1
-								print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
-					elif os.path.isdir(item_fullpath2) and self.recursive:
-						folderlist.append(item_fullpath2)
+					if (not self.open_hidden_files and os.path.basename(item_fullpath2)[0] != '.') or self.open_hidden_files:
+						if os.path.isfile(item_fullpath2):
+							if self.valid_image(item_fullpath2):
+								filelist.append(item2)
+								if self.verbose and print_found_msg:
+									self.images_found += 1
+									print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
+						elif os.path.isdir(item_fullpath2) and self.recursive:
+							folderlist.append(item_fullpath2)
+					else:
+						print _("Skipping2") + ":", item_fullpath2
 			if len(self.image_list)>0:
 				if update_window_title:
 					self.update_title()
