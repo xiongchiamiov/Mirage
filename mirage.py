@@ -515,7 +515,7 @@ class Base:
 		self.table.attach(self.hscroll, 0, 1, 1, 2, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
 		self.table.attach(self.vscroll, 1, 2, 0, 1, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
 		vbox.pack_start(self.table, True, True, 0)
-		if bgcolor_found == False:
+		if not bgcolor_found:
 			self.bgcolor = gtk.gdk.Color(0, 0, 0) # Default to black
 		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.imageview = gtk.Image()
@@ -647,10 +647,10 @@ class Base:
 
 		# Show GUI:
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
-		if self.toolbar_show == False:
+		if not self.toolbar_show:
 			self.toolbar.set_property('visible', False)
 			self.toolbar.set_no_show_all(True)
-		if self.statusbar_show == False:
+		if not self.statusbar_show:
 			self.statusbar.set_property('visible', False)
 			self.statusbar.set_no_show_all(True)
 			self.statusbar2.set_property('visible', False)
@@ -660,9 +660,9 @@ class Base:
 		go_into_fullscreen = False
 		if opts != []:
 			for o, a in opts:
-				if (o in ("-f", "--fullscreen")) or ((o in ("-s", "--slideshow")) and self.slideshow_in_fullscreen == True):
+				if (o in ("-f", "--fullscreen")) or ((o in ("-s", "--slideshow")) and self.slideshow_in_fullscreen):
 					go_into_fullscreen = True
-		if go_into_fullscreen == True or self.start_in_fullscreen == True:
+		if go_into_fullscreen or self.start_in_fullscreen:
 			self.enter_fullscreen(None)
 			self.statusbar.set_no_show_all(True)
 			self.statusbar2.set_no_show_all(True)
@@ -788,8 +788,8 @@ class Base:
 				self.toolbar.set_style(gtk.TOOLBAR_ICONS)
 			elif style == "text":
 				self.toolbar.set_style(gtk.TOOLBAR_TEXT)
-			if self.image_loaded == True and self.last_image_action_was_fit == True:
-				if self.last_image_action_was_smart_fit == True:
+			if self.image_loaded and self.last_image_action_was_fit:
+				if self.last_image_action_was_smart_fit:
 					self.zoom_to_fit_or_1_to_1(None, False, False)
 				else:
 					self.zoom_to_fit_window(None, False, False)
@@ -819,7 +819,7 @@ class Base:
 		while gtk.events_pending():
 			gtk.main_iteration()
 		self.curr_custom_action = 0
-		if batchmode == True:
+		if batchmode:
 			self.num_custom_actions = len(self.image_list)
 			for i in range(self.num_custom_actions):
 				self.curr_custom_action += 1
@@ -838,12 +838,12 @@ class Base:
 		gc.collect()
 		self.change_cursor(None)
 		# Refresh the current image or any preloaded needed if they have changed:
-		if os.path.exists(self.currimg_name) == False:
+		if not os.path.exists(self.currimg_name):
 			self.currimg_pixbuf_original = None
 			self.image_load_failed(False)
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
-			if animtest.is_static_image() == True:
+			if animtest.is_static_image():
 				if self.images_are_different(animtest.get_static_image(), self.currimg_pixbuf_original):
 					self.load_new_image2(False, False, True, False)
 			else:
@@ -853,11 +853,11 @@ class Base:
 		self.update_statusbar()
 		while gtk.events_pending():
 			gtk.main_iteration()
-		if os.path.exists(self.preloadimg_prev_name) == False:
+		if not os.path.exists(self.preloadimg_prev_name):
 			self.preloadimg_prev_in_list = -1
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
-			if animtest.is_static_image() == True:
+			if animtest.is_static_image():
 				if self.images_are_different(animtest.get_static_image(), self.preloadimg_prev_pixbuf_original):
 					self.preloadimg_prev_in_list = -1
 					self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
@@ -865,11 +865,11 @@ class Base:
 				if self.images_are_different(animtest, self.preloadimg_prev_pixbuf_original):
 					self.preloadimg_prev_in_list = -1
 					self.preload_when_idle = gobject.idle_add(self.preload_prev_image, False)
-		if os.path.exists(self.preloadimg_next_name) == False:
+		if not os.path.exists(self.preloadimg_next_name):
 			self.preloadimg_next_in_list = -1
 		else:
 			animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
-			if animtest.is_static_image() == True:
+			if animtest.is_static_image():
 				if self.images_are_different(animtest.get_static_image(), self.preloadimg_next_pixbuf_original):
 					self.preloadimg_next_in_list = -1
 					self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
@@ -889,7 +889,7 @@ class Base:
 		while gtk.events_pending():
 			gtk.main_iteration()
 		cancel = self.autosave_image()
-		if cancel == True:
+		if cancel:
 			return
 		index = int(action.get_name())
 		if os.path.isfile(self.recentfiles[index][0]) or os.path.exists(self.recentfiles[index][0]) or self.recentfiles[index][0].startswith('http://') or self.recentfiles[index][0].startswith('ftp://'):
@@ -948,7 +948,7 @@ class Base:
 			self.refresh_recent_files_menu()
 
 	def custom_action_click(self, action):
-		if self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).get_property('sensitive') == True:
+		if self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action.get_name()).get_property('sensitive'):
 			for i in range(len(self.action_shortcuts)):
 				try:
 					if action.get_name() == self.action_names[i]:
@@ -975,7 +975,7 @@ class Base:
 		commands = string.split(command, ";")
 		for i in range(len(commands)):
 			commands[i] = string.lstrip(commands[i])
-			if self.verbose == True:
+			if self.verbose:
 				print _("Action") + ":", commands[i]
 			if commands[i] == "[NEXT]":
 				self.goto_next_image(None)
@@ -1030,7 +1030,7 @@ class Base:
 			try:
 				filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
 				self.UIManager.get_widget('/MainMenu/FileMenu/Properties').set_sensitive(True)
-				if self.filetype_is_writable(filetype) == True:
+				if self.filetype_is_writable(filetype):
 					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(enable)
 			except:
 				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_sensitive(False)
@@ -1075,7 +1075,7 @@ class Base:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').set_sensitive(False)
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').hide()
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').set_sensitive(False)
-		elif self.slideshow_mode == True:
+		elif self.slideshow_mode:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').hide()
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').set_sensitive(False)
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').show()
@@ -1085,7 +1085,7 @@ class Base:
 			self.UIManager.get_widget('/MainMenu/GoMenu/Start Slideshow').set_sensitive(True)
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').hide()
 			self.UIManager.get_widget('/MainMenu/GoMenu/Stop Slideshow').set_sensitive(False)
-		if self.slideshow_mode == True:
+		if self.slideshow_mode:
 			self.UIManager.get_widget('/Popup/Start Slideshow').hide()
 			self.UIManager.get_widget('/Popup/Stop Slideshow').show()
 		else:
@@ -1097,7 +1097,7 @@ class Base:
 			self.UIManager.get_widget('/Popup/Start Slideshow').set_sensitive(True)
 
 	def set_zoom_sensitivities(self):
-		if self.currimg_is_animation == False:
+		if not self.currimg_is_animation:
 			self.set_zoom_out_sensitivities(True)
 			self.set_zoom_in_sensitivities(True)
 		else:
@@ -1127,9 +1127,9 @@ class Base:
 
 	def delay_changed(self, action):
 		self.curr_slideshow_delay = self.ss_delaycombo.get_active()
-		if self.slideshow_mode == True:
+		if self.slideshow_mode:
 			gobject.source_remove(self.timer_delay)
-			if self.curr_slideshow_random == True:
+			if self.curr_slideshow_random:
 				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 			else:
 				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
@@ -1162,10 +1162,10 @@ class Base:
 		return
 
 	def expose_event(self, widget, event):
-		if self.updating_adjustments == True:
+		if self.updating_adjustments:
 			return
 		self.updating_adjustments = True
-		if self.hscroll.get_property('visible') == True:
+		if self.hscroll.get_property('visible'):
 			try:
 				zoomratio = float(self.currimg_width)/self.previmg_width
 				newvalue = abs(self.layout.get_hadjustment().get_value() * zoomratio + (self.available_image_width()) * (zoomratio - 1) / 2)
@@ -1173,7 +1173,7 @@ class Base:
 					self.layout.get_hadjustment().set_value(newvalue)
 			except:
 				pass
-		if self.vscroll.get_property('visible') == True:
+		if self.vscroll.get_property('visible'):
 			try:
 				newvalue = abs(self.layout.get_vadjustment().get_value() * zoomratio + (self.available_image_height()) * (zoomratio - 1) / 2)
 				if newvalue >= self.layout.get_vadjustment().lower and newvalue <= (self.layout.get_vadjustment().upper - self.layout.get_vadjustment().page_size):
@@ -1185,10 +1185,10 @@ class Base:
 
 	def window_resized(self, widget, allocation):
 		# Update the image size on window resize if the current image was last fit:
-		if self.image_loaded == True:
+		if self.image_loaded:
 			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
-				if self.last_image_action_was_fit == True:
-					if self.last_image_action_was_smart_fit == True:
+				if self.last_image_action_was_fit:
+					if self.last_image_action_was_smart_fit:
 						self.zoom_to_fit_or_1_to_1(None, False, False)
 					else:
 						self.zoom_to_fit_window(None, False, False)
@@ -1244,9 +1244,9 @@ class Base:
 			conf.set('recent', 'recurse[' + str(i) + ']', self.recentfiles_recurse[i])
 			for j in range(len(self.recentfiles[i])):
 				conf.set('recent', 'urls[' + str(i) + ',' + str(j) + ']', self.recentfiles[i][j])
-		if os.path.exists(os.path.expanduser('~/.config/')) == False:
+		if not os.path.exists(os.path.expanduser('~/.config/')):
 			os.mkdir(os.path.expanduser('~/.config/'))
-		if os.path.exists(os.path.expanduser('~/.config/mirage/')) == False:
+		if not os.path.exists(os.path.expanduser('~/.config/mirage/')):
 			os.mkdir(os.path.expanduser('~/.config/mirage/'))
 		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
 
@@ -1257,7 +1257,7 @@ class Base:
 
 	def delete_event(self, widget, event, data=None):
 		cancel = self.autosave_image()
-		if cancel == True:
+		if cancel:
 			return True
 		self.stop_now = True
 		self.closing_app = True
@@ -1266,7 +1266,7 @@ class Base:
 
 	def destroy(self, event, data=None):
 		cancel = self.autosave_image()
-		if cancel == True:
+		if cancel:
 			return True
 		self.stop_now = True
 		self.closing_app = True
@@ -1274,7 +1274,7 @@ class Base:
 
 	def exit_app(self, action):
 		cancel = self.autosave_image()
-		if cancel == True:
+		if cancel:
 			return True
 		self.stop_now = True
 		self.closing_app = True
@@ -1283,14 +1283,14 @@ class Base:
 
 	def put_zoom_image_to_window(self, currimg_preloaded):
 		self.window.window.freeze_updates()
-		if currimg_preloaded == False:
+		if not currimg_preloaded:
 			# Always start with the original image to preserve quality!
 			# Calculate image size:
 			finalimg_width = int(self.currimg_pixbuf_original.get_width() * self.currimg_zoomratio)
 			finalimg_height = int(self.currimg_pixbuf_original.get_height() * self.currimg_zoomratio)
-			if self.currimg_is_animation  == False:
+			if not self.currimg_is_animation:
 				# Scale image:
-				if self.currimg_pixbuf_original.get_has_alpha() == False:
+				if not self.currimg_pixbuf_original.get_has_alpha():
 					self.currimg_pixbuf = self.currimg_pixbuf_original.scale_simple(finalimg_width, finalimg_height, self.zoom_quality)
 				else:
 					colormap = self.imageview.get_colormap()
@@ -1303,7 +1303,7 @@ class Base:
 		self.layout.set_size(self.currimg_width, self.currimg_height)
 		self.center_image()
 		self.show_scrollbars_if_needed()
-		if self.currimg_is_animation  == False:
+		if not self.currimg_is_animation:
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 			self.previmage_is_animation = False
 		else:
@@ -1339,16 +1339,16 @@ class Base:
 
 	def available_image_height(self):
 		height = self.window.get_size()[1]
-		if self.fullscreen_mode == False:
+		if not self.fullscreen_mode:
 			height -= self.menubar.size_request()[1]
-			if self.toolbar_show == True:
+			if self.toolbar_show:
 				height -= self.toolbar.size_request()[1]
-			if self.statusbar_show == True:
+			if self.statusbar_show:
 				height -= self.statusbar.size_request()[1]
 		return height
 
 	def save_image(self, action):
-		if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive') == True:
+		if self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive'):
 			self.save_image_now(self.currimg_name, gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name'])
 
 	def save_image_as(self, action):
@@ -1388,7 +1388,7 @@ class Base:
 				gtk.main_iteration()
 			if filetype == None:
 				filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
-			if self.filetype_is_writable(filetype) == True:
+			if self.filetype_is_writable(filetype):
 				self.currimg_pixbuf_original.save(dest_name, filetype)
 				self.currimg_name = dest_name
 				self.image_list[self.curr_img_in_list] = dest_name
@@ -1415,7 +1415,7 @@ class Base:
 
 	def autosave_image(self):
 		# returns True if the user has canceled out of the dialog
-		if self.image_modified == True:
+		if self.image_modified:
 			if self.savemode == 1:
 				temp = self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive')
 				self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', True)
@@ -1455,7 +1455,7 @@ class Base:
 		filetype_is_writable = True
 		for i in gtk.gdk.pixbuf_get_formats():
 			if filetype in i['extensions']:
-				if i['is_writable'] == True:
+				if i['is_writable']:
 					return True
 		return False
 
@@ -1496,11 +1496,11 @@ class Base:
 
 	def open_file_or_folder(self, action, isfile):
 		cancel = self.autosave_image()
-		if cancel == True:
+		if cancel:
 			return
 		# If isfile = True, file; If isfile = False, folder
 		dialog = gtk.FileChooserDialog(title=_("Open"),action=gtk.FILE_CHOOSER_ACTION_OPEN,buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
-		if isfile == True:
+		if isfile:
 			filter = gtk.FileFilter()
 			filter.set_name(_("Images"))
 			filter.add_pixbuf_formats()
@@ -1519,7 +1519,7 @@ class Base:
 			dialog.set_extra_widget(recursivebutton)
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		dialog.set_select_multiple(True)
-		if self.use_last_dir == True:
+		if self.use_last_dir:
 			if self.last_dir != None:
 				dialog.set_current_folder(self.last_dir)
 		else:
@@ -1527,9 +1527,9 @@ class Base:
 				dialog.set_current_folder(self.fixed_dir)
 		response = dialog.run()
 		if response == gtk.RESPONSE_OK:
-			if self.use_last_dir == True:
+			if self.use_last_dir:
 				self.last_dir = dialog.get_current_folder()
-			if isfile == False and recursivebutton.get_property('active') == True:
+			if not isfile and recursivebutton.get_property('active'):
 				self.recursive = True
 			filenames = dialog.get_filenames()
 			dialog.destroy()
@@ -1567,7 +1567,7 @@ class Base:
 		gc.collect()
 
 	def hide_cursor(self):
-		if self.fullscreen_mode == True and self.user_prompt_visible == False and self.slideshow_controls_visible == False:
+		if self.fullscreen_mode and not self.user_prompt_visible and not self.slideshow_controls_visible:
 			pix_data = """/* XPM */
 			static char * invisible_xpm[] = {
 			"1 1 1 1",
@@ -1580,7 +1580,7 @@ class Base:
 		return False
 
 	def enter_fullscreen(self, action):
-		if self.fullscreen_mode == False:
+		if not self.fullscreen_mode:
 			self.fullscreen_mode = True
 			self.UIManager.get_widget('/Popup/Full Screen').hide()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
@@ -1595,17 +1595,17 @@ class Base:
 			self.leave_fullscreen(action)
 
 	def leave_fullscreen(self, action):
-		if self.fullscreen_mode == True:
+		if self.fullscreen_mode:
 			self.slideshow_controls_visible = False
 			self.slideshow_window.hide_all()
 			self.slideshow_window2.hide_all()
 			self.fullscreen_mode = False
 			self.UIManager.get_widget('/Popup/Full Screen').show()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
-			if self.toolbar_show == True:
+			if self.toolbar_show:
 				self.toolbar.show()
 			self.menubar.show()
-			if self.statusbar_show == True:
+			if self.statusbar_show:
 				self.statusbar.show()
 				self.statusbar2.show()
 			self.window.unfullscreen()
@@ -1613,7 +1613,7 @@ class Base:
 			self.set_slideshow_sensitivities()
 
 	def toggle_status_bar(self, action):
-		if self.statusbar.get_property('visible') == True:
+		if self.statusbar.get_property('visible'):
 			self.statusbar.hide()
 			self.statusbar2.hide()
 			self.statusbar_show = False
@@ -1621,28 +1621,28 @@ class Base:
 			self.statusbar.show()
 			self.statusbar2.show()
 			self.statusbar_show = True
-		if self.image_loaded == True and self.last_image_action_was_fit == True:
-			if self.last_image_action_was_smart_fit == True:
+		if self.image_loaded and self.last_image_action_was_fit:
+			if self.last_image_action_was_smart_fit:
 				self.zoom_to_fit_or_1_to_1(None, False, False)
 			else:
 				self.zoom_to_fit_window(None, False, False)
 
 	def toggle_toolbar(self, action):
-		if self.toolbar.get_property('visible') == True:
+		if self.toolbar.get_property('visible'):
 			self.toolbar.hide()
 			self.toolbar_show = False
 		else:
 			self.toolbar.show()
 			self.toolbar_show = True
-		if self.image_loaded == True and self.last_image_action_was_fit == True:
-			if self.last_image_action_was_smart_fit == True:
+		if self.image_loaded and self.last_image_action_was_fit:
+			if self.last_image_action_was_smart_fit:
 				self.zoom_to_fit_or_1_to_1(None, False, False)
 			else:
 				self.zoom_to_fit_window(None, False, False)
 
 	def toggle_thumbnails(self, action):
 		# toggle between thumbnail view and single image view
-		if self.table.get_property('visible') == True:
+		if self.table.get_property('visible'):
 			self.table.hide()
 			if not self.thumb_view_inited:
 				self.init_thumb_view()
@@ -1720,7 +1720,7 @@ class Base:
 		status_text = ""
 		if self.running_custom_actions:
 			status_text = _('Custom actions') + ': ' + str(self.curr_custom_action) + ' ' + _('of') + ' ' + str(self.num_custom_actions)
-		elif self.searching_for_images == True:
+		elif self.searching_for_images:
 			status_text = _('Scanning') + '...'
 		self.statusbar2.push(self.statusbar2.get_context_id(""), status_text)
 
@@ -1833,7 +1833,7 @@ class Base:
 			self.open_custom_action_dialog(False, self.action_names[row], self.action_commands[row], self.action_shortcuts[row], self.action_batch[row], treeview)
 
 	def open_custom_action_dialog(self, add_call, name, command, shortcut, batch, treeview):
-		if add_call == True:
+		if add_call:
 			self.dialog_name = gtk.Dialog(_("Add Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		else:
 			self.dialog_name = gtk.Dialog(_("Edit Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
@@ -2039,7 +2039,7 @@ class Base:
 		table = gtk.Table(3, 3, False)
 		image = gtk.Image()
 		animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
-		if animtest.is_static_image() == True:
+		if animtest.is_static_image():
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 180)
 		else:
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180)
@@ -2079,11 +2079,11 @@ class Base:
 		imagesize2 = gtk.Label(str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()))
 		filetype2 = gtk.Label(gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['mime_types'][0])
 		filesize2 = gtk.Label(str(filestat[stat.ST_SIZE]/1000) + "KB")
-		if pixbuf.get_has_alpha() == True:
+		if pixbuf.get_has_alpha():
 			transparency2 = gtk.Label(_("Yes"))
 		else:
 			transparency2 = gtk.Label(_("No"))
-		if animtest.is_static_image() == True:
+		if animtest.is_static_image():
 			animation2 = gtk.Label(_("No"))
 		else:
 			animation2 = gtk.Label(_("Yes"))
@@ -2185,7 +2185,7 @@ class Base:
 			self.defaultdir.set_label(self.fixed_dir)
 		self.defaultdir.connect('clicked', self.defaultdir_clicked)
 		self.defaultdir.set_size_request(250, -1)
-		if self.use_last_dir == True:
+		if self.use_last_dir:
 			openpref1.set_active(True)
 			self.defaultdir.set_sensitive(False)
 		else:
@@ -2333,7 +2333,7 @@ class Base:
 			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.open_all_images = openallimages.get_active()
-			if openpref1.get_active() == True:
+			if openpref1.get_active():
 				self.use_last_dir = True
 			else:
 				self.use_last_dir = False
@@ -2353,18 +2353,18 @@ class Base:
 			self.confirm_delete = deletebutton.get_active()
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
-			if (self.preloading_images == True and preloading_images_prev == False) or (open_mode_prev != self.open_mode):
+			if (self.preloading_images and not preloading_images_prev) or (open_mode_prev != self.open_mode):
 				# The user just turned on preloading, so do it:
 				self.preloadimg_next_in_list = -1
 				self.preloadimg_prev_in_list = -1
 				self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 				self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
-			elif self.preloading_images == False:
+			elif not self.preloading_images:
 				self.preloadimg_next_in_list = -1
 				self.preloadimg_prev_in_list = -1
 
 	def prefs_use_fixed_dir_clicked(self, button):
-		if button.get_active() == True:
+		if button.get_active():
 			self.defaultdir.set_sensitive(True)
 		else:
 			self.defaultdir.set_sensitive(False)
@@ -2372,7 +2372,7 @@ class Base:
 	def rename_image(self, action):
 		if len(self.image_list) > 0:
 			temp_slideshow_mode = self.slideshow_mode
-			if self.slideshow_mode == True:
+			if self.slideshow_mode:
 				self.toggle_slideshow(None)
 			rename_dialog = gtk.Dialog(_('Rename Image'), self.window, gtk.DIALOG_MODAL)
 			self.rename_txt = gtk.Entry()
@@ -2422,7 +2422,7 @@ class Base:
 					error_dialog.run()
 					error_dialog.destroy()
 			rename_dialog.destroy()
-			if temp_slideshow_mode == True:
+			if temp_slideshow_mode:
 				self.toggle_slideshow(None)
 
 	def select_rename_text(self, widget):
@@ -2433,10 +2433,10 @@ class Base:
 	def delete_image(self, action):
 		if len(self.image_list) > 0:
 			temp_slideshow_mode = self.slideshow_mode
-			if self.slideshow_mode == True:
+			if self.slideshow_mode:
 				self.toggle_slideshow(None)
 			delete_dialog = gtk.Dialog(_('Delete Image'), self.window, gtk.DIALOG_MODAL)
-			if self.confirm_delete == True:
+			if self.confirm_delete:
 				permlabel = gtk.Label(_('Are you sure you wish to permanently delete') + ' ' + os.path.split(self.currimg_name)[1] + '?')
 				permlabel.set_line_wrap(True)
 				permlabel.set_alignment(0, 0.1)
@@ -2488,7 +2488,7 @@ class Base:
 					error_dialog.run()
 					error_dialog.destroy()
 			delete_dialog.destroy()
-			if temp_slideshow_mode == True:
+			if temp_slideshow_mode:
 				self.toggle_slideshow(None)
 
 	def defaultdir_clicked(self, button):
@@ -2622,10 +2622,10 @@ class Base:
 			self.updating_adjustments = False
 		self.prevmousex = x
 		self.prevmousey = y
-		if self.fullscreen_mode == True:
+		if self.fullscreen_mode:
 			# Show cursor on movement, then hide after 2 seconds of no movement
 			self.change_cursor(None)
-			if self.slideshow_controls_visible == False:
+			if not self.slideshow_controls_visible:
 				gobject.source_remove(self.timer_id)
 				if not self.closing_app:
 					while gtk.events_pending():
@@ -2638,14 +2638,14 @@ class Base:
 		return True
 
 	def button_pressed(self, widget, event):
-		if self.image_loaded == True:
+		if self.image_loaded:
 			# Changes the cursor to the 'resize' cursor, like GIMP, on a middle click:
 			if (event.button == 2 or event.button == 1) and (self.hscroll.get_property('visible')==True or self.vscroll.get_property('visible')==True):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.FLEUR))
 				self.prevmousex = event.x_root
 				self.prevmousey = event.y_root
 			# Right-click popup:
-			elif self.image_loaded == True and event.button == 3:
+			elif self.image_loaded and event.button == 3:
 				self.UIManager.get_widget('/Popup').popup(None, None, None, event.button, event.time)
 		return True
 
@@ -2656,7 +2656,7 @@ class Base:
 		return True
 
 	def zoom_in(self, action):
-		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/In').get_property('sensitive') == True:
+		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/In').get_property('sensitive'):
 			self.image_zoomed = True
 			self.currimg_zoomratio = self.currimg_zoomratio * 1.25
 			self.set_zoom_sensitivities()
@@ -2665,7 +2665,7 @@ class Base:
 			self.update_statusbar()
 
 	def zoom_out(self, action):
-		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Out').get_property('sensitive') == True:
+		if self.currimg_name != "" and self.UIManager.get_widget('/MainMenu/ViewMenu/Out').get_property('sensitive'):
 			if self.currimg_zoomratio == self.min_zoomratio:
 				# No point in proceeding..
 				return
@@ -2682,8 +2682,8 @@ class Base:
 		self.zoom_to_fit_window(action, False, False)
 
 	def zoom_to_fit_window(self, action, is_preloadimg_next, is_preloadimg_prev):
-		if is_preloadimg_next == True:
-			if self.preloading_images == True and self.preloadimg_next_in_list != -1:
+		if is_preloadimg_next:
+			if self.preloading_images and self.preloadimg_next_in_list != -1:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
 				preimg_width = self.preloadimg_next_pixbuf_original.get_width()
@@ -2695,8 +2695,8 @@ class Base:
 				else:
 					premax_ratio = prewidth_ratio
 				self.preloadimg_next_zoomratio = 1/float(max_ratio)
-		elif is_preloadimg_prev == True:
-			if self.preloading_images == True and self.preloadimg_prev_in_list != -1:
+		elif is_preloadimg_prev:
+			if self.preloading_images and self.preloadimg_prev_in_list != -1:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
 				preimg_width = self.preloadimg_prev_pixbuf_original.get_width()
@@ -2709,7 +2709,7 @@ class Base:
 					premax_ratio = prewidth_ratio
 				self.preloadimg_prev_zoomratio = 1/float(max_ratio)
 		else:
-			if self.currimg_name != "" and (self.slideshow_mode == True or self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').get_property('sensitive') == True):
+			if self.currimg_name != "" and (self.slideshow_mode or self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').get_property('sensitive')):
 				self.image_zoomed = True
 				self.last_mode = self.open_mode_fit
 				self.last_image_action_was_fit = True
@@ -2731,8 +2731,8 @@ class Base:
 				self.update_statusbar()
 
 	def zoom_to_fit_or_1_to_1(self, action, is_preloadimg_next, is_preloadimg_prev):
-		if is_preloadimg_next == True:
-			if self.preloading_images == True and self.preloadimg_next_in_list != -1:
+		if is_preloadimg_next:
+			if self.preloading_images and self.preloadimg_next_in_list != -1:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
 				preimg_width = self.preloadimg_next_pixbuf_original.get_width()
@@ -2746,8 +2746,8 @@ class Base:
 				self.preloadimg_next_zoomratio = 1/float(premax_ratio)
 				if self.preloadimg_next_zoomratio > 1:
 					self.preloadimg_next_zoomratio = 1
-		elif is_preloadimg_prev == True:
-			if self.preloading_images == True and self.preloadimg_prev_in_list != -1:
+		elif is_preloadimg_prev:
+			if self.preloading_images and self.preloadimg_prev_in_list != -1:
 				win_width = self.available_image_width()
 				win_height = self.available_image_height()
 				preimg_width = self.preloadimg_prev_pixbuf_original.get_width()
@@ -2790,14 +2790,14 @@ class Base:
 		self.zoom_1_to_1(action, False, False)
 
 	def zoom_1_to_1(self, action, is_preloadimg_next, is_preloadimg_prev):
-		if is_preloadimg_next == True:
-			if self.preloading_images == True:
+		if is_preloadimg_next:
+			if self.preloading_images:
 				self.preloadimg_next_zoomratio = 1
-		elif is_preloadimg_prev == True:
-			if self.preloading_images == True:
+		elif is_preloadimg_prev:
+			if self.preloading_images:
 				self.preloadimg_prev_zoomratio = 1
 		else:
-			if self.currimg_name != "" and (self.slideshow_mode == True or self.currimg_is_animation == True or (self.currimg_is_animation == False and self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').get_property('sensitive') == True)):
+			if self.currimg_name != "" and (self.slideshow_mode or self.currimg_is_animation or (not self.currimg_is_animation and self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').get_property('sensitive'))):
 				self.image_zoomed = True
 				self.last_mode = self.open_mode_1to1
 				self.last_image_action_was_fit = False
@@ -2812,10 +2812,10 @@ class Base:
 		self.rotate_left_or_right(self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right'), 270)
 	
 	def rotate_left_or_right(self, widget, angle):
-		if self.currimg_name != "" and widget.get_property('sensitive') == True:
+		if self.currimg_name != "" and widget.get_property('sensitive'):
 			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, angle)
-			if self.last_image_action_was_fit == True:
-				if self.last_image_action_was_smart_fit == True:
+			if self.last_image_action_was_fit:
+				if self.last_image_action_was_smart_fit:
 					self.zoom_to_fit_or_1_to_1(None, False, False)
 				else:
 					self.zoom_to_fit_window(None, False, False)
@@ -2837,7 +2837,7 @@ class Base:
 		self.flip_image_vert_or_horiz(self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally'), False)
 			
 	def flip_image_vert_or_horiz(self, widget, vertical):
-		if self.currimg_name != "" and widget.get_property('sensitive') == True:
+		if self.currimg_name != "" and widget.get_property('sensitive'):
 			self.currimg_pixbuf = self.image_flip(self.currimg_pixbuf, vertical)
 			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, vertical)
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
@@ -2857,7 +2857,7 @@ class Base:
 			if image_height > size:
 				image_width = int(size/float(image_height)*image_width)
 				image_height = size
-		if pixbuf.get_has_alpha() == False:
+		if not pixbuf.get_has_alpha():
 			crop_pixbuf = pixbuf.scale_simple(image_width, image_height, self.zoom_quality)
 		else:
 			colormap = self.imageview.get_colormap()
@@ -2993,8 +2993,8 @@ class Base:
 	def crop_image_mouse_moved(self, widget, event, image, x2, y2, x, y, width, height, image_width, image_height, width_adj, height_adj):
 		if event != None:
 			x2, y2, state = event.window.get_pointer()
-		if self.drawing_crop_rectangle == True:
-			if self.crop_rectangle != None or self.update_rectangle == True:
+		if self.drawing_crop_rectangle:
+			if self.crop_rectangle != None or self.update_rectangle:
 				gc = image.window.new_gc(function=gtk.gdk.INVERT)
 				if self.rect != None:
 					# Get rid of the previous drawn rectangle:
@@ -3173,7 +3173,7 @@ class Base:
 
 	def aspect_ratio_toggled(self, togglebutton, width, height):
 		self.preserve_aspect = togglebutton.get_active()
-		if self.preserve_aspect == True:
+		if self.preserve_aspect:
 			# Set height based on width and aspect ratio
 			target_value = float(width.get_value_as_int())/self.currimg_pixbuf_original.get_width()
 			target_value = int(target_value * self.currimg_pixbuf_original.get_height())
@@ -3182,9 +3182,9 @@ class Base:
 			self.ignore_preserve_aspect_callback = False
 
 	def preserve_image_aspect(self, currspinbox, type, otherspinbox):
-		if self.preserve_aspect == False:
+		if not self.preserve_aspect:
 			return
-		if self.ignore_preserve_aspect_callback == True:
+		if self.ignore_preserve_aspect_callback:
 			return
 		if type == "width":
 			target_value = float(currspinbox.get_value_as_int())/self.currimg_pixbuf_original.get_width()
@@ -3213,12 +3213,12 @@ class Base:
 		
 	def goto_image(self, location, action):
 		# location can be "LAST", "FIRST", "NEXT", "PREV", or "RANDOM"
-		if self.slideshow_mode == True and action != "ss":
+		if self.slideshow_mode and action != "ss":
 			gobject.source_remove(self.timer_delay)
 		if ((location=="PREV" or location=="NEXT" or location=="RANDOM") and len(self.image_list) > 1) or (location=="FIRST" and (len(self.image_list) > 1 and self.curr_img_in_list != 0)) or (location=="LAST" and (len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1)):
 			self.load_new_image_stop_now()
 			cancel = self.autosave_image()
-			if cancel == True:
+			if cancel:
 				return
 			check_wrap = False
 			if location != "RANDOM":
@@ -3232,10 +3232,10 @@ class Base:
 					# check if we have seen every image; if so, reinitialize array and repeat:
 					all_items_are_true = True
 					for item in self.randomlist:
-						if item == False:
+						if not item:
 							all_items_are_true = False
-					if all_items_are_true == True:
-						if self.slideshow_mode == False or (self.slideshow_mode == True and self.listwrap_mode == 1):
+					if all_items_are_true:
+						if not self.slideshow_mode or (self.slideshow_mode and self.listwrap_mode == 1):
 							self.reinitialize_randomlist()
 						else:
 							check_wrap = True
@@ -3254,7 +3254,7 @@ class Base:
 			if check_wrap:
 				if self.listwrap_mode == 0:
 					if location == "NEXT":
-						if self.slideshow_mode == True:
+						if self.slideshow_mode:
 							self.toggle_slideshow(None)
 					return
 				elif (location == "PREV" or location == "NEXT") and self.listwrap_mode == 1:
@@ -3263,7 +3263,7 @@ class Base:
 					elif location == "NEXT":
 						self.curr_img_in_list = 0
 				else:
-					if self.fullscreen_mode == True:
+					if self.fullscreen_mode:
 						self.change_cursor(None)
 					if location == "PREV":
 						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the first image in the list. Wrap around to the last image?"))
@@ -3284,33 +3284,33 @@ class Base:
 							self.reinitialize_randomlist()
 						dialog.destroy()
 						self.user_prompt_visible = False
-						if self.fullscreen_mode == True:
+						if self.fullscreen_mode:
 							self.hide_cursor
 					else:
 						dialog.destroy()
 						self.user_prompt_visible = False
-						if self.fullscreen_mode == True:
+						if self.fullscreen_mode:
 							self.hide_cursor
-						if self.slideshow_mode == True:
+						if self.slideshow_mode:
 							self.toggle_slideshow(None)
 						return
 			if location == "RANDOM":
 				# Find random image that hasn't already been chosen:
 				j = random.randint(0, len(self.image_list)-1)
-				while self.randomlist[j] == True:
+				while self.randomlist[j]:
 					j = random.randint(0, len(self.image_list)-1)
 				self.curr_img_in_list = j
 				self.randomlist[j] = True
 				self.currimg_name = str(self.image_list[self.curr_img_in_list])
-			if self.fullscreen_mode == False and (self.slideshow_mode == False or (self.slideshow_mode == True and action != "ss")):
+			if not self.fullscreen_mode and (not self.slideshow_mode or (self.slideshow_mode and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 			if location == "PREV":
 				self.load_when_idle = gobject.idle_add(self.load_new_image, True, False, True, True, True, True)
 			else:
 				self.load_when_idle = gobject.idle_add(self.load_new_image, False, False, True, True, True, True)
 			self.set_go_navigation_sensitivities(False)
-			if self.slideshow_mode == True:
-				if self.curr_slideshow_random == True:
+			if self.slideshow_mode:
+				if self.curr_slideshow_random:
 					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
 				else:
 					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
@@ -3319,7 +3319,7 @@ class Base:
 		# setting skip_image_list_check to True is useful when calling from
 		# expand_filelist_and_load_image() for example, as self.image_list has not
 		# yet fully populated
-		if (self.image_loaded == False or len(self.image_list) == 1) and skip_initial_check == False:
+		if (not self.image_loaded or len(self.image_list) == 1) and not skip_initial_check:
 			self.set_previous_image_sensitivities(False)
 			self.set_first_image_sensitivities(False)
 			self.set_next_image_sensitivities(False)
@@ -3362,14 +3362,14 @@ class Base:
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
 		else:
 			self.currmg_name = filename
-		if self.verbose == True and self.currimg_name != "":
+		if self.verbose and self.currimg_name != "":
 			print _("Loading") + ":", self.currimg_name
 		self.update_title()
 		self.put_error_image_to_window()
 		self.image_loaded = False
 		self.currimg_pixbuf_original = None
-		if reset_cursor == True:
-			if self.fullscreen_mode == False:
+		if reset_cursor:
+			if not self.fullscreen_mode:
 				self.change_cursor(None)
 
 	def load_new_image_stop_now(self):
@@ -3402,7 +3402,7 @@ class Base:
 		# or self.preloadimg_next and can be reused.
 		if prev_index != self.preloadimg_prev_in_list and prev_index != -1:
 			# Need to update preloadimg_prev:
-			if prev_index == self.loaded_img_in_list and self.image_modified == False and self.image_zoomed == False:
+			if prev_index == self.loaded_img_in_list and not self.image_modified and not self.image_zoomed:
 				self.preloadimg_prev_in_list = self.loaded_img_in_list
 				self.preloadimg_prev_name = self.currimg_name
 				self.preloadimg_prev_width = self.currimg_width
@@ -3431,7 +3431,7 @@ class Base:
 		# or self.preloadimg_prev and can be reused.
 		if next_index != self.preloadimg_next_in_list and next_index != -1:
 			# Need to update preloadimg_next:
-			if next_index == self.loaded_img_in_list and self.image_modified == False and self.image_zoomed == False:
+			if next_index == self.loaded_img_in_list and not self.image_modified and not self.image_zoomed:
 				self.preloadimg_next_in_list = self.loaded_img_in_list
 				self.preloadimg_next_name = self.currimg_name
 				self.preloadimg_next_width = self.currimg_width
@@ -3473,10 +3473,10 @@ class Base:
 				self.currimg_zoomratio = self.preloadimg_prev_zoomratio
 				self.currimg_is_animation = self.preloadimg_prev_is_animation
 				used_prev = True
-				if self.verbose == True and self.currimg_name != "":
+				if self.verbose and self.currimg_name != "":
 					print _("Loading") + ":", self.currimg_name
 				self.put_zoom_image_to_window(True)
-				if self.currimg_is_animation == False:
+				if not self.currimg_is_animation:
 					self.set_image_sensitivities(True)
 				else:
 					self.set_image_sensitivities(False)
@@ -3490,10 +3490,10 @@ class Base:
 				self.currimg_zoomratio = self.preloadimg_next_zoomratio
 				self.currimg_is_animation = self.preloadimg_next_is_animation
 				used_next = True
-				if self.verbose == True and self.currimg_name != "":
+				if self.verbose and self.currimg_name != "":
 					print _("Loading") + ":", self.currimg_name
 				self.put_zoom_image_to_window(True)
-				if self.currimg_is_animation == False:
+				if not self.currimg_is_animation:
 					self.set_image_sensitivities(True)
 				else:
 					self.set_image_sensitivities(False)
@@ -3521,13 +3521,13 @@ class Base:
 				prev_index = -1
 			else:
 				prev_index = len(self.image_list)-1
-		if self.preloading_images == True:
+		if self.preloading_images:
 			if check_prev_last:
 				self.check_preloadimg_next_for_existing(next_index)
 			else:
 				self.check_preloadimg_prev_for_existing(prev_index)
 		used_prev, used_next = self.check_currimg_for_existing()
-		if self.preloading_images == True:
+		if self.preloading_images:
 			if check_prev_last:
 				self.check_preloadimg_prev_for_existing(prev_index)
 			else:
@@ -3547,12 +3547,12 @@ class Base:
 			self.currimg_pixbuf = None
 			self.currimg_zoomratio = 1
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
-			if self.verbose == True and self.currimg_name != "":
+			if self.verbose and self.currimg_name != "":
 				print _("Loading") + ":", self.currimg_name
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
-			if animtest.is_static_image() == True or (use_current_pixbuf_original == True and self.currimg_is_animation == False):
+			if animtest.is_static_image() or (use_current_pixbuf_original and not self.currimg_is_animation):
 				self.currimg_is_animation = False
-				if use_current_pixbuf_original == False:
+				if not use_current_pixbuf_original:
 					self.currimg_pixbuf_original = animtest.get_static_image()
 				self.set_image_sensitivities(True)
 				if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
@@ -3563,11 +3563,11 @@ class Base:
 					self.zoom_1_to_1(None, False, False)
 			else:
 				self.currimg_is_animation = True
-				if use_current_pixbuf_original == False:
+				if not use_current_pixbuf_original:
 					self.currimg_pixbuf_original = animtest
 				self.zoom_1_to_1(None, False, False)
 				self.set_image_sensitivities(False)
-		if self.onload_cmd != None and perform_onload_action == True:
+		if self.onload_cmd != None and perform_onload_action:
 			self.parse_action_command(self.onload_cmd, False)
 		self.update_statusbar()
 		self.update_title()
@@ -3575,14 +3575,14 @@ class Base:
 		self.image_modified = False
 		self.image_zoomed = False
 		self.set_slideshow_sensitivities()
-		if reset_cursor == True:
-			if self.fullscreen_mode == False:
+		if reset_cursor:
+			if not self.fullscreen_mode:
 				self.change_cursor(None)
 
 	def preload_next_image(self, use_existing_image):
 		try:
-			if self.preloading_images == True and len(self.image_list) > 1:
-				if use_existing_image == False:
+			if self.preloading_images and len(self.image_list) > 1:
+				if not use_existing_image:
 					next_index = self.curr_img_in_list + 1
 					if next_index > len(self.image_list)-1:
 						if self.listwrap_mode == 0:
@@ -3595,7 +3595,7 @@ class Base:
 					self.preloadimg_next_in_list = next_index
 					self.preloadimg_next_name = str(self.image_list[next_index])
 					pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_next_name)
-					if pre_animtest.is_static_image() == True:
+					if pre_animtest.is_static_image():
 						self.preloadimg_next_is_animation = False
 						self.preloadimg_next_pixbuf_original = pre_animtest.get_static_image()
 					else:
@@ -3614,9 +3614,9 @@ class Base:
 				# Calculate image size:
 				self.preloadimg_next_width = int(self.preloadimg_next_pixbuf_original.get_width() * self.preloadimg_next_zoomratio)
 				self.preloadimg_next_height = int(self.preloadimg_next_pixbuf_original.get_height() * self.preloadimg_next_zoomratio)
-				if self.preloadimg_next_is_animation == False:
+				if not self.preloadimg_next_is_animation:
 					# Scale image:
-					if self.preloadimg_next_pixbuf_original.get_has_alpha() == False:
+					if not self.preloadimg_next_pixbuf_original.get_has_alpha():
 						self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original.scale_simple(self.preloadimg_next_width, self.preloadimg_next_height, self.zoom_quality)
 					else:
 						colormap = self.imageview.get_colormap()
@@ -3626,15 +3626,15 @@ class Base:
 				else:
 					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original
 				gc.collect()
-				if self.verbose == True:
+				if self.verbose:
 					print _("Preloading") + ":", self.preloadimg_next_name
 		except:
 			self.preloadimg_next_in_list = -1
 
 	def preload_prev_image(self, use_existing_image):
 		try:
-			if self.preloading_images == True and len(self.image_list) > 1:
-				if use_existing_image == False:
+			if self.preloading_images and len(self.image_list) > 1:
+				if not use_existing_image:
 					prev_index = self.curr_img_in_list - 1
 					if prev_index < 0:
 						if self.listwrap_mode == 0:
@@ -3647,7 +3647,7 @@ class Base:
 					self.preloadimg_prev_in_list = prev_index
 					self.preloadimg_prev_name = str(self.image_list[prev_index])
 					pre_animtest = gtk.gdk.PixbufAnimation(self.preloadimg_prev_name)
-					if pre_animtest.is_static_image() == True:
+					if pre_animtest.is_static_image():
 						self.preloadimg_prev_is_animation = False
 						self.preloadimg_prev_pixbuf_original = pre_animtest.get_static_image()
 					else:
@@ -3666,9 +3666,9 @@ class Base:
 				# Calculate image size:
 				self.preloadimg_prev_width = int(self.preloadimg_prev_pixbuf_original.get_width() * self.preloadimg_prev_zoomratio)
 				self.preloadimg_prev_height = int(self.preloadimg_prev_pixbuf_original.get_height() * self.preloadimg_prev_zoomratio)
-				if self.preloadimg_prev_is_animation == False:
+				if not self.preloadimg_prev_is_animation:
 					# Scale image:
-					if self.preloadimg_prev_pixbuf_original.get_has_alpha() == False:
+					if not self.preloadimg_prev_pixbuf_original.get_has_alpha():
 						self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original.scale_simple(self.preloadimg_prev_width, self.preloadimg_prev_height, self.zoom_quality)
 					else:
 						colormap = self.imageview.get_colormap()
@@ -3678,7 +3678,7 @@ class Base:
 				else:
 					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original
 				gc.collect()
-				if self.verbose == True:
+				if self.verbose:
 					print _("Preloading") + ":", self.preloadimg_prev_name
 		except:
 			self.preloadimg_prev_in_list = -1
@@ -3764,7 +3764,7 @@ class Base:
 					pass
 		init_image = os.path.abspath(inputlist[0])
 		# If open all images in dir...
-		if self.open_all_images == True:
+		if self.open_all_images:
 			temp = inputlist
 			inputlist = []
 			for item in temp:
@@ -3779,7 +3779,7 @@ class Base:
 					inputlist.append(item)
 			for item in self.image_list:
 				inputlist.append(item)
-				if first_image_found == True and second_image_found == False:
+				if first_image_found and not second_image_found:
 					second_image_found = True
 					second_image = item
 					second_image_came_from_dir = False
@@ -3790,20 +3790,20 @@ class Base:
 					self.curr_img_in_list = len(inputlist)-1
 		self.image_list = []
 		for item in inputlist:
-			if item[0] != '.' and self.closing_app == False:
+			if not self.closing_app:
 				if os.path.isfile(item):
 					if self.valid_image(item):
-						if second_image_found == False:
-							if first_image_found == True:
+						if not second_image_found:
+							if first_image_found:
 								second_image_found = True
 								second_image = item
 								second_image_came_from_dir = False
-						if first_image_found == False:
+						if not first_image_found:
 							first_image_found = True
 							first_image = item
 							first_image_came_from_dir = False
 						self.image_list.append(item)
-						if self.verbose == True:
+						if self.verbose:
 							self.images_found += 1
 							print _("Found") + ":", item, "[" + str(self.images_found) + "]"
 				else:
@@ -3812,15 +3812,15 @@ class Base:
 					# Retrieve only images in the top directory specified by the user
 					# only explicitly told to recurse (via -R or in Settings>Preferences)
 					folderlist.append(item)
-					if second_image_found == False:
+					if not second_image_found:
 						# See if we can find an image in this directory:
 						self.stop_now = False
 						self.expand_directory(item, True, go_buttons_enabled, False, False)
 						itemnum = 0
-						while itemnum < len(self.image_list) and second_image_found == False:
+						while itemnum < len(self.image_list) and not second_image_found:
 							if os.path.isfile(self.image_list[itemnum]):
-								if second_image_found == False:
-									if first_image_found == True:
+								if not second_image_found:
+									if first_image_found:
 										second_image_found = True
 										second_image_came_from_dir = True
 										second_image = self.image_list[itemnum]
@@ -3828,17 +3828,17 @@ class Base:
 										go_buttons_enabled = True
 										while gtk.events_pending():
 											gtk.main_iteration(True)
-								if first_image_found == False:
+								if not first_image_found:
 									first_image_found = True
 									first_image = self.image_list[itemnum]
 									first_image_came_from_dir = True
 							itemnum += 1
 				# Load first image and display:
-				if first_image_found == True and first_image_loaded == False and self.curr_img_in_list <= len(self.image_list)-1:
+				if first_image_found and not first_image_loaded and self.curr_img_in_list <= len(self.image_list)-1:
 					first_image_loaded = True
-					if self.slideshow_mode == True:
+					if self.slideshow_mode:
 						self.toggle_slideshow(None)
-					if self.verbose == True and self.currimg_name != "":
+					if self.verbose and self.currimg_name != "":
 						print _("Loading") + ":", self.currimg_name
 					try:
 						self.load_new_image2(False, False, True, True)
@@ -3846,7 +3846,7 @@ class Base:
 						# to 0, so ensure they are -1 again (no images preloaded)
 						self.preloadimg_prev_in_list = -1
 						self.preloadimg_next_in_list = -1
-						if self.currimg_is_animation == False:
+						if not self.currimg_is_animation:
 							self.previmg_width = self.currimg_pixbuf.get_width()
 						else:
 							self.previmg_width = self.currimg_pixbuf.get_static_image().get_width()
@@ -3857,10 +3857,10 @@ class Base:
 								gtk.main_iteration(True)
 					except:
 						pass
-					if first_image_came_from_dir == True:
+					if first_image_came_from_dir:
 						self.image_list = []
 				# Pre-load second image:
-				if second_image_found == True and second_image_preloaded == False and ((second_image_came_from_dir == False and self.curr_img_in_list+1 <= len(self.image_list)-1) or second_image_came_from_dir == True):
+				if second_image_found and not second_image_preloaded and ((not second_image_came_from_dir and self.curr_img_in_list+1 <= len(self.image_list)-1) or second_image_came_from_dir):
 					second_image_preloaded = True
 					temp = self.image_list
 					self.image_list = []
@@ -3869,9 +3869,9 @@ class Base:
 					self.image_list.append(second_image)
 					self.preload_next_image(False)
 					self.image_list = temp
-		if first_image_found == True:
+		if first_image_found:
 			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
-			if first_image_came_from_dir == True:
+			if first_image_came_from_dir:
 				self.add_folderlist_images(folderlist, go_buttons_enabled)
 				self.do_image_list_stuff(first_image, second_image)
 			else:
@@ -3900,7 +3900,7 @@ class Base:
 			folderlist.sort(locale.strcoll)
 			folderlist = list(set(folderlist))
 			for item in folderlist:
-				if item[0] != '.' and not self.closing_app:
+				if not self.closing_app:
 					self.stop_now = False
 					self.expand_directory(item, False, go_buttons_enabled, True, True)
 
@@ -3911,25 +3911,25 @@ class Base:
 			self.image_list.sort(locale.strcoll)
 
 	def expand_directory(self, item, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg):
-		if self.stop_now == False and self.closing_app == False:
+		if not self.stop_now and not self.closing_app:
 			folderlist = []
 			filelist = []
-			if os.access(item, os.R_OK) == False:
+			if not os.access(item, os.R_OK):
 				return False
 			for item2 in os.listdir(item):
-				if item2[0] != '.' and self.closing_app == False and self.stop_now == False:
+				if not self.closing_app and not self.stop_now:
 					item2 = item + "/" + item2
 					item_fullpath2 = os.path.abspath(item2)
 					if os.path.isfile(item_fullpath2):
-						if self.valid_image(item_fullpath2) == True:
+						if self.valid_image(item_fullpath2):
 							filelist.append(item2)
-							if self.verbose == True and print_found_msg == True:
+							if self.verbose and print_found_msg:
 								self.images_found += 1
 								print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
-					elif os.path.isdir(item_fullpath2) and self.recursive == True:
+					elif os.path.isdir(item_fullpath2) and self.recursive:
 						folderlist.append(item_fullpath2)
 			if len(self.image_list)>0:
-				if update_window_title == True:
+				if update_window_title:
 					self.update_title()
 					if not self.closing_app:
 						while gtk.events_pending():
@@ -3940,17 +3940,17 @@ class Base:
 				for item2 in filelist:
 					if not item2 in self.image_list:
 						self.image_list.append(item2)
-						if stop_when_second_image_found == True and len(self.image_list)==2:
+						if stop_when_second_image_found and len(self.image_list)==2:
 							self.stop_now = True
 							return
-						if go_buttons_enabled == False:
+						if not go_buttons_enabled:
 							if len(self.image_list) > 1:
 								self.set_go_navigation_sensitivities(True)
 								go_buttons_enabled = True
 			if len(folderlist) > 0:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
-					if self.stop_now == False:
+					if not self.stop_now:
 						self.expand_directory(item2, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg)
 
 	def valid_image(self, file):
@@ -3972,7 +3972,7 @@ class Base:
 		width = old_pix.get_width()
 		height = old_pix.get_height()
 		d = None
-		if vertical == True:
+		if vertical:
 			d, w, h, rws = imgfuncs.vert(old_pix.get_pixels(), width, height, old_pix.get_rowstride(), old_pix.get_n_channels())
 		else:
 			d, w, h, rws = imgfuncs.horiz(old_pix.get_pixels(), width, height, old_pix.get_rowstride(), old_pix.get_n_channels())
@@ -4000,13 +4000,13 @@ class Base:
 
 	def toggle_slideshow(self, action):
 		if len(self.image_list) > 1:
-			if self.slideshow_mode == False:
-				if self.slideshow_in_fullscreen == True and self.fullscreen_mode == False:
+			if not self.slideshow_mode:
+				if self.slideshow_in_fullscreen and not self.fullscreen_mode:
 					self.enter_fullscreen(None)
 				self.slideshow_mode = True
 				self.update_title()
 				self.set_slideshow_sensitivities()
-				if self.curr_slideshow_random == False:
+				if not self.curr_slideshow_random:
 					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
 				else:
 					self.reinitialize_randomlist()
@@ -4028,18 +4028,18 @@ class Base:
 			title = "Mirage"
 		else:
 			title = "Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name)
-			if self.slideshow_mode == True:
+			if self.slideshow_mode:
 				title = title + ' - ' + _('Slideshow Mode')
 		self.window.set_title(title)
 
 	def slideshow_controls_show(self):
-		if self.slideshow_controls_visible == False and self.controls_moving == False:
+		if not self.slideshow_controls_visible and not self.controls_moving:
 			self.slideshow_controls_visible = True
 
 			self.ss_delaycombo.set_active(self.curr_slideshow_delay)
 			self.ss_randomize.set_active(self.curr_slideshow_random)
 
-			if self.slideshow_mode == True:
+			if self.slideshow_mode:
 				self.ss_start.set_no_show_all(True)
 				self.ss_stop.set_no_show_all(False)
 			else:
@@ -4073,7 +4073,7 @@ class Base:
 			self.controls_moving = False
 
 	def slideshow_controls_hide(self):
-		if self.slideshow_controls_visible == True and self.controls_moving == False:
+		if self.slideshow_controls_visible and not self.controls_moving:
 			self.slideshow_controls_visible = False
 
 			(xpos, ypos) = self.window.get_position()
@@ -4094,7 +4094,7 @@ class Base:
 			self.controls_moving = False
 
 	def disable_screensaver_in_slideshow_mode(self):
-		if self.slideshow_mode == True and self.disable_screensaver == True:
+		if self.slideshow_mode and self.disable_screensaver:
 			test = os.spawnlp(os.P_WAIT, "/usr/bin/xscreensaver-command", "xscreensaver-command", "-deactivate")
 			if test <> 127:
 				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
