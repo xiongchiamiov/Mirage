@@ -1,7 +1,6 @@
 0.9
 + Allow zooming in crop dialog (default to same view as main window so that
   the user can essentially 'crop visible' by clicking ok right away?)
-+ pref for opening hidden files
 + Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
 + mirage --add to add image to current instance instead of opening
   new window
@@ -9,7 +8,6 @@
 	- <md5 of URI>.png, 128x128, in ~/.thumbnails/normal/
 	- delete thumbnail if image is deleted, update if image is moved, etc
 + Try to highlight selected region of cropped image (or darken unselected region)
-+ Open remote files - use threading... (tempfile.mkdtemp)
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
 + code cleanup... (preload_*, animtest stuff, rename funcs)
 

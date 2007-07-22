@@ -41,8 +41,9 @@ import stat
 import time
 import subprocess
 import shutil
-import md5
 import filecmp
+import tempfile
+import socket
 try:
 	import gconf
 except:
@@ -2319,11 +2320,11 @@ class Base:
 		table_image.attach(gtk.Label(), 1, 3, 13, 14,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
-		notebook.append_page(table_behavior, gtk.Label(str=_("Behavior")))
-		notebook.append_page(table_navigation, gtk.Label(str=_("Navigation")))
-		notebook.append_page(table_settings, gtk.Label(str=_("Interface")))
-		notebook.append_page(table_slideshow, gtk.Label(str=_("Slideshow")))
-		notebook.append_page(table_image, gtk.Label(str=_("Image")))
+		notebook.append_page(table_behavior, gtk.Label(_("Behavior")))
+		notebook.append_page(table_navigation, gtk.Label(_("Navigation")))
+		notebook.append_page(table_settings, gtk.Label(_("Interface")))
+		notebook.append_page(table_slideshow, gtk.Label(_("Slideshow")))
+		notebook.append_page(table_image, gtk.Label(_("Image")))
 		notebook.set_current_page(0)
 		hbox = gtk.HBox()
 		self.prefs_dialog.vbox.pack_start(hbox, False, False, 7)
@@ -3751,28 +3752,12 @@ class Base:
 				inputlist[itemnum] = os.path.abspath(inputlist[itemnum])
 			else:
 				try:
-					# Remote file. Save as /tmp/mirage-<hash>
-					tmpfile = "/tmp/mirage-"+md5.new(inputlist[itemnum]).hexdigest()
+					# Remote file. Save as /tmp/mirage-<random>/filename.ext
+					tmpdir = tempfile.mkdtemp(prefix="mirage-") + "/"
+					tmpfile = tmpdir + os.path.basename(inputlist[itemnum])
+					socket.setdefaulttimeout(5)
 					urllib.urlretrieve(inputlist[itemnum], tmpfile)
-					destfile = "/tmp/" + os.path.basename(inputlist[itemnum])
-					suffix_num = 1
-					destfile_set = False
-					# Increment destination filename (i.e. /tmp/<name><num>.<ext>) until
-					# it either doesn't exist or is an exact copy of the image. This
-					# will keep everything nice and tidy if the user tries to remotely
-					# get the same image again.
-					while not destfile_set:
-						if os.path.exists(destfile):
-							if filecmp.cmp(tmpfile, destfile):
-								shutil.move(tmpfile, destfile)
-								destfile_set = True
-							else:
-								suffix_num = suffix_num + 1
-								destfile = "/tmp/" + os.path.splitext(os.path.basename(inputlist[itemnum]))[0] + str(suffix_num) + "." + os.path.splitext(os.path.basename(inputlist[itemnum]))[1]
-						else:
-							shutil.move(tmpfile, destfile)
-							destfile_set = True
-					inputlist[itemnum] = destfile
+					inputlist[itemnum] = tmpfile
 				except:
 					pass
 		# Remove hidden files from list:
@@ -3964,8 +3949,8 @@ class Base:
 									print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
 						elif os.path.isdir(item_fullpath2) and self.recursive:
 							folderlist.append(item_fullpath2)
-					else:
-						print _("Skipping2") + ":", item_fullpath2
+					elif self.verbose:
+						print _("Skipping") + ":", item_fullpath2
 			if len(self.image_list)>0:
 				if update_window_title:
 					self.update_title()
