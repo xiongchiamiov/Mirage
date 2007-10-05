@@ -3657,6 +3657,7 @@ class Base:
 		self.image_modified = False
 		self.image_zoomed = False
 		self.set_slideshow_sensitivities()
+		self.register_file_with_recent_docs(self.currimg_name)
 		if reset_cursor:
 			if not self.fullscreen_mode:
 				self.change_cursor(None)
@@ -4044,6 +4045,15 @@ class Base:
 				for item2 in folderlist:
 					if not self.stop_now:
 						self.expand_directory(item2, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg)
+
+	def register_file_with_recent_docs(self, imgfile):
+		if os.path.isfile(imgfile) and gtk.check_version(2, 10, 0) == None:
+			gtk_recent_manager = gtk.recent_manager_get_default()
+			uri = ''
+			if imgfile[:7] != 'file://':
+				uri = 'file://'
+			uri = uri + urllib.pathname2url(os.path.abspath(imgfile))
+			gtk_recent_manager.add_item(uri)
 
 	def valid_image(self, file):
 		test = gtk.gdk.pixbuf_get_file_info(file)
