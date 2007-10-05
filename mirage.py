@@ -3382,6 +3382,7 @@ class Base:
 				self.randomlist[j] = True
 				self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if valid_int(location):
+				prev_img = self.curr_img_in_list
 				self.curr_img_in_list = int(location)
 				self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if not self.fullscreen_mode and (not self.slideshow_mode or (self.slideshow_mode and action != "ss")):
@@ -3479,10 +3480,11 @@ class Base:
 		if preload_prev_image_after:
 			self.preload_when_idle2 = gobject.idle_add(self.preload_prev_image, False)
 
-	def check_preloadimg_prev_for_existing(self, prev_index):
+	def check_preloadimg_prev_for_existing(self, prev_index, reset_preloadimg_prev_in_list):
 		# Determines if preloadimg_prev needs to be updated; if so,
 		# checks if the image is already stored in self.currimg
 		# or self.preloadimg_next and can be reused.
+		reset_preloadimg_prev_in_list = False
 		if prev_index != self.preloadimg_prev_in_list and prev_index != -1:
 			# Need to update preloadimg_prev:
 			if prev_index == self.loaded_img_in_list and not self.image_modified and not self.image_zoomed:
@@ -3504,14 +3506,15 @@ class Base:
 				self.preloadimg_prev_zoomratio = self.preloadimg_next_zoomratio
 				self.preloadimg_prev_is_animation = self.preloadimg_next_is_animation
 			else:
-				self.preloadimg_prev_in_list = -1
+				reset_preloadimg_prev_in_list = True
 		elif prev_index == -1:
-			self.preloadimg_prev_in_list = -1
+			reset_preloadimg_prev_in_list = True
 
-	def check_preloadimg_next_for_existing(self, next_index):
+	def check_preloadimg_next_for_existing(self, next_index, reset_preloadimg_next_in_list):
 		# Determines if preloadimg_next needs to be updated; if so,
 		# checks if the image is already stored in self.currimg
 		# or self.preloadimg_prev and can be reused.
+		reset_preloadimg_next_in_list = False
 		if next_index != self.preloadimg_next_in_list and next_index != -1:
 			# Need to update preloadimg_next:
 			if next_index == self.loaded_img_in_list and not self.image_modified and not self.image_zoomed:
@@ -3533,9 +3536,9 @@ class Base:
 				self.preloadimg_next_zoomratio = self.preloadimg_prev_zoomratio
 				self.preloadimg_next_is_animation = self.preloadimg_prev_is_animation
 			else:
-				self.preloadimg_next_in_list = -1
+				reset_preloadimg_next_in_list = True
 		elif next_index == -1:
-			self.preloadimg_next_in_list = -1
+			reset_preloadimg_next_in_list = True
 
 	def check_currimg_for_existing(self):
 		# Determines if currimg needs to be updated; if so,
@@ -3605,16 +3608,22 @@ class Base:
 			else:
 				prev_index = len(self.image_list)-1
 		if self.preloading_images:
+			reset_preloadimg_next_in_list = False
+			reset_preloadimg_prev_in_list = False
 			if check_prev_last:
-				self.check_preloadimg_next_for_existing(next_index)
+				self.check_preloadimg_next_for_existing(next_index, reset_preloadimg_next_in_list)
 			else:
-				self.check_preloadimg_prev_for_existing(prev_index)
+				self.check_preloadimg_prev_for_existing(prev_index, reset_preloadimg_prev_in_list)
 		used_prev, used_next = self.check_currimg_for_existing()
 		if self.preloading_images:
 			if check_prev_last:
-				self.check_preloadimg_prev_for_existing(prev_index)
+				self.check_preloadimg_prev_for_existing(prev_index, reset_preloadimg_prev_in_list)
 			else:
-				self.check_preloadimg_next_for_existing(next_index)
+				self.check_preloadimg_next_for_existing(next_index, reset_preloadimg_next_in_list)
+		if reset_preloadimg_prev_in_list:
+			self.preloadimg_prev_in_list = -1
+		if reset_preloadimg_next_in_list:
+			self.preloadimg_next_in_list = -1
 		if used_prev or used_next:
 			# If we used a preload image, set the correct boolean variables
 			if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
