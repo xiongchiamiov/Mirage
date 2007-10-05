@@ -637,8 +637,7 @@ class Base:
 		self.layout.connect("motion-notify-event", self.mouse_moved)
 		self.layout.connect("button-release-event", self.button_released)
 		self.imageview.connect("expose-event", self.expose_event)
-		self.thumbpane.connect('item-activated', self.thumbpane_load_image)
-		self.thumbpane.connect('selection-changed', self.thumbpane_selection_changed)
+		self.thumb_sel_handler = self.thumbpane.connect('selection-changed', self.thumbpane_selection_changed)
 
 		# Since GNOME does its own thing for the toolbar style...
 		# Requires gnome-python installed to work (but optional)
@@ -835,7 +834,9 @@ class Base:
 		
 	def thumbpane_select(self, imgnum):
 		if self.thumbpane_show:
+			self.thumbpane.handler_block(self.thumb_sel_handler)
 			self.thumbpane.select_path((imgnum,))
+			self.thumbpane.handler_unblock(self.thumb_sel_handler)
 			self.thumbpane.scroll_to_path((imgnum,), False, False, False)
 
 	def find_path(self, filename):

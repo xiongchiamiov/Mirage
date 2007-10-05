@@ -2,9 +2,11 @@
 + Pane for thumbnails of all images in list (use .thumbnails?)
 	- do a better job of loading thumbnails as they are found (look at updating of app title..)
 	- make sure user can cancel thumbnails...
+	- use cached images when loading, if possible!
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
 + code cleanup... (preload_*, animtest stuff, rename funcs)
 + remote images - load in separate thread to prevent blocking...
++ bug 11263
 
 1.0
 + Allow zooming in crop dialog (default to same view as main window so that
