@@ -121,7 +121,7 @@ class Base:
 		self.recursive = False
 		self.verbose = False
 		self.image_loaded = False
-		self.open_all_images = False			# open all images in the directory(ies)
+		self.open_all_images = True				# open all images in the directory(ies)
 		self.use_last_dir = True
 		self.last_dir = os.path.expanduser("~")
 		self.fixed_dir = os.path.expanduser("~")
@@ -129,12 +129,12 @@ class Base:
 		self.open_mode = self.open_mode_smart
 		self.last_mode = self.open_mode_smart
 		self.listwrap_mode = 0					# 0=no, 1=yes, 2=ask
-		self.user_prompt_visible = False		# the "wrap?" prompt
-		self.slideshow_delay = 1				# self.delayoptions[self.slideshow_delay] seconds
+		self.user_prompt_visible = False			# the "wrap?" prompt
+		self.slideshow_delay = 1					# self.delayoptions[self.slideshow_delay] seconds
 		self.slideshow_mode = False
-		self.delayoptions = [2,3,5,10,15,30]	# in seconds
+		self.delayoptions = [2,3,5,10,15,30]			# in seconds
 		self.slideshow_random = False
-		self.slideshow_controls_visible = False	# fullscreen slideshow controls
+		self.slideshow_controls_visible = False		# fullscreen slideshow controls
 		self.controls_moving = False
 		self.zoomvalue = 2
 		self.updating_adjustments = False
@@ -370,7 +370,9 @@ class Base:
 			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in),
 			('Ctrl-KP_0', None, '', '<Ctrl>KP_0', _('Fit'), self.zoom_to_fit_window_action),
 			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action),
-			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen)
+			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen),
+			('Prev', None, '', 'Up', _('Previous Image'), self.goto_prev_image),
+			('Next', None, '', 'Down', _('Next Image'), self.goto_next_image)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
@@ -477,6 +479,8 @@ class Base:
 			      <menuitem action="Ctrl-KP_0"/>
 			      <menuitem action="Ctrl-KP_1"/>
 			      <menuitem action="Full Screen Key"/>
+			      <menuitem action="Prev"/>
+			      <menuitem action="Next"/>
 			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
@@ -532,6 +536,7 @@ class Base:
 		self.thumbpane.set_margin(15)
 		self.thumbpane.set_selection_mode(gtk.SELECTION_SINGLE)
 		self.thumbpane.select_path("0")
+		self.thumbpane.set_property('can-focus', False)
 		self.thumbscroll = gtk.ScrolledWindow()
 		self.thumbscroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
 		self.thumbscroll.set_size_request(self.thumbpane_width, -1)
@@ -803,22 +808,22 @@ class Base:
 		# Returns a valid pixbuf or None if a pixbuf cannot be generated. Tries to re-use
 		# a thumbnail from ~/.thumbails/normal/, otherwise generates one with the
 		# XDG filename: md5(file:///full/path/to/image).png
-		#try:
-		if os.path.exists(thumb_url) and not force_generation:
-			pix = gtk.gdk.pixbuf_new_from_file(thumb_url)
-			return pix
-		else:
-			# Create the 128x128 thumbnail:
-			imgfile = image_url
-			if imgfile[:7] == 'file://':
-				imgfile = imgfile[7:]
-			pix = gtk.gdk.pixbuf_new_from_file(imgfile)
-			pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128)
-			# Save image to .thumbnails:
-			pix.save(thumb_url, "png")
-			return pix
-		#except:
-		#	return None
+		try:
+			if os.path.exists(thumb_url) and not force_generation:
+				pix = gtk.gdk.pixbuf_new_from_file(thumb_url)
+				return pix
+			else:
+				# Create the 128x128 thumbnail:
+				imgfile = image_url
+				if imgfile[:7] == 'file://':
+					imgfile = imgfile[7:]
+				pix = gtk.gdk.pixbuf_new_from_file(imgfile)
+				pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128)
+				# Save image to .thumbnails:
+				pix.save(thumb_url, "png")
+				return pix
+		except:
+			return None
 	
 	def thumbpane_load_image(self, iconview, path):
 		image_num = int(path[0])
@@ -836,8 +841,8 @@ class Base:
 		if self.thumbpane_show:
 			self.thumbpane.handler_block(self.thumb_sel_handler)
 			self.thumbpane.select_path((imgnum,))
-			self.thumbpane.handler_unblock(self.thumb_sel_handler)
 			self.thumbpane.scroll_to_path((imgnum,), False, False, False)
+			self.thumbpane.handler_unblock(self.thumb_sel_handler)
 
 	def find_path(self, filename):
 		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
@@ -877,10 +882,10 @@ class Base:
 		# For whatever reason, 'Left' and 'Right' cannot be used as menu
 		# accelerators so we will manually check for them here:
 		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
-			if event.keyval == gtk.gdk.keyval_from_name('Left'):
+			if event.keyval == gtk.gdk.keyval_from_name('Left') or event.keyval == gtk.gdk.keyval_from_name('Up'):
 				self.goto_prev_image(None)
 				return
-			elif event.keyval == gtk.gdk.keyval_from_name('Right'):
+			elif event.keyval == gtk.gdk.keyval_from_name('Right') or event.keyval == gtk.gdk.keyval_from_name('Down'):
 				self.goto_next_image(None)
 				return
 		shortcut = gtk.accelerator_name(event.keyval, event.state)
