@@ -42,7 +42,7 @@
 
 			<p align="justify">Custom actions allow a user to hook external programs or calls into Mirage and bind
 			these actions to a shortcut. Custom actions can make use of various supported image
-			parameters and operations (see Edit > Custom Actions for the current listing). Custom actions
+			parameters and operations (see Edit &gt; Custom Actions for the current listing). Custom actions
 			can also be implemented that act on all images in the list (batch mode).
 			</p>
 
@@ -50,7 +50,9 @@
 			thumbnail, Create thumbnails (batch), and Move to favorites.</p>
 
 			<p align="justify">Custom actions can consist of shell commands and external executables. Multiple lines
-			can be specified as needed, with a semicolon (";") separating the lines.</p>
+			can be specified as needed, with a semicolon (";") separating the lines. The custom action is simply
+			executed by the shell, so you can use pipelines and redirections as well as simple commands. Filenames with
+			spaces or special shell characters are escaped correctly for security reasons before they're passed to the shell.</p>
 
 			<p><b><a name="cli">Commandline Arguments</a></b></p>
 

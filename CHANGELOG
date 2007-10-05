@@ -1,6 +1,10 @@
 v0.9 - Pending
+	+ Thumbnails pane (freedesktop spec compliant)
 	+ Ability to open remote images (http and ftp)
 	+ Preference for opening hidden files
+	+ Bug: Filenames in custom actions aren't correctly escaped (Andrew)
+	+ Bug: Can't open properties on animated images
+	+ Bug: Editing a custom action creates a new action
 
 v0.8.3 - January 17, 2007
 	+ Use F11 for fullscreen like most applications
