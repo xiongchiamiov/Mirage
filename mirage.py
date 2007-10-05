@@ -160,8 +160,7 @@ class Base:
 		self.actionGroupCustom = None
 		self.merge_id_recent = None
 		self.actionGroupRecent = None
-		self.recentfiles = [[''], [''], [''], [''], ['']]
-		self.recentfiles_recurse = [False, False, False, False, False]
+		self.recentfiles = ['', '', '', '', '']
 		self.open_hidden_files = False
 
 		# Read any passed options/arguments:
@@ -271,19 +270,8 @@ class Base:
 			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
 		if conf.has_option('recent', 'num_recent'):
 			num_recent = conf.getint('recent', 'num_recent')
-			if num_recent > 0:
-				self.recentfiles = []
-				self.recentfiles_recurse = []
-				for i in range(num_recent):
-					num = conf.getint('recent', 'num[' + str(i) + ']')
-					if conf.has_option('recent', 'recurse[' + str(i) + ']'):
-						self.recentfiles_recurse.append(conf.getboolean('recent', 'recurse[' + str(i) + ']'))
-					else:
-						self.recentfiles_recurse.append(False)
-					urls = []
-					for j in range(num):
-						urls.append(conf.get('recent', 'urls[' + str(i) + ',' + str(j) + ']'))
-					self.recentfiles.append(urls)
+			for i in range(num_recent):
+				self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
@@ -727,19 +715,17 @@ class Base:
 		self.UIManager.ensure_update()
 		for i in range(len(self.recentfiles)):
 			if len(self.recentfiles[i]) > 0:
-				first_filename = self.recentfiles[i][0].split("/")[-1]
-				if len(first_filename) > 0:
-					if len(first_filename) > 27:
+				filename = self.recentfiles[i].split("/")[-1]
+				if len(filename) > 0:
+					if len(filename) > 27:
 						# Replace end of file name (excluding extension) with ..
 						try:
-							menu_name = first_filename[:25] + '..' + os.path.splitext(first_filename)[1]
+							menu_name = filename[:25] + '..' + os.path.splitext(filename)[1]
 						except:
-							menu_name = first_filename[0]
+							menu_name = filename[0]
 					else:
-						menu_name = first_filename
+						menu_name = filename
 					menu_name = menu_name.replace('_','__')
-					if len(self.recentfiles[i]) > 1:
-						menu_name = menu_name + '  [' + _('list') + ']'
 					action = [(str(i), None, menu_name, '<Alt>' + str(i+1), None, self.recent_action_click)]
 					self.actionGroupRecent.add_actions(action)
 		uiDescription = """
@@ -750,8 +736,7 @@ class Base:
 			"""
 		for i in range(len(self.recentfiles)):
 			if len(self.recentfiles[i]) > 0:
-				if len(self.recentfiles[i][0]) > 0:
-					uiDescription = uiDescription + """<menuitem action=\"""" + str(i) + """\"/>"""
+				uiDescription = uiDescription + """<menuitem action=\"""" + str(i) + """\"/>"""
 		uiDescription = uiDescription + """</placeholder></menu></menubar></ui>"""
 		self.merge_id_recent = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupRecent, 0)
@@ -787,6 +772,8 @@ class Base:
 			imgnum = 0
 			for image in self.image_list:
 				gobject.idle_add(self.thumbpane_set_image, image, imgnum)
+				while gtk.events_pending():
+					gtk.main_iteration(True)
 			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
 			
 	def thumbpane_set_image(self, image_name, imgnum, append=True):
@@ -977,59 +964,52 @@ class Base:
 		if cancel:
 			return
 		index = int(action.get_name())
-		if os.path.isfile(self.recentfiles[index][0]) or os.path.exists(self.recentfiles[index][0]) or self.recentfiles[index][0].startswith('http://') or self.recentfiles[index][0].startswith('ftp://'):
-			filelist = []
-			for item in self.recentfiles[index]:
-				filelist.append(item)
-			self.recursive = self.recentfiles_recurse[index]
-			self.expand_filelist_and_load_image(filelist)
+		if os.path.isfile(self.recentfiles[index]) or os.path.exists(self.recentfiles[index]) or self.recentfiles[index].startswith('http://') or self.recentfiles[index].startswith('ftp://'):
+			self.expand_filelist_and_load_image([self.recentfiles[index]])
 		else:
 			self.image_list = []
 			self.curr_img_in_list = 0
-			self.image_list.append(self.recentfiles[index][0])
+			self.image_list.append(self.recentfiles[index])
 			self.image_load_failed(False)
 			self.recent_file_remove_and_refresh(index)
-
+	
+	def recent_file_remove_and_refresh_name(self, rmfile):
+		index_num = 0
+		for imgfile in self.recentfiles:
+			if imgfile == rmfile:
+				self.recent_file_remove_and_refresh(index_num)
+				break
+			index_num += index_num
+	
 	def recent_file_remove_and_refresh(self, index_num):
 		i = index_num
 		while i < len(self.recentfiles)-1:
 			self.recentfiles[i] = self.recentfiles[i+1]
-			self.recentfiles_recurse[i] = self.recentfiles_recurse[i+1]
 			i = i + 1
 		# Set last item empty:
-		self.recentfiles[len(self.recentfiles)-1] = ['']
-		self.recentfiles_recurse[len(self.recentfiles)-1] = False
+		self.recentfiles[len(self.recentfiles)-1] = ''
 		self.refresh_recent_files_menu()
 
-	def recent_file_add_and_refresh(self, list):
-		# Compile list:
-		addlist = []
-		for i in list:
-			addlist.append(i)
+	def recent_file_add_and_refresh(self, addfile):
 		# First check if the filename is already in the list:
 		for i in range(len(self.recentfiles)):
 			if len(self.recentfiles[i]) > 0:
-				if len(self.recentfiles[i][0]) > 0:
-					if addlist == self.recentfiles[i]:
-						# If found in list, put to position 1 and decrement the rest:
-						j = i
-						while j > 0:
-							self.recentfiles[j] = self.recentfiles[j-1]
-							self.recentfiles_recurse[j] = self.recentfiles_recurse[j-1]
-							j = j - 1
-						self.recentfiles[0] = addlist
-						self.recentfiles_recurse[0] = self.recursive
-						self.refresh_recent_files_menu()
-						return
+				if addfile == self.recentfiles[i]:
+					# If found in list, put to position 1 and decrement the rest:
+					j = i
+					while j > 0:
+						self.recentfiles[j] = self.recentfiles[j-1]
+						j = j - 1
+					self.recentfiles[0] = addfile
+					self.refresh_recent_files_menu()
+					return
 		# If not found, put to position 1, decrement the rest:
 		j = len(self.recentfiles)-1
 		while j > 0:
 			self.recentfiles[j] = self.recentfiles[j-1]
-			self.recentfiles_recurse[j] = self.recentfiles_recurse[j-1]
 			j = j - 1
 		if len(self.recentfiles) > 0:
-			self.recentfiles[0] = addlist
-			self.recentfiles_recurse[0] = self.recursive
+			self.recentfiles[0] = addfile
 			self.refresh_recent_files_menu()
 
 	def custom_action_click(self, action):
@@ -1332,9 +1312,7 @@ class Base:
 		conf.set('recent', 'num_recent', len(self.recentfiles))
 		for i in range(len(self.recentfiles)):
 			conf.set('recent', 'num[' + str(i) + ']', len(self.recentfiles[i]))
-			conf.set('recent', 'recurse[' + str(i) + ']', self.recentfiles_recurse[i])
-			for j in range(len(self.recentfiles[i])):
-				conf.set('recent', 'urls[' + str(i) + ',' + str(j) + ']', self.recentfiles[i][j])
+			conf.set('recent', 'urls[' + str(i) + ',0]', self.recentfiles[i])
 		if not os.path.exists(os.path.expanduser('~/.config/')):
 			os.mkdir(os.path.expanduser('~/.config/'))
 		if not os.path.exists(os.path.expanduser('~/.config/mirage/')):
@@ -1466,12 +1444,7 @@ class Base:
 				if fileext in i['extensions']:
 					filetype = i['name']
 			self.save_image_now(filename, filetype)
-			recentfile_found = self.update_filename_in_first_recentfiles_item(prev_name, self.currimg_name)
-			if not recentfile_found:
-				# Add to list:
-				templist = []
-				templist.append(self.currimg_name)
-				self.recent_file_add_and_refresh(templist)
+			self.register_file_with_recent_docs(filename)
 		else:
 			dialog.destroy()
 			
@@ -1533,18 +1506,6 @@ class Base:
 					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', temp)
 				elif response != gtk.RESPONSE_NO:
 					return True
-
-	def update_filename_in_first_recentfiles_item(self, prevname, currname):
-		# Returns True if prevname is found
-		for i in range(len(self.recentfiles[0])):
-			if self.recentfiles[0][i] == prevname:
-				self.recentfiles[0][i] = currname
-				templist = self.recentfiles[0]
-				if i == 0:
-					self.recent_file_remove_and_refresh(0)
-					self.recent_file_add_and_refresh(templist)
-				return True
-		return False		
 
 	def filetype_is_writable(self, filetype):
 		# Determine if filetype is a writable format
@@ -2483,8 +2444,9 @@ class Base:
 				try:
 					new_filename = os.path.dirname(self.currimg_name) + "/" + self.rename_txt.get_text()
 					shutil.move(self.currimg_name, new_filename)
-					recentfile_found = self.update_filename_in_first_recentfiles_item(self.currimg_name, new_filename)
+					self.recent_file_remove_and_refresh_name(self.currimg_name)
 					self.currimg_name = new_filename
+					self.register_file_with_recent_docs(self.currimg_name)
 					self.update_title()
 				except:
 					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to rename') + ' ' + self.currimg_name)
@@ -2529,6 +2491,7 @@ class Base:
 			if response  == gtk.RESPONSE_YES:
 				try:
 					os.remove(self.currimg_name)
+					self.recent_file_remove_and_refresh_name(self.currimg_name)
 					iter = self.thumblist.get_iter((self.curr_img_in_list,))
 					self.thumblist.remove(iter)
 					templist = self.image_list
@@ -3995,7 +3958,6 @@ class Base:
 		self.set_slideshow_sensitivities()
 		if not self.closing_app:
 			self.change_cursor(None)
-		self.recent_file_add_and_refresh(recentfiles_list)
 		self.recursive = False
 		gobject.idle_add(self.thumbpane_populate)
 
@@ -4062,6 +4024,7 @@ class Base:
 						self.expand_directory(item2, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg)
 
 	def register_file_with_recent_docs(self, imgfile):
+		self.recent_file_add_and_refresh(imgfile)
 		if os.path.isfile(imgfile) and gtk.check_version(2, 10, 0) == None:
 			gtk_recent_manager = gtk.recent_manager_get_default()
 			uri = ''
