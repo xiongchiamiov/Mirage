@@ -515,9 +515,9 @@ class Base:
 		self.hscroll.set_adjustment(self.layout.get_hadjustment())
 		self.table = gtk.Table(3, 2, False)
 		
-		self.thumblist = gtk.ListStore(int, gtk.gdk.Pixbuf)
+		self.thumblist = gtk.ListStore(gtk.gdk.Pixbuf)
 		self.thumbpane = gtk.IconView(self.thumblist)
-		self.thumbpane.set_pixbuf_column(1)
+		self.thumbpane.set_pixbuf_column(0)
 		self.thumbpane.set_columns(1)
 		self.thumbpane.set_item_width(128)
 		self.thumbpane.set_spacing(10)
@@ -630,7 +630,7 @@ class Base:
 		self.layout.connect("motion-notify-event", self.mouse_moved)
 		self.layout.connect("button-release-event", self.button_released)
 		self.imageview.connect("expose-event", self.expose_event)
-		self.thumb_sel_handler = self.thumbpane.connect('selection-changed', self.thumbpane_selection_changed)
+		self.thumb_sel_handler = self.thumbpane.connect("selection-changed", self.thumbpane_selection_changed)
 
 		# Since GNOME does its own thing for the toolbar style...
 		# Requires gnome-python installed to work (but optional)
@@ -771,10 +771,13 @@ class Base:
 			self.thumblist.clear()
 			imgnum = 0
 			for image in self.image_list:
-				gobject.idle_add(self.thumbpane_set_image, image, imgnum)
-				while gtk.events_pending():
-					gtk.main_iteration(True)
-			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
+				if not self.closing_app and not self.stop_now:
+					gobject.idle_add(self.thumbpane_set_image, image, imgnum)
+					if imgnum == self.curr_img_in_list:
+						gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
+					imgnum += 1
+					while gtk.events_pending():
+						gtk.main_iteration(True)
 			
 	def thumbpane_set_image(self, image_name, imgnum, append=True):
 		if self.thumbpane_show:
@@ -787,9 +790,9 @@ class Base:
 			if pix:
 				if append:
 					imgnum = imgnum + 1
-					self.thumblist.append([imgnum, self.pixbuf_add_border(pix)])
+					self.thumblist.append([self.pixbuf_add_border(pix)])
 				else:
-					self.thumblist[imgnum] = [imgnum, self.pixbuf_add_border(pix)]
+					self.thumblist[imgnum] = [self.pixbuf_add_border(pix)]
 		
 	def thumbpane_get_pixbuf(self, thumb_url, image_url, force_generation):
 		# Returns a valid pixbuf or None if a pixbuf cannot be generated. Tries to re-use
@@ -948,6 +951,7 @@ class Base:
 				if self.images_are_different(animtest, self.preloadimg_next_pixbuf_original):
 					self.preloadimg_next_in_list = -1
 					self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
+		self.stop_now = False
 		gobject.idle_add(self.thumbpane_populate)
 
 	def images_are_different(self, pixbuf1, pixbuf2):
@@ -1698,6 +1702,7 @@ class Base:
 			self.thumbscroll.show()
 			self.thumbpane.show()
 			self.thumbpane_show = True
+			self.stop_now = False
 			self.thumbpane_populate()
 		if self.image_loaded and self.last_image_action_was_fit:
 			if self.last_image_action_was_smart_fit:
@@ -3338,6 +3343,8 @@ class Base:
 						self.user_prompt_visible = False
 						if self.fullscreen_mode:
 							self.hide_cursor
+						else:
+							self.change_cursor(None)
 						if self.slideshow_mode:
 							self.toggle_slideshow(None)
 						return
@@ -3753,6 +3760,7 @@ class Base:
 	def expand_filelist_and_load_image(self, inputlist):
 		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found
+		self.thumblist.clear()
 		recentfiles_list = []
 		passed_list = []
 		for item in inputlist:
@@ -3829,6 +3837,7 @@ class Base:
 				self.update_title()
 				return
 		init_image = os.path.abspath(inputlist[0])
+		self.stop_now = False
 		# If open all images in dir...
 		if self.open_all_images:
 			temp = inputlist
@@ -3859,11 +3868,10 @@ class Base:
 			if not self.closing_app:
 				if os.path.isfile(item):
 					if self.valid_image(item):
-						if not second_image_found:
-							if first_image_found:
-								second_image_found = True
-								second_image = item
-								second_image_came_from_dir = False
+						if not second_image_found and first_image_found:
+							second_image_found = True
+							second_image = item
+							second_image_came_from_dir = False
 						if not first_image_found:
 							first_image_found = True
 							first_image = item
@@ -3876,7 +3884,7 @@ class Base:
 					# If it's a directory that was explicitly selected or passed to
 					# the program, get all the files in the dir.
 					# Retrieve only images in the top directory specified by the user
-					# only explicitly told to recurse (via -R or in Settings>Preferences)
+					# unless explicitly told to recurse (via -R or in Settings>Preferences)
 					folderlist.append(item)
 					if not second_image_found:
 						# See if we can find an image in this directory:
@@ -3885,15 +3893,14 @@ class Base:
 						itemnum = 0
 						while itemnum < len(self.image_list) and not second_image_found:
 							if os.path.isfile(self.image_list[itemnum]):
-								if not second_image_found:
-									if first_image_found:
-										second_image_found = True
-										second_image_came_from_dir = True
-										second_image = self.image_list[itemnum]
-										self.set_go_navigation_sensitivities(True)
-										go_buttons_enabled = True
-										while gtk.events_pending():
-											gtk.main_iteration(True)
+								if not second_image_found and first_image_found:
+									second_image_found = True
+									second_image_came_from_dir = True
+									second_image = self.image_list[itemnum]
+									self.set_go_navigation_sensitivities(True)
+									go_buttons_enabled = True
+									while gtk.events_pending():
+										gtk.main_iteration(True)
 								if not first_image_found:
 									first_image_found = True
 									first_image = self.image_list[itemnum]
@@ -3956,10 +3963,10 @@ class Base:
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
 		self.set_slideshow_sensitivities()
+		gobject.idle_add(self.thumbpane_populate)
 		if not self.closing_app:
 			self.change_cursor(None)
 		self.recursive = False
-		gobject.idle_add(self.thumbpane_populate)
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
@@ -3985,38 +3992,35 @@ class Base:
 				return False
 			for item2 in os.listdir(item):
 				if not self.closing_app and not self.stop_now:
+					while gtk.events_pending():
+						gtk.main_iteration(True)
 					item2 = item + "/" + item2
 					item_fullpath2 = os.path.abspath(item2)
 					if (not self.open_hidden_files and os.path.basename(item_fullpath2)[0] != '.') or self.open_hidden_files:
-						if os.path.isfile(item_fullpath2):
-							if self.valid_image(item_fullpath2):
-								filelist.append(item2)
-								if self.verbose and print_found_msg:
-									self.images_found += 1
-									print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
+						if os.path.isfile(item_fullpath2) and self.valid_image(item_fullpath2):
+							filelist.append(item2)
+							if self.verbose and print_found_msg:
+								self.images_found += 1
+								print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
 						elif os.path.isdir(item_fullpath2) and self.recursive:
 							folderlist.append(item_fullpath2)
 					elif self.verbose:
 						print _("Skipping") + ":", item_fullpath2
-			if len(self.image_list)>0:
-				if update_window_title:
-					self.update_title()
-					if not self.closing_app:
-						while gtk.events_pending():
-							gtk.main_iteration(True)
-			# Sort the filelist and folderlist alphabetically, and recurse into folderlist:
+			if len(self.image_list)>0 and update_window_title:
+				self.update_title()
+			# Sort the filelist and folderlist alphabetically:
 			if len(filelist) > 0:
 				filelist.sort(locale.strcoll)
 				for item2 in filelist:
 					if not item2 in self.image_list:
 						self.image_list.append(item2)
 						if stop_when_second_image_found and len(self.image_list)==2:
-							self.stop_now = True
+							#self.stop_now = True
 							return
-						if not go_buttons_enabled:
-							if len(self.image_list) > 1:
-								self.set_go_navigation_sensitivities(True)
-								go_buttons_enabled = True
+						if not go_buttons_enabled and len(self.image_list) > 1:
+							self.set_go_navigation_sensitivities(True)
+							go_buttons_enabled = True
+			# Recurse into the folderlist:
 			if len(folderlist) > 0:
 				folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
