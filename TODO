@@ -1,5 +1,5 @@
 0.9
-+ code cleanup... (preload_*, animtest stuff, rename funcs)
++ update to gplv3
 
 1.0
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
@@ -9,6 +9,7 @@
 + Printing support (requires gtk 2.10, pygtk) (Bjoern Martensen)
 + Try to highlight selected region of cropped image (or darken unselected region)
 + remote images - load in separate thread to prevent blocking...
++ code cleanup... (preload_*, animtest stuff, rename funcs)
 
 Future
 + Ability to specify save compression level?

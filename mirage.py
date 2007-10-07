@@ -1,11 +1,11 @@
 # $HeadURL$
 # $Id$
 
-__version__ = "0.8.3"
+__version__ = "0.9"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
-Copyright 2006 Scott Horowitz <stonecrest@gmail.com>
+Copyright 2007 Scott Horowitz <stonecrest@gmail.com>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

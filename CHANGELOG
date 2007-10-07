@@ -1,5 +1,5 @@
 v0.9 - Pending
-	+ Thumbnails pane (freedesktop spec compliant)
+	+ Thumbnails pane (freedesktop spec compliant using ~/.thumbnails)
 	+ Ability to open remote images (http and ftp)
 	+ Register viewed images with gtk's recent documents (ongardie)
 	+ Preference for opening hidden files
