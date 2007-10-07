@@ -3315,6 +3315,15 @@ class Base:
 					elif location == "NEXT":
 						self.curr_img_in_list = 0
 				else:
+					if self.curr_img_in_list != self.loaded_img_in_list:
+						# Ensure that the user is looking at the correct "last" image before
+						# they are asked the wrap question:
+						if location == "PREV":
+							self.load_new_image(True, False, True, True, True, True)
+						else:
+							self.load_new_image(False, False, True, True, True, True)
+						self.set_go_navigation_sensitivities(False)
+						self.thumbpane_select(self.curr_img_in_list)
 					if self.fullscreen_mode:
 						self.change_cursor(None)
 					if location == "PREV":

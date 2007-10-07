@@ -7,6 +7,7 @@ v0.9 - Pending
 	+ Bug: Filenames in custom actions aren't correctly escaped (Andrew)
 	+ Bug: Can't open properties on animated images
 	+ Bug: Editing a custom action creates a new action
+	+ Bug: Fast image traversal overruns image list and becomes stuck
 
 v0.8.3 - January 17, 2007
 	+ Use F11 for fullscreen like most applications
