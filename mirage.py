@@ -72,7 +72,6 @@ class Base:
 		self.open_mode_1to1 = 2
 		self.open_mode_last = 3
 		self.min_zoomratio = 0.02
-		self.thumbpane_width = 180
 
 		# Initialize vars:
 		width=600
@@ -162,6 +161,8 @@ class Base:
 		self.actionGroupRecent = None
 		self.recentfiles = ['', '', '', '', '']
 		self.open_hidden_files = False
+		self.thumbnail_sizes = ["128", "96", "72", "64", "48", "32"]
+		self.thumbnail_size = 128 					# Default to 128 x 128
 
 		# Read any passed options/arguments:
 		try:
@@ -251,6 +252,8 @@ class Base:
 			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
 		if conf.has_option('prefs', 'preloading_images'):
 			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
+		if conf.has_option('prefs', 'thumbsize'):
+			self.thumbnail_size = conf.getint('prefs', 'thumbsize')
 		if conf.has_option('actions', 'num_actions'):
 			num_actions = conf.getint('actions', 'num_actions')
 			self.action_names = []
@@ -514,20 +517,22 @@ class Base:
 		self.hscroll = gtk.HScrollbar(None)
 		self.hscroll.set_adjustment(self.layout.get_hadjustment())
 		self.table = gtk.Table(3, 2, False)
-		
+
+
 		self.thumblist = gtk.ListStore(gtk.gdk.Pixbuf)
-		self.thumbpane = gtk.IconView(self.thumblist)
-		self.thumbpane.set_pixbuf_column(0)
-		self.thumbpane.set_columns(1)
-		self.thumbpane.set_item_width(128)
-		self.thumbpane.set_spacing(10)
-		self.thumbpane.set_margin(15)
-		self.thumbpane.set_selection_mode(gtk.SELECTION_SINGLE)
-		self.thumbpane.select_path("0")
+		self.thumbpane = gtk.TreeView(self.thumblist)
+		self.thumbcolumn = gtk.TreeViewColumn(None)
+		self.thumbcell = gtk.CellRendererPixbuf()
+		self.thumbcolumn.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+		self.thumbpane_set_size()
+		self.thumbpane.append_column(self.thumbcolumn)
+		self.thumbcolumn.pack_start(self.thumbcell, True)
+		self.thumbcolumn.set_attributes(self.thumbcell, pixbuf=0)
+		self.thumbpane.get_selection().set_mode(gtk.SELECTION_SINGLE)
+		self.thumbpane.set_headers_visible(False)
 		self.thumbpane.set_property('can-focus', False)
 		self.thumbscroll = gtk.ScrolledWindow()
 		self.thumbscroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
-		self.thumbscroll.set_size_request(self.thumbpane_width, -1)
 		self.thumbscroll.add(self.thumbpane)
 		
 		self.table.attach(self.thumbscroll, 0, 1, 0, 1, 0, gtk.FILL|gtk.EXPAND, 0, 0)
@@ -630,7 +635,7 @@ class Base:
 		self.layout.connect("motion-notify-event", self.mouse_moved)
 		self.layout.connect("button-release-event", self.button_released)
 		self.imageview.connect("expose-event", self.expose_event)
-		self.thumb_sel_handler = self.thumbpane.connect("selection-changed", self.thumbpane_selection_changed)
+		self.thumb_sel_handler = self.thumbpane.get_selection().connect('changed', self.thumbpane_selection_changed)
 
 		# Since GNOME does its own thing for the toolbar style...
 		# Requires gnome-python installed to work (but optional)
@@ -788,6 +793,9 @@ class Base:
 			mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
 			pix = self.thumbpane_get_pixbuf(mhex_filename, filename, not append)
 			if pix:
+				if self.thumbnail_size != 128:
+					# 128 is the size of the saved thumbnail, so convert if different:
+					pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
 				if append:
 					imgnum = imgnum + 1
 					self.thumblist.append([self.pixbuf_add_border(pix)])
@@ -822,17 +830,24 @@ class Base:
 		
 	def thumbpane_selection_changed(self, iconview):
 		try:
-			paths = self.thumbpane.get_selected_items()
+			model, paths = self.thumbpane.get_selection().get_selected_rows()
 			self.thumbpane_load_image(iconview, paths[0])
 		except:
 			pass
 		
 	def thumbpane_select(self, imgnum):
 		if self.thumbpane_show:
-			self.thumbpane.handler_block(self.thumb_sel_handler)
-			self.thumbpane.select_path((imgnum,))
-			self.thumbpane.scroll_to_path((imgnum,), False, False, False)
-			self.thumbpane.handler_unblock(self.thumb_sel_handler)
+			self.thumbpane.get_selection().handler_block(self.thumb_sel_handler)
+			self.thumbpane.get_selection().select_path((imgnum,))
+			self.thumbpane.scroll_to_cell((imgnum,))
+			self.thumbpane.get_selection().handler_unblock(self.thumb_sel_handler)
+
+	def thumbpane_set_size(self):
+		self.thumbcolumn.set_fixed_width(self.thumbpane_get_size())
+		self.window_resized(None, self.window.allocation, True)
+	
+	def thumbpane_get_size(self):
+		return int(self.thumbnail_size * 1.3)
 
 	def find_path(self, filename):
 		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
@@ -1256,10 +1271,10 @@ class Base:
 				pass
 		self.updating_adjustments = False
 
-	def window_resized(self, widget, allocation):
+	def window_resized(self, widget, allocation, force_update=False):
 		# Update the image size on window resize if the current image was last fit:
 		if self.image_loaded:
-			if allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
+			if force_update or allocation.width != self.prevwinwidth or allocation.height != self.prevwinheight:
 				if self.last_image_action_was_fit:
 					if self.last_image_action_was_smart_fit:
 						self.zoom_to_fit_or_1_to_1(None, False, False)
@@ -1305,6 +1320,7 @@ class Base:
 		conf.set('prefs', 'preloading_images', self.preloading_images)
 		conf.set('prefs', 'savemode', self.savemode)
 		conf.set('prefs', 'start_in_fullscreen', self.start_in_fullscreen)
+		conf.set('prefs', 'thumbsize', self.thumbnail_size)
 		conf.add_section('actions')
 		conf.set('actions', 'num_actions', len(self.action_names))
 		for i in range(len(self.action_names)):
@@ -1410,7 +1426,7 @@ class Base:
 		width = self.window.get_size()[0]
 		if not self.fullscreen_mode:
 			if self.thumbpane_show:
-				width -= self.thumbpane_width
+				width -= self.thumbpane_get_size()
 		return width
 
 	def available_image_height(self):
@@ -2147,6 +2163,7 @@ class Base:
 		show_props.destroy()
 
 	def show_prefs(self, action):
+		prev_thumbnail_size = self.thumbnail_size
 		self.prefs_dialog = gtk.Dialog(_("Mirage Preferences"), self.window)
 		self.prefs_dialog.set_has_separator(False)
 		self.prefs_dialog.set_resizable(False)
@@ -2166,14 +2183,25 @@ class Base:
 		color_hbox.pack_start(gtk.Label(), True, True, 0)
 		fullscreen = gtk.CheckButton(_("Open Mirage in fullscreen mode"))
 		fullscreen.set_active(self.start_in_fullscreen)
+		thumbbox = gtk.HBox()
+		thumblabel = gtk.Label(_("Thumbnail size") + ":  ")
+		thumbbox.pack_start(thumblabel, False, False, 0)
+		thumbsize = gtk.combo_box_new_text()
+		option = 0
+		for size in self.thumbnail_sizes:
+			thumbsize.append_text(size + " x " + size)
+			if self.thumbnail_size == int(size):
+				thumbsize.set_active(option)
+			option += 1
+		thumbbox.pack_start(thumbsize, False, False, 5)
 		table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_settings.attach(bglabel, 1, 3, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_settings.attach(fullscreen, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(thumbbox, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(fullscreen, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
@@ -2387,6 +2415,10 @@ class Base:
 			self.savemode = savecombo.get_active()
 			self.start_in_fullscreen = fullscreen.get_active()
 			self.confirm_delete = deletebutton.get_active()
+			self.thumbnail_size = int(self.thumbnail_sizes[thumbsize.get_active()])
+			if self.thumbnail_size != prev_thumbnail_size:
+				gobject.idle_add(self.thumbpane_set_size)
+				gobject.idle_add(self.thumbpane_populate)
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
 			if (self.preloading_images and not preloading_images_prev) or (open_mode_prev != self.open_mode):
@@ -3770,10 +3802,6 @@ class Base:
 		# Takes the current list (i.e. ["pic.jpg", "pic2.gif", "../images"]) and
 		# expands it into a list of all pictures found
 		self.thumblist.clear()
-		recentfiles_list = []
-		passed_list = []
-		for item in inputlist:
-			passed_list.append(item)
 		first_image_loaded_successfully = False
 		self.images_found = 0
 		self.stop_now = True # Make sure that any previous search process is stopped
@@ -3963,10 +3991,7 @@ class Base:
 			if not self.closing_app:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
-		if first_image_loaded_successfully:
-			for item in passed_list:
-				recentfiles_list.append(item)
-		else:
+		if not first_image_loaded_successfully:
 			self.image_load_failed(False, inputlist[0])
 		self.searching_for_images = False
 		self.update_statusbar()
@@ -4024,7 +4049,6 @@ class Base:
 					if not item2 in self.image_list:
 						self.image_list.append(item2)
 						if stop_when_second_image_found and len(self.image_list)==2:
-							#self.stop_now = True
 							return
 						if not go_buttons_enabled and len(self.image_list) > 1:
 							self.set_go_navigation_sensitivities(True)
