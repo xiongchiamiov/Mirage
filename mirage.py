@@ -56,6 +56,13 @@ if gtk.gtk_version < (2, 6, 0):
 if gtk.pygtk_version < (2, 6, 0):
 	sys.stderr.write("Mirage requires PyGTK 2.6.0 or newer.\n")
 	sys.exit(1)
+	
+def valid_int(inputstring):
+	try:
+		x = int(inputstring)
+		return True
+	except:
+		return False
 
 class Base:
 
@@ -4222,10 +4229,3 @@ class Base:
 if __name__ == "__main__":
 	base = Base()
 	base.main()
-
-def valid_int(inputstring):
-	try:
-		x = int(inputstring)
-		return True
-	except:
-		return False
