@@ -1624,10 +1624,10 @@ class Base:
 		dialog.vbox.pack_start(hbox, True, True, 10)
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		dialog.vbox.show_all()
-		dialog.connect('response', self.open_file_remote_response)
+		dialog.connect('response', self.open_file_remote_response,  location)
 		response = dialog.show()
 	
-	def open_file_remote_response(self, dialog, response):
+	def open_file_remote_response(self, dialog, response, location):
 		if response == gtk.RESPONSE_OK:
 			filenames = []
 			filenames.append(location.get_text())
