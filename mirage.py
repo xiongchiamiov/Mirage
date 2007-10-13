@@ -829,14 +829,8 @@ class Base:
 		self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
 		self.thumblist.clear()
 		self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
-		# Initialize with blank images:
-		blank_pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, self.thumbnail_size, self.thumbnail_size)
-		blank_pix.fill(0x00000000)
-		imgsize = int(self.thumbnail_size*0.8)
-		composite_pix = self.blank_image.scale_simple(imgsize, imgsize, gtk.gdk.INTERP_BILINEAR)
-		leftcoord = int((self.thumbnail_size - imgsize)/2)
-		composite_pix.copy_area(0, 0, imgsize, imgsize, blank_pix, leftcoord, leftcoord)
-		for i in range(len(self.image_list)):
+		for image in self.image_list:
+			blank_pix = self.get_blank_pix_for_image(image)
 			self.thumblist.append([blank_pix])
 		self.thumbnail_loaded = [False]*len(self.image_list)
 
@@ -913,7 +907,32 @@ class Base:
 	
 	def thumbpane_scrolled(self, range):
 		self.thumbpane_update_images()
-		
+
+	def get_blank_pix_for_image(self, image):
+		# Sizes the "blank image" icon for the thumbpane. This will ensure that we don't
+		# load a humongous icon for a small pix, for example, and will keep the thumbnails
+		# from shifting around when they are actually loaded.
+		info = gtk.gdk.pixbuf_get_file_info(image)
+		imgwidth = float(info[1])
+		imgheight = float(info[2])
+		if imgheight > self.thumbnail_size:
+			if imgheight > imgwidth:
+				imgheight = self.thumbnail_size
+			else:
+				imgheight = imgheight/imgwidth * self.thumbnail_size
+		imgheight = 2 + int(imgheight) # Account for border that will be added to thumbnails..
+		imgwidth = self.thumbnail_size
+		# Initialize with blank images:
+		blank_pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, imgwidth, imgheight)
+		blank_pix.fill(0x00000000)
+		imgwidth2 = int(imgheight*0.8)
+		imgheight2 = int(imgheight*0.8)
+		composite_pix = self.blank_image.scale_simple(imgwidth2, imgheight2, gtk.gdk.INTERP_BILINEAR)
+		leftcoord = int((imgwidth - imgwidth2)/2)
+		topcoord = int((imgheight - imgheight2)/2)
+		composite_pix.copy_area(0, 0, imgwidth2, imgheight2, blank_pix, leftcoord, topcoord)
+		return blank_pix
+
 	def find_path(self, filename):
 		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
 			full_filename = os.path.join(sys.prefix, 'share', 'pixmaps', filename)
@@ -1112,9 +1131,7 @@ class Base:
 
 
 	def parse_action_command2(self, cmd, imagename):
-		"""
-		Executes the given command using ``os.system``, substituting "%"-macros approprately.
-		"""
+		# Executes the given command using ``os.system``, substituting "%"-macros approprately.
 		def sh_esc(s):
 			import re
 			return re.sub(r'[^/._a-zA-Z0-9]', lambda c: '\\'+c.group(), s)
