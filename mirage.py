@@ -45,6 +45,7 @@ import filecmp
 import tempfile
 import socket
 import md5
+import threading
 try:
 	import gconf
 except:
@@ -67,6 +68,8 @@ def valid_int(inputstring):
 class Base:
 
 	def __init__(self):
+		
+		gtk.gdk.threads_init()
 
 		try:
 			gettext.install('mirage', '/usr/share/locale', unicode=1)
@@ -170,6 +173,8 @@ class Base:
 		self.open_hidden_files = False
 		self.thumbnail_sizes = ["128", "96", "72", "64", "48", "32"]
 		self.thumbnail_size = 128 					# Default to 128 x 128
+		self.thumbnail_loaded = []
+		self.thumbpane_updating = False
 
 		# Read any passed options/arguments:
 		try:
@@ -291,6 +296,8 @@ class Base:
 		# Read accel_map file, if it exists
 		if os.path.isfile(os.path.expanduser('~/.config/mirage/accel_map')):
 			gtk.accel_map_load(os.path.expanduser('~/.config/mirage/accel_map'))
+			
+		self.blank_image = gtk.gdk.pixbuf_new_from_file(self.find_path("mirage_blank.png"))
 
 		# Define the main menubar and toolbar:
 		factory = gtk.IconFactory()
@@ -525,7 +532,6 @@ class Base:
 		self.hscroll.set_adjustment(self.layout.get_hadjustment())
 		self.table = gtk.Table(3, 2, False)
 
-
 		self.thumblist = gtk.ListStore(gtk.gdk.Pixbuf)
 		self.thumbpane = gtk.TreeView(self.thumblist)
 		self.thumbcolumn = gtk.TreeViewColumn(None)
@@ -643,6 +649,7 @@ class Base:
 		self.layout.connect("button-release-event", self.button_released)
 		self.imageview.connect("expose-event", self.expose_event)
 		self.thumb_sel_handler = self.thumbpane.get_selection().connect('changed', self.thumbpane_selection_changed)
+		self.thumb_scroll_handler = self.thumbscroll.get_vscrollbar().connect("value-changed", self.thumbpane_scrolled)
 
 		# Since GNOME does its own thing for the toolbar style...
 		# Requires gnome-python installed to work (but optional)
@@ -777,37 +784,83 @@ class Base:
 		self.merge_id = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupCustom, 0)
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
+		
+	def thumbpane_update_images(self, clear_first=False, force_upto_imgnum=-1):
+		self.stop_now = False
+		# When first populating the thumbpane, make sure we go up to at least
+		# force_upto_imgnum so that we can show this image selected:
+		if clear_first:
+			self.thumbpane_clear_list()
+		# Load all images up to the bottom ofo the visible thumbpane rect:
+		rect = self.thumbpane.get_visible_rect()
+		bottom_coord = rect.y + rect.height + self.thumbnail_size
+		if bottom_coord > self.thumbpane_bottom_coord_loaded:
+			self.thumbpane_bottom_coord_loaded = bottom_coord
+		# update images:
+		if not self.thumbpane_updating:
+			thread = threading.Thread(target=self.thumbpane_update_pending_images, args=(force_upto_imgnum, None))
+			thread.setDaemon(True)
+			thread.start()
+		
+	def thumbpane_update_pending_images(self, force_upto_imgnum, foo):
+		self.thumbpane_updating = True
+		# Check to see if any images need their thumbnails generated.
+		curr_coord = 0
+		imgnum = 0
+		while curr_coord < self.thumbpane_bottom_coord_loaded or imgnum < force_upto_imgnum:
+			if self.closing_app or self.stop_now:
+				break
+			if self.thumbpane_show:
+				if imgnum >= len(self.image_list):
+					break
+				self.thumbpane_set_image(self.image_list[imgnum], imgnum)
+				curr_coord += self.thumbpane.get_background_area((imgnum,),self.thumbcolumn).height
+				if force_upto_imgnum == imgnum:
+					# Verify that the user hasn't switched images whil we're loading thumbnails:
+					if force_upto_imgnum == self.curr_img_in_list:
+						gobject.idle_add(self.thumbpane_select, force_upto_imgnum)
+				imgnum += 1
+			else:
+				break
+		self.thumbpane_updating = False
 	
-	def thumbpane_populate(self):
+	def thumbpane_clear_list(self):
+		self.thumbpane_bottom_coord_loaded = 0
+		self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
+		self.thumblist.clear()
+		self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
+		# Initialize with blank images:
+		blank_pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, self.thumbnail_size, self.thumbnail_size)
+		blank_pix.fill(0x00000000)
+		imgsize = int(self.thumbnail_size*0.8)
+		composite_pix = self.blank_image.scale_simple(imgsize, imgsize, gtk.gdk.INTERP_BILINEAR)
+		leftcoord = int((self.thumbnail_size - imgsize)/2)
+		composite_pix.copy_area(0, 0, imgsize, imgsize, blank_pix, leftcoord, leftcoord)
+		for i in range(len(self.image_list)):
+			self.thumblist.append([blank_pix])
+		self.thumbnail_loaded = [False]*len(self.image_list)
+
+	def thumbpane_set_image(self, image_name, imgnum, force_update=False):
 		if self.thumbpane_show:
-			self.thumblist.clear()
-			imgnum = 0
-			for image in self.image_list:
-				if not self.closing_app and not self.stop_now:
-					gobject.idle_add(self.thumbpane_set_image, image, imgnum)
-					if imgnum == self.curr_img_in_list:
-						gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
-					imgnum += 1
-					while gtk.events_pending():
-						gtk.main_iteration(True)
-			
-	def thumbpane_set_image(self, image_name, imgnum, append=True):
-		if self.thumbpane_show:
-			filename = os.path.expanduser('file://' + image_name)
-			m = md5.new()
-			m.update(filename)
-			mhex = m.hexdigest()
-			mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
-			pix = self.thumbpane_get_pixbuf(mhex_filename, filename, not append)
-			if pix:
-				if self.thumbnail_size != 128:
-					# 128 is the size of the saved thumbnail, so convert if different:
-					pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
-				if append:
-					imgnum = imgnum + 1
-					self.thumblist.append([self.pixbuf_add_border(pix)])
-				else:
+			if not self.thumbnail_loaded[imgnum] or force_update:
+				filename, thumbfile = self.thumbnail_get_name(image_name)
+				pix = self.thumbpane_get_pixbuf(thumbfile, filename, force_update)
+				if pix:
+					if self.thumbnail_size != 128:
+						# 128 is the size of the saved thumbnail, so convert if different:
+						pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
+					self.thumbnail_loaded[imgnum] = True
+					self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
 					self.thumblist[imgnum] = [self.pixbuf_add_border(pix)]
+					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
+	
+	def thumbnail_get_name(self, image_name):
+		filename = os.path.expanduser('file://' + image_name)
+		m = md5.new()
+		m.update(filename)
+		mhex = m.hexdigest()
+		mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
+		return filename, mhex_filename
 		
 	def thumbpane_get_pixbuf(self, thumb_url, image_url, force_generation):
 		# Returns a valid pixbuf or None if a pixbuf cannot be generated. Tries to re-use
@@ -830,15 +883,17 @@ class Base:
 		except:
 			return None
 	
-	def thumbpane_load_image(self, iconview, path):
-		image_num = int(path[0])
-		if image_num != self.curr_img_in_list:
-			self.goto_image(str(image_num), None)
+	def thumbpane_load_image(self, treeview, imgnum):
+		if imgnum != self.curr_img_in_list:
+			gobject.idle_add(self.goto_image, str(imgnum), None)
 		
-	def thumbpane_selection_changed(self, iconview):
+	def thumbpane_selection_changed(self, treeview):
 		try:
 			model, paths = self.thumbpane.get_selection().get_selected_rows()
-			self.thumbpane_load_image(iconview, paths[0])
+			imgnum = paths[0][0]
+			if not self.thumbnail_loaded[imgnum]:
+				self.thumbpane_set_image(self.image_list[imgnum], imgnum)
+			gobject.idle_add(self.thumbpane_load_image, treeview, imgnum)
 		except:
 			pass
 		
@@ -855,7 +910,10 @@ class Base:
 	
 	def thumbpane_get_size(self):
 		return int(self.thumbnail_size * 1.3)
-
+	
+	def thumbpane_scrolled(self, range):
+		self.thumbpane_update_images()
+		
 	def find_path(self, filename):
 		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
 			full_filename = os.path.join(sys.prefix, 'share', 'pixmaps', filename)
@@ -974,7 +1032,12 @@ class Base:
 					self.preloadimg_next_in_list = -1
 					self.preload_when_idle = gobject.idle_add(self.preload_next_image, False)
 		self.stop_now = False
-		gobject.idle_add(self.thumbpane_populate)
+		if batchmode:
+			# Update all thumbnails:
+			gobject.idle_add(self.thumbpane_update_images, True, self.curr_img_in_list)
+		else:
+			# Update only the current thumbnail:
+			gobject.idle_add(self.thumbpane_set_image, self.image_list[self.curr_img_in_list], self.curr_img_in_list, True)
 
 	def images_are_different(self, pixbuf1, pixbuf2):
 		if pixbuf1.get_pixels() == pixbuf2.get_pixels():
@@ -1489,7 +1552,7 @@ class Base:
 				self.update_title()
 				self.update_statusbar()
 				# Update thumbnail:
-				gobject.idle_add(self.thumbpane_set_image, dest_name, self.curr_img_in_list, False)
+				gobject.idle_add(self.thumbpane_set_image, dest_name, self.curr_img_in_list, True)
 				self.image_modified = False
 			else:
 				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, _('The') + ' ' + filetype + ' ' + 'format is not supported for saving. Do you wish to save the file in a different format?')
@@ -1561,14 +1624,17 @@ class Base:
 		dialog.vbox.pack_start(hbox, True, True, 10)
 		dialog.set_default_response(gtk.RESPONSE_OK)
 		dialog.vbox.show_all()
-		response = dialog.run()
+		dialog.connect('response', self.open_file_remote_response)
+		response = dialog.show()
+	
+	def open_file_remote_response(self, dialog, response):
 		if response == gtk.RESPONSE_OK:
 			filenames = []
 			filenames.append(location.get_text())
 			dialog.destroy()
 			while gtk.events_pending():
 				gtk.main_iteration()
-			getfiles = gobject.idle_add(self.expand_filelist_and_load_image, filenames)
+			self.expand_filelist_and_load_image(filenames)
 		else:
 			dialog.destroy()
 
@@ -1609,7 +1675,10 @@ class Base:
 		else:
 			if self.fixed_dir != None:
 				dialog.set_current_folder(self.fixed_dir)
-		response = dialog.run()
+		dialog.connect("response", self.open_file_or_folder_response, isfile)
+		response = dialog.show()
+	
+	def open_file_or_folder_response(self, dialog, response, isfile):
 		if response == gtk.RESPONSE_OK:
 			if self.use_last_dir:
 				self.last_dir = dialog.get_current_folder()
@@ -1619,7 +1688,7 @@ class Base:
 			dialog.destroy()
 			while gtk.events_pending():
 				gtk.main_iteration()
-			getfiles = gobject.idle_add(self.expand_filelist_and_load_image, filenames)
+			self.expand_filelist_and_load_image(filenames)
 		else:
 			dialog.destroy()
 
@@ -1697,6 +1766,7 @@ class Base:
 			if self.thumbpane_show:
 				self.thumbscroll.show()
 				self.thumbpane.show()
+				self.thumbpane_update_images(False, self.curr_img_in_list)
 			self.window.unfullscreen()
 			self.change_cursor(None)
 			self.set_slideshow_sensitivities()
@@ -1726,7 +1796,7 @@ class Base:
 			self.thumbpane.show()
 			self.thumbpane_show = True
 			self.stop_now = False
-			self.thumbpane_populate()
+			gobject.idle_add(self.thumbpane_update_images, True, self.curr_img_in_list)
 		if self.image_loaded and self.last_image_action_was_fit:
 			if self.last_image_action_was_smart_fit:
 				self.zoom_to_fit_or_1_to_1(None, False, False)
@@ -2425,7 +2495,7 @@ class Base:
 			self.thumbnail_size = int(self.thumbnail_sizes[thumbsize.get_active()])
 			if self.thumbnail_size != prev_thumbnail_size:
 				gobject.idle_add(self.thumbpane_set_size)
-				gobject.idle_add(self.thumbpane_populate)
+				gobject.idle_add(self.thumbpane_update_images, True, self.curr_img_in_list)
 			self.prefs_dialog.destroy()
 			self.set_go_navigation_sensitivities(False)
 			if (self.preloading_images and not preloading_images_prev) or (open_mode_prev != self.open_mode):
@@ -2488,6 +2558,11 @@ class Base:
 				try:
 					new_filename = os.path.dirname(self.currimg_name) + "/" + self.rename_txt.get_text()
 					shutil.move(self.currimg_name, new_filename)
+					# Update thumbnail filename:
+					try:
+						shutil.move(self.thumbnail_get_name(self.currimg_name)[1], self.thumbnail_get_name(new_filename)[1])
+					except:
+						pass
 					self.recent_file_remove_and_refresh_name(self.currimg_name)
 					self.currimg_name = new_filename
 					self.register_file_with_recent_docs(self.currimg_name)
@@ -2535,6 +2610,10 @@ class Base:
 			if response  == gtk.RESPONSE_YES:
 				try:
 					os.remove(self.currimg_name)
+					try:
+						os.remove(self.thumbnail_get_name(self.currimg_name)[1])
+					except:
+						pass
 					self.recent_file_remove_and_refresh_name(self.currimg_name)
 					iter = self.thumblist.get_iter((self.curr_img_in_list,))
 					self.thumblist.remove(iter)
@@ -4004,7 +4083,7 @@ class Base:
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
 		self.set_slideshow_sensitivities()
-		gobject.idle_add(self.thumbpane_populate)
+		self.thumbpane_update_images(True, self.curr_img_in_list)
 		if not self.closing_app:
 			self.change_cursor(None)
 		self.recursive = False
@@ -4228,4 +4307,6 @@ class Base:
 
 if __name__ == "__main__":
 	base = Base()
+	gtk.gdk.threads_enter()
 	base.main()
+	gtk.gdk.threads_leave()
