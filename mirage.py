@@ -3746,10 +3746,10 @@ class Base:
 				self.check_preloadimg_prev_for_existing(prev_index, reset_preloadimg_prev_in_list)
 			else:
 				self.check_preloadimg_next_for_existing(next_index, reset_preloadimg_next_in_list)
-		if reset_preloadimg_prev_in_list:
-			self.preloadimg_prev_in_list = -1
-		if reset_preloadimg_next_in_list:
-			self.preloadimg_next_in_list = -1
+			if reset_preloadimg_prev_in_list:
+				self.preloadimg_prev_in_list = -1
+			if reset_preloadimg_next_in_list:
+				self.preloadimg_next_in_list = -1
 		if used_prev or used_next:
 			# If we used a preload image, set the correct boolean variables
 			if self.open_mode == self.open_mode_smart or (self.open_mode == self.open_mode_last and self.last_mode == self.open_mode_smart):
