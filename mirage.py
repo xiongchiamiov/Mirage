@@ -912,16 +912,20 @@ class Base:
 		# Sizes the "blank image" icon for the thumbpane. This will ensure that we don't
 		# load a humongous icon for a small pix, for example, and will keep the thumbnails
 		# from shifting around when they are actually loaded.
-		info = gtk.gdk.pixbuf_get_file_info(image)
-		imgwidth = float(info[1])
-		imgheight = float(info[2])
-		if imgheight > self.thumbnail_size:
-			if imgheight > imgwidth:
-				imgheight = self.thumbnail_size
-			else:
-				imgheight = imgheight/imgwidth * self.thumbnail_size
-		imgheight = 2 + int(imgheight) # Account for border that will be added to thumbnails..
-		imgwidth = self.thumbnail_size
+		try:
+			info = gtk.gdk.pixbuf_get_file_info(image)
+			imgwidth = float(info[1])
+			imgheight = float(info[2])
+			if imgheight > self.thumbnail_size:
+				if imgheight > imgwidth:
+					imgheight = self.thumbnail_size
+				else:
+					imgheight = imgheight/imgwidth * self.thumbnail_size
+			imgheight = 2 + int(imgheight) # Account for border that will be added to thumbnails..
+			imgwidth = self.thumbnail_size
+		except:
+			imgheight = 2 + self.thumbnail_size
+			imgwidth = self.thumbnail_size
 		# Initialize with blank images:
 		blank_pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, imgwidth, imgheight)
 		blank_pix.fill(0x00000000)
@@ -3046,12 +3050,15 @@ class Base:
 	def pixbuf_add_border(self, pix):
 		# Add a gray outline to pix. This will increase the pixbuf size by
 		# 2 pixels lengthwise and heightwise, 1 on each side. Returns pixbuf.
-		width = pix.get_width()
-		height = pix.get_height()
-		newpix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width+2, height+2)
-		newpix.fill(0x858585ff)
-		pix.copy_area(0, 0, width, height, newpix, 1, 1)
-		return newpix
+		try:
+			width = pix.get_width()
+			height = pix.get_height()
+			newpix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width+2, height+2)
+			newpix.fill(0x858585ff)
+			pix.copy_area(0, 0, width, height, newpix, 1, 1)
+			return newpix
+		except:
+			return pix
 
 	def crop_image(self, action):
 		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
