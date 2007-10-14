@@ -926,7 +926,6 @@ class Base:
 		except:
 			imgheight = 2 + self.thumbnail_size
 			imgwidth = self.thumbnail_size
-		# Initialize with blank images:
 		blank_pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, imgwidth, imgheight)
 		blank_pix.fill(0x00000000)
 		imgwidth2 = int(imgheight*0.8)
@@ -1684,6 +1683,7 @@ class Base:
 			dialog.set_preview_widget(preview)
 			dialog.set_use_preview_label(False)
 			dialog.connect("update-preview", self.update_preview, preview)
+			recursivebutton = None
 		else:
 			dialog.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
 			recursivebutton = gtk.CheckButton(label=_("Include images in subdirectories"))

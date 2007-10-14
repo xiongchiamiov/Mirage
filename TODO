@@ -1,5 +1,6 @@
 0.9
 dbl click from thunar - not highlighted in thumbpane?
+save width, height from valid_image to prevent calling pixbuf_get_file_info twice
 + update to gplv3
 
 1.0
