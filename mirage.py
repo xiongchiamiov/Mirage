@@ -1696,10 +1696,10 @@ class Base:
 		else:
 			if self.fixed_dir != None:
 				dialog.set_current_folder(self.fixed_dir)
-		dialog.connect("response", self.open_file_or_folder_response, isfile)
+		dialog.connect("response", self.open_file_or_folder_response, isfile, recursivebutton)
 		response = dialog.show()
 	
-	def open_file_or_folder_response(self, dialog, response, isfile):
+	def open_file_or_folder_response(self, dialog, response, isfile, recursivebutton):
 		if response == gtk.RESPONSE_OK:
 			if self.use_last_dir:
 				self.last_dir = dialog.get_current_folder()
