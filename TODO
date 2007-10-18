@@ -1,8 +1,3 @@
-0.9
-dbl click from thunar - not highlighted in thumbpane?
-save width, height from valid_image to prevent calling pixbuf_get_file_info twice
-+ update to gplv3
-
 1.0
 + Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
 + Allow zooming in crop dialog (default to same view as main window so that

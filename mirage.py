@@ -807,7 +807,7 @@ class Base:
 		# Check to see if any images need their thumbnails generated.
 		curr_coord = 0
 		imgnum = 0
-		while curr_coord < self.thumbpane_bottom_coord_loaded or imgnum < force_upto_imgnum:
+		while curr_coord < self.thumbpane_bottom_coord_loaded or imgnum <= force_upto_imgnum:
 			if self.closing_app or self.stop_now:
 				break
 			if self.thumbpane_show:
@@ -816,7 +816,7 @@ class Base:
 				self.thumbpane_set_image(self.image_list[imgnum], imgnum)
 				curr_coord += self.thumbpane.get_background_area((imgnum,),self.thumbcolumn).height
 				if force_upto_imgnum == imgnum:
-					# Verify that the user hasn't switched images whil we're loading thumbnails:
+					# Verify that the user hasn't switched images while we're loading thumbnails:
 					if force_upto_imgnum == self.curr_img_in_list:
 						gobject.idle_add(self.thumbpane_select, force_upto_imgnum)
 				imgnum += 1
