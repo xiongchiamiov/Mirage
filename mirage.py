@@ -274,10 +274,11 @@ class Base:
 			self.action_shortcuts = []
 			self.action_batch = []
 			for i in range(num_actions):
-				self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
-				self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
-				self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
-				self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
+				if conf.has_option('actions', 'names[' + str(i) + ']') and conf.has_option('actions', 'commands[' + str(i) + ']') and conf.has_option('actions', 'shortcuts[' + str(i) + ']') and conf.has_option('actions', 'batch[' + str(i) + ']'):
+					self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
+					self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
+					self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
+					self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
 		if conf.has_option('prefs', 'savemode'):
 			self.savemode = conf.getint('prefs', 'savemode')
 		if conf.has_option('prefs', 'start_in_fullscreen'):
