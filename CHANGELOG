@@ -1,3 +1,6 @@
+v0.9.1 - Pending
+	+ Fix .desktop file category
+
 v0.9 - October 18, 2007
 	+ Thumbnails pane (freedesktop spec compliant using ~/.thumbnails)
 	+ Ability to open remote images (http and ftp)
