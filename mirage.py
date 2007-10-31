@@ -2767,7 +2767,7 @@ class Base:
 	def mousewheel_scrolled(self, widget, event):
 		if event.type == gtk.gdk.SCROLL:
 			# Zooming of the image by Ctrl-mousewheel
-			if event.state == gtk.gdk.CONTROL_MASK:
+			if event.state & gtk.gdk.CONTROL_MASK:
 				if event.direction == gtk.gdk.SCROLL_UP:
 					self.zoom_out(None)
 				elif event.direction == gtk.gdk.SCROLL_DOWN:

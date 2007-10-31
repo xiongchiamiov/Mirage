@@ -1,5 +1,6 @@
 v0.9.1 - Pending
-	+ Fix .desktop file category
+	+ Bug: Fix .desktop file category
+	+ Bug: Ctrl+mousewheel doesn't zoom when caps/num lock is on
 
 v0.9 - October 18, 2007
 	+ Thumbnails pane (freedesktop spec compliant using ~/.thumbnails)
