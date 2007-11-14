@@ -170,7 +170,6 @@ class Base:
 		self.actionGroupCustom = None
 		self.merge_id_recent = None
 		self.actionGroupRecent = None
-		self.recentfiles = ['', '', '', '', '']
 		self.open_hidden_files = False
 		self.thumbnail_sizes = ["128", "96", "72", "64", "48", "32"]
 		self.thumbnail_size = 128 					# Default to 128 x 128
@@ -285,10 +284,13 @@ class Base:
 			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
 		if conf.has_option('prefs', 'confirm_delete'):
 			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
+		self.recentfiles = []
 		if conf.has_option('recent', 'num_recent'):
 			num_recent = conf.getint('recent', 'num_recent')
 			for i in range(num_recent):
-				self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
+				self.recentfiles.append('')
+				if conf.has_option('recent', 'urls[' + str(i) + ',0]'):
+					self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
