@@ -175,6 +175,7 @@ class Base:
 		self.thumbnail_size = 128 					# Default to 128 x 128
 		self.thumbnail_loaded = []
 		self.thumbpane_updating = False
+		self.recentfiles = ["", "", "", "", ""]
 
 		# Read any passed options/arguments:
 		try:
