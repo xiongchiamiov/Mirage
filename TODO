@@ -1,5 +1,4 @@
 0.9.1
-+ Screenshots (a la gsnapshot) (gtk.gdk.Pixbuf.get_from_drawable)
 + Improve saturation dialog
 + Location of thumbpane
 

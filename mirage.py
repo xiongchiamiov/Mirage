@@ -26,27 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import pygtk
 pygtk.require('2.0')
 import gtk
-import gtk.gdk
-import os
-import sys, getopt
-import ConfigParser
-import string
-import gc
-import random
-import imgfuncs
-import urllib
-import gobject
-import gettext
-import locale
-import stat
-import time
-import subprocess
-import shutil
-import filecmp
-import tempfile
-import socket
-import md5
-import threading
+import os, sys, getopt, ConfigParser, string, gc
+import random, imgfuncs, xmouse, urllib, gobject
+import gettext, locale, stat, time, subprocess
+import shutil, filecmp, tempfile, socket, md5, threading
 try:
 	import gconf
 except:
@@ -176,6 +159,7 @@ class Base:
 		self.thumbnail_loaded = []
 		self.thumbpane_updating = False
 		self.recentfiles = ["", "", "", "", ""]
+		self.screenshot_delay = 2
 
 		# Read any passed options/arguments:
 		try:
@@ -267,6 +251,8 @@ class Base:
 			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
 		if conf.has_option('prefs', 'thumbsize'):
 			self.thumbnail_size = conf.getint('prefs', 'thumbsize')
+		if conf.has_option('prefs', 'screenshot_delay'):
+			self.screenshot_delay = conf.getint('prefs', 'screenshot_delay')
 		if conf.has_option('actions', 'num_actions'):
 			num_actions = conf.getint('actions', 'num_actions')
 			self.action_names = []
@@ -1419,6 +1405,7 @@ class Base:
 		conf.set('prefs', 'savemode', self.savemode)
 		conf.set('prefs', 'start_in_fullscreen', self.start_in_fullscreen)
 		conf.set('prefs', 'thumbsize', self.thumbnail_size)
+		conf.set('prefs', 'screenshot_delay', self.screenshot_delay)
 		conf.add_section('actions')
 		conf.set('actions', 'num_actions', len(self.action_names))
 		for i in range(len(self.action_names)):
@@ -2194,14 +2181,13 @@ class Base:
 		loc.set_alignment(0, 0)
 		area = gtk.RadioButton()
 		area1 = gtk.RadioButton(group=area, label=_("Entire screen"))
-		area2 = gtk.RadioButton(group=area, label=_("Focused window only"))
-		area2.set_sensitive(False)
+		area2 = gtk.RadioButton(group=area, label=_("Window under mouse cursor"))
 		area1.set_active(True)
 		de = gtk.Label()
 		de.set_markup('<b>' + _("Delay") + '</b>')
 		de.set_alignment(0, 0)
 		delaybox = gtk.HBox()
-		adj = gtk.Adjustment(1, 0, 30, 1, 10, 10)
+		adj = gtk.Adjustment(self.screenshot_delay, 0, 30, 1, 10, 10)
 		delay = gtk.SpinButton(adj, 0, 0)
 		delay.set_numeric(True)
 		delay.set_update_policy(gtk.UPDATE_IF_VALID)
@@ -2228,33 +2214,36 @@ class Base:
 			dialog.destroy()
 			while gtk.events_pending():
 				gtk.main_iteration()
-			time.sleep(float(delay.get_text()))
-			root_win = gtk.gdk.get_default_root_window()
-			if area1.get_active():
-				x = 0
-				y = 0
-				width = gtk.gdk.screen_width()
-				height = gtk.gdk.screen_height()
-			else:
-				return
-			pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width, height)
-			pix = pix.get_from_drawable(root_win, gtk.gdk.colormap_get_system(), x, y, 0, 0, width, height)
-			# Save as /tmp/mirage-<random>/filename.ext
-			tmpdir = tempfile.mkdtemp(prefix="mirage-") + "/"
-			tmpfile = tmpdir + "screenshot.png"
-			pix.save(tmpfile, 'png')
-			# Load file:
-			self.image_list = [tmpfile]
-			self.curr_img_in_list = 0
-			gobject.idle_add(self.load_new_image2, False, False, False, False, True)
-			self.update_statusbar()
-			self.set_go_navigation_sensitivities(False)
-			self.set_slideshow_sensitivities()
-			self.thumbpane_update_images(True, self.curr_img_in_list)
-			del pix
-			self.window.present()
+			self.screenshot_delay = int(delay.get_text())
+			gobject.timeout_add(self.screenshot_delay*1000, self._screenshot_grab, area1.get_active())
 		else:
 			dialog.destroy()
+	
+	def _screenshot_grab(self, entire_screen):
+		root_win = gtk.gdk.get_default_root_window()
+		if entire_screen:
+			x = 0
+			y = 0
+			width = gtk.gdk.screen_width()
+			height = gtk.gdk.screen_height()
+		else:
+			(x, y, width, height) = xmouse.geometry()
+		pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width, height)
+		pix = pix.get_from_drawable(root_win, gtk.gdk.colormap_get_system(), x, y, 0, 0, width, height)
+		# Save as /tmp/mirage-<random>/filename.ext
+		tmpdir = tempfile.mkdtemp(prefix="mirage-") + "/"
+		tmpfile = tmpdir + "screenshot.png"
+		pix.save(tmpfile, 'png')
+		# Load file:
+		self.image_list = [tmpfile]
+		self.curr_img_in_list = 0
+		gobject.idle_add(self.load_new_image2, False, False, False, False, True)
+		self.update_statusbar()
+		self.set_go_navigation_sensitivities(False)
+		self.set_slideshow_sensitivities()
+		self.thumbpane_update_images(True, self.curr_img_in_list)
+		del pix
+		self.window.present()
 
 	def show_properties(self, action):
 		show_props = gtk.Dialog(_("Properties"), self.window)
@@ -4188,7 +4177,7 @@ class Base:
 				while gtk.events_pending():
 					gtk.main_iteration(True)
 		if not first_image_loaded_successfully:
-			self.image_load_failed(False, inputlist[0])
+			self.image_load_failed(False, init_image)
 		self.searching_for_images = False
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
