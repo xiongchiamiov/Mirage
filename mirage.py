@@ -366,6 +366,7 @@ class Base:
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
 			('Delete Image', gtk.STOCK_DELETE, _('_Delete...'), 'Delete', _('Delete Image'), self.delete_image),
 			('Rename Image', None, _('Re_name...'), 'F2', _('Rename Image'), self.rename_image),
+			('Take Screenshot', None, _('Take _Screenshot...'), None, _('Take Screenshot'), self.screenshot),
 			('Properties', gtk.STOCK_PROPERTIES, _('_Properties...'), None, _('Properties'), self.show_properties),
 			('Custom Actions', None, _('_Configure...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
@@ -419,15 +420,17 @@ class Base:
 			      <menuitem action="Open Image"/>
 			      <menuitem action="Open Folder"/>
 			      <menuitem action="Open Remote Image"/>
-			      <separator name="FM2"/>
+			      <separator name="FM1"/>
 			      <menuitem action="Save"/>
 			      <menuitem action="Save As"/>
+			      <separator name="FM2"/>
+			      <menuitem action="Take Screenshot"/>
 			      <separator name="FM3"/>
 			      <menuitem action="Properties"/>
-			      <separator name="FM1"/>
+			      <separator name="FM4"/>
 			      <placeholder name="Recent Files">
 			      </placeholder>
-			      <separator name="FM4"/>
+			      <separator name="FM5"/>
 			      <menuitem action="Quit"/>
 			    </menu>
 			    <menu action="EditMenu">
@@ -1521,7 +1524,7 @@ class Base:
 		width = self.window.get_size()[0]
 		if not self.fullscreen_mode:
 			if self.thumbpane_show:
-				width -= self.thumbpane_get_size()
+				width -= self.thumbscroll.size_request()[0]
 		return width
 
 	def available_image_height(self):
@@ -2175,6 +2178,83 @@ class Base:
 		self.tvcolumn1.set_attributes(self.cell, markup=1)
 		self.tvcolumn2.set_attributes(self.cell, text=2)
 		self.tvcolumn1.set_expand(True)
+	
+	def screenshot(self, action):
+		cancel = self.autosave_image()
+		if cancel:
+			return
+		# Dialog:
+		dialog = gtk.Dialog(_("Screenshot"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
+		snapbutton = dialog.add_button(_("Snap"), gtk.RESPONSE_ACCEPT)
+		snapimage = gtk.Image()
+		snapimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
+		snapbutton.set_image(snapimage)
+		loc = gtk.Label()
+		loc.set_markup('<b>' + _('Location') + '</b>')
+		loc.set_alignment(0, 0)
+		area = gtk.RadioButton()
+		area1 = gtk.RadioButton(group=area, label=_("Entire screen"))
+		area2 = gtk.RadioButton(group=area, label=_("Focused window only"))
+		area2.set_sensitive(False)
+		area1.set_active(True)
+		de = gtk.Label()
+		de.set_markup('<b>' + _("Delay") + '</b>')
+		de.set_alignment(0, 0)
+		delaybox = gtk.HBox()
+		adj = gtk.Adjustment(1, 0, 30, 1, 10, 10)
+		delay = gtk.SpinButton(adj, 0, 0)
+		delay.set_numeric(True)
+		delay.set_update_policy(gtk.UPDATE_IF_VALID)
+		delay.set_wrap(False)
+		delaylabel = gtk.Label(_(" seconds"))
+		delaybox.pack_start(delay, False)
+		delaybox.pack_start(delaylabel, False)
+		table = gtk.Table()
+		table.attach(gtk.Label(), 1, 2, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table.attach(loc, 1, 2, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(gtk.Label(), 1, 2, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table.attach(area1, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table.attach(area2, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table.attach(gtk.Label(), 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table.attach(de, 1, 2, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		table.attach(gtk.Label(), 1, 2, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table.attach(delaybox, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table.attach(gtk.Label(), 1, 2, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		dialog.vbox.pack_start(table)
+		dialog.set_default_response(gtk.RESPONSE_ACCEPT)
+		dialog.vbox.show_all()
+		response = dialog.run()
+		if response == gtk.RESPONSE_ACCEPT:
+			dialog.destroy()
+			while gtk.events_pending():
+				gtk.main_iteration()
+			time.sleep(float(delay.get_text()))
+			root_win = gtk.gdk.get_default_root_window()
+			if area1.get_active():
+				x = 0
+				y = 0
+				width = gtk.gdk.screen_width()
+				height = gtk.gdk.screen_height()
+			else:
+				return
+			pix = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, True, 8, width, height)
+			pix = pix.get_from_drawable(root_win, gtk.gdk.colormap_get_system(), x, y, 0, 0, width, height)
+			# Save as /tmp/mirage-<random>/filename.ext
+			tmpdir = tempfile.mkdtemp(prefix="mirage-") + "/"
+			tmpfile = tmpdir + "screenshot.png"
+			pix.save(tmpfile, 'png')
+			# Load file:
+			self.image_list = [tmpfile]
+			self.curr_img_in_list = 0
+			gobject.idle_add(self.load_new_image2, False, False, False, False, True)
+			self.update_statusbar()
+			self.set_go_navigation_sensitivities(False)
+			self.set_slideshow_sensitivities()
+			self.thumbpane_update_images(True, self.curr_img_in_list)
+			del pix
+			self.window.present()
+		else:
+			dialog.destroy()
 
 	def show_properties(self, action):
 		show_props = gtk.Dialog(_("Properties"), self.window)
@@ -3716,7 +3796,7 @@ class Base:
 					self.set_image_sensitivities(False)
 		return used_prev, used_next
 
-	def load_new_image2(self, check_prev_last, use_current_pixbuf_original, reset_cursor, perform_onload_action):
+	def load_new_image2(self, check_prev_last, use_current_pixbuf_original, reset_cursor, perform_onload_action, skip_recentfiles=False):
 		# check_prev_last is used to determine if we should check whether
 		# preloadimg_prev can be reused last. This should really only
 		# be done if the user just clicked the previous image button in
@@ -3798,7 +3878,8 @@ class Base:
 		self.image_modified = False
 		self.image_zoomed = False
 		self.set_slideshow_sensitivities()
-		self.register_file_with_recent_docs(self.currimg_name)
+		if not skip_recentfiles:
+			self.register_file_with_recent_docs(self.currimg_name)
 		if reset_cursor:
 			if not self.fullscreen_mode:
 				self.change_cursor(None)
