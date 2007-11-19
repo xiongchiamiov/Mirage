@@ -876,6 +876,10 @@ class Base:
 			gobject.idle_add(self.goto_image, str(imgnum), None)
 		
 	def thumbpane_selection_changed(self, treeview):
+		cancel = self.autosave_image()
+		if cancel:
+			self.thumbpane_select(self.curr_img_in_list)
+			return True
 		try:
 			model, paths = self.thumbpane.get_selection().get_selected_rows()
 			imgnum = paths[0][0]
@@ -1609,7 +1613,10 @@ class Base:
 					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', True)
 					self.save_image(None)
 					self.UIManager.get_widget('/MainMenu/FileMenu/Save').set_property('sensitive', temp)
-				elif response != gtk.RESPONSE_NO:
+					self.image_modified = False
+				elif response == gtk.RESPONSE_NO:
+					self.image_modified = False
+				else:
 					return True
 
 	def filetype_is_writable(self, filetype):
@@ -3343,9 +3350,16 @@ class Base:
 		scale.set_increments(0.1, 0.5)
 		scale.set_value(1)
 		scale.connect('value-changed', self.saturation_preview)
-		hbox = gtk.HBox()
-		hbox.pack_start(scale, True, True, 10)
-		dialog.vbox.pack_start(hbox, True, True, 10)
+		label = gtk.Label(_("Saturation level:"))
+		label.set_alignment(0, 0.5)
+		hbox1 = gtk.HBox()
+		hbox1.pack_start(label, True, True, 10)
+		hbox2 = gtk.HBox()
+		hbox2.pack_start(scale, True, True, 20)
+		dialog.vbox.pack_start(gtk.Label(" "))
+		dialog.vbox.pack_start(hbox1, False)
+		dialog.vbox.pack_start(hbox2, True, True, 10)
+		dialog.vbox.pack_start(gtk.Label(" "))
 		dialog.set_default_response(gtk.RESPONSE_ACCEPT)
 		dialog.vbox.show_all()
 		response = dialog.run()
