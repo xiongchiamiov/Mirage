@@ -2,7 +2,7 @@
 + Location of thumbpane?
 + assert errors involving thumbpane..
 + modify img, go to neighbor img, don't save -> need to update preloadimg!
-+ cancel save, revert selected thumbnail -> scroll window doesn't scroll
++ small img height in thumbpane sometimes?
 
 1.0
 + Allow zooming in crop dialog (default to same view as main window so that

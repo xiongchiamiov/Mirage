@@ -878,7 +878,7 @@ class Base:
 	def thumbpane_selection_changed(self, treeview):
 		cancel = self.autosave_image()
 		if cancel:
-			self.thumbpane_select(self.curr_img_in_list)
+			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
 			return True
 		try:
 			model, paths = self.thumbpane.get_selection().get_selected_rows()
