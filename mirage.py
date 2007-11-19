@@ -878,6 +878,7 @@ class Base:
 	def thumbpane_selection_changed(self, treeview):
 		cancel = self.autosave_image()
 		if cancel:
+			# Revert selection...
 			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
 			return True
 		try:
@@ -1592,7 +1593,9 @@ class Base:
 		self.change_cursor(None)
 
 	def autosave_image(self):
-		# returns True if the user has canceled out of the dialog
+		# Returns True if the user has canceled out of the dialog
+		# Never call this function from an idle or timeout loop! That will cause
+		# the app to freeze.
 		if self.image_modified:
 			if self.savemode == 1:
 				temp = self.UIManager.get_widget('/MainMenu/FileMenu/Save').get_property('sensitive')
@@ -1616,6 +1619,9 @@ class Base:
 					self.image_modified = False
 				elif response == gtk.RESPONSE_NO:
 					self.image_modified = False
+					# Ensures that we don't use the current pixbuf for any preload pixbufs if we are in
+					# the process of loading the previous or next image in the list:
+					self.currimg_pixbuf = None 
 				else:
 					return True
 

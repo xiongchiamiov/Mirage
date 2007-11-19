@@ -1,8 +1,11 @@
 v0.9.1 - Pending
 	+ Screenshot support
-	+ Bug: Fix .desktop file category
+	+ Bug: Fix freeze involving modified image and navigation
+	+ Bug: Prevent possible crash on invalid image files
+	+ Bug: Wrong image displayed if discarding modified app and using preload
 	+ Bug: Ctrl+mousewheel doesn't zoom when caps/num lock is on
 	+ Bug: Fix horizontal centering of image
+	+ Bug: Fix .desktop file category
 
 v0.9 - October 18, 2007
 	+ Thumbnails pane (freedesktop spec compliant using ~/.thumbnails)
