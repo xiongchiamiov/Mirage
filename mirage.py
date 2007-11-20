@@ -802,20 +802,17 @@ class Base:
 		curr_coord = 0
 		imgnum = 0
 		while curr_coord < self.thumbpane_bottom_coord_loaded or imgnum <= force_upto_imgnum:
-			if self.closing_app or self.stop_now:
+			if self.closing_app or self.stop_now or not self.thumbpane_show:
 				break
-			if self.thumbpane_show:
-				if imgnum >= len(self.image_list):
-					break
-				self.thumbpane_set_image(self.image_list[imgnum], imgnum)
-				curr_coord += self.thumbpane.get_background_area((imgnum,),self.thumbcolumn).height
-				if force_upto_imgnum == imgnum:
-					# Verify that the user hasn't switched images while we're loading thumbnails:
-					if force_upto_imgnum == self.curr_img_in_list:
-						gobject.idle_add(self.thumbpane_select, force_upto_imgnum)
-				imgnum += 1
-			else:
+			if imgnum >= len(self.image_list):
 				break
+			self.thumbpane_set_image(self.image_list[imgnum], imgnum)
+			curr_coord += self.thumbpane.get_background_area((imgnum,),self.thumbcolumn).height
+			if force_upto_imgnum == imgnum:
+				# Verify that the user hasn't switched images while we're loading thumbnails:
+				if force_upto_imgnum == self.curr_img_in_list:
+					gobject.idle_add(self.thumbpane_select, force_upto_imgnum)
+			imgnum += 1
 		self.thumbpane_updating = False
 	
 	def thumbpane_clear_list(self):
@@ -839,7 +836,10 @@ class Base:
 						pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
 					self.thumbnail_loaded[imgnum] = True
 					self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
-					self.thumblist[imgnum] = [self.pixbuf_add_border(pix)]
+					try:
+						self.thumblist[imgnum] = [self.pixbuf_add_border(pix)]
+					except:
+						pass
 					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
 	
 	def thumbnail_get_name(self, image_name):
@@ -893,8 +893,11 @@ class Base:
 	def thumbpane_select(self, imgnum):
 		if self.thumbpane_show:
 			self.thumbpane.get_selection().handler_block(self.thumb_sel_handler)
-			self.thumbpane.get_selection().select_path((imgnum,))
-			self.thumbpane.scroll_to_cell((imgnum,))
+			try:
+				self.thumbpane.get_selection().select_path((imgnum,))
+				self.thumbpane.scroll_to_cell((imgnum,))
+			except:
+				pass
 			self.thumbpane.get_selection().handler_unblock(self.thumb_sel_handler)
 
 	def thumbpane_set_size(self):
@@ -1621,7 +1624,10 @@ class Base:
 					self.image_modified = False
 					# Ensures that we don't use the current pixbuf for any preload pixbufs if we are in
 					# the process of loading the previous or next image in the list:
-					self.currimg_pixbuf = None 
+					self.currimg_pixbuf = self.currimg_pixbuf_original
+					self.preloadimg_next_in_list = -1
+					self.preloadimg_prev_in_list = -1
+					self.loaded_img_in_list = -1
 				else:
 					return True
 
