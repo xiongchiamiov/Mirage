@@ -836,8 +836,9 @@ class Base:
 						pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
 					self.thumbnail_loaded[imgnum] = True
 					self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
+					pix = self.pixbuf_add_border(pix)
 					try:
-						self.thumblist[imgnum] = [self.pixbuf_add_border(pix)]
+						self.thumblist[imgnum] = [pix]
 					except:
 						pass
 					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)

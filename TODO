@@ -1,8 +1,5 @@
 0.9.1
 + Location of thumbpane?
-+ assert errors involving thumbpane..
-+ small img height in thumbpane sometimes?
-+ possible thumbpane crash?
 
 1.0
 + Allow zooming in crop dialog (default to same view as main window so that
