@@ -12,7 +12,6 @@
 
 Future
 + Ability to specify save compression level?
-+ Make gcc requirement optional
 + Test on Windows/Mac? (requires new pygtk)
 + Try to make zooming smoother (is this even possible with pygtk?)
 + mirage --add to add image to current instance instead of opening

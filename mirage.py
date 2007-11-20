@@ -2294,7 +2294,7 @@ class Base:
 		else:
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180)
 			image_is_anim = True
-		image.set_from_pixbuf(pixbuf)
+		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
 		vbox_left = gtk.VBox()
 		filename = gtk.Label(_("File name") + ":")
 		filename.set_alignment(1, 1)
@@ -3462,7 +3462,7 @@ class Base:
 		else:
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 96)
 		image = gtk.Image()
-		image.set_from_pixbuf(pixbuf)
+		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
 		hbox_total.pack_start(image, False, False, 10)
 		hbox_total.pack_start(vbox, False, False, 10)
 		dialog.vbox.pack_start(hbox_total, False, False, 0)
