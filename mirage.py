@@ -27,9 +27,21 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 import os, sys, getopt, ConfigParser, string, gc
-import random, imgfuncs, xmouse, urllib, gobject
-import gettext, locale, stat, time, subprocess
-import shutil, filecmp, tempfile, socket, md5, threading
+import random, urllib, gobject, gettext, locale
+import stat, time, subprocess, shutil, filecmp
+import tempfile, socket, md5, threading
+try:
+	import imgfuncs
+	HAS_IMGFUNCS = True
+except:
+	HAS_IMGFUNCS = False
+	print "imgfuncs.so module not found, rotating/flipping images will be disabled."
+try:
+	import xmouse
+	HAS_XMOUSE = True
+except:
+	HAS_XMOUSE = False
+	print "xmouse.so module not found, some screenshot capabilities will be disabled."
 try:
 	import gconf
 except:
@@ -1190,10 +1202,6 @@ class Base:
 		self.set_zoom_out_sensitivities(enable)
 		self.UIManager.get_widget('/MainMenu/ViewMenu/1:1').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/ViewMenu/Fit').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
-		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Delete Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Rename Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/EditMenu/Crop').set_sensitive(enable)
@@ -1218,6 +1226,12 @@ class Base:
 		if self.actionGroupCustom:
 			for action in self.action_names:
 				self.UIManager.get_widget('/MainMenu/EditMenu/ActionSubMenu/' + action).set_sensitive(enable)
+		if not HAS_IMGFUNCS:
+			enable = False
+		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/EditMenu/Flip Horizontally').set_sensitive(enable)
 
 	def set_zoom_in_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/ViewMenu/In').set_sensitive(enable)
@@ -2202,6 +2216,8 @@ class Base:
 		area = gtk.RadioButton()
 		area1 = gtk.RadioButton(group=area, label=_("Entire screen"))
 		area2 = gtk.RadioButton(group=area, label=_("Window under mouse cursor"))
+		if not HAS_XMOUSE:
+			area2.set_sensitive(False)
 		area1.set_active(True)
 		de = gtk.Label()
 		de.set_markup('<b>' + _("Delay") + '</b>')

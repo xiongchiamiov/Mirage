@@ -1,5 +1,6 @@
 v0.9.1 - Pending
 	+ Screenshot support
+	+ Allow running without compiled C modules (certain features disabled)
 	+ Bug: Fix freeze involving modified image and navigation
 	+ Bug: Prevent possible crash on invalid image files
 	+ Bug: Fix occassional wrong height of thumbnails (and gobject assertion)
