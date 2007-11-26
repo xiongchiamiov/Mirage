@@ -1,4 +1,4 @@
-v0.9.1 - Pending
+v0.9.1 - November 25, 2007
 	+ Screenshot support
 	+ Allow running without compiled C modules (certain features disabled)
 	+ Bug: Fix freeze involving modified image and navigation
