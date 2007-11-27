@@ -6,7 +6,7 @@ PyObject* xmouse_geometry(PyObject* self, PyObject* args)
 {
     Display* dpy;
     int screennum = 0; 
-    char* display;
+    char* display = NULL;
     Window rootwin, childwin;
     int root_x, root_y;
     int child_x, child_y;
@@ -18,6 +18,8 @@ PyObject* xmouse_geometry(PyObject* self, PyObject* args)
     PyArg_ParseTuple(args, "|zi", &display, &screennum);
 
     dpy = XOpenDisplay(display);
+    //printf("display: %s\n", display);
+    //printf("dpy: %s\n", XDisplayString(dpy));
     if(!dpy)
     {  
         /* TODO is this right?? */
