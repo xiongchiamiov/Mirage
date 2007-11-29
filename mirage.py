@@ -856,9 +856,10 @@ class Base:
 					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
 	
 	def thumbnail_get_name(self, image_name):
-		filename = os.path.expanduser('file://' + urllib.pathname2url(image_name))
+		filename = os.path.expanduser('file://' + image_name)
+		uriname = os.path.expanduser('file://' + urllib.pathname2url(image_name))
 		m = md5.new()
-		m.update(filename)
+		m.update(uriname)
 		mhex = m.hexdigest()
 		mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
 		return filename, mhex_filename
