@@ -856,7 +856,7 @@ class Base:
 					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
 	
 	def thumbnail_get_name(self, image_name):
-		filename = os.path.expanduser('file://' + image_name)
+		filename = os.path.expanduser('file://' + urllib.pathname2url(image_name))
 		m = md5.new()
 		m.update(filename)
 		mhex = m.hexdigest()
@@ -876,10 +876,13 @@ class Base:
 				imgfile = image_url
 				if imgfile[:7] == 'file://':
 					imgfile = imgfile[7:]
+				uri = 'file://' + urllib.pathname2url(imgfile)
 				pix = gtk.gdk.pixbuf_new_from_file(imgfile)
 				pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128)
+				st = os.stat(imgfile)
+				mtime = str(st[stat.ST_MTIME])
 				# Save image to .thumbnails:
-				pix.save(thumb_url, "png")
+				pix.save(thumb_url, "png", {'tEXt::Thumb::URI':uri, 'tEXt::Thumb::MTime':mtime, 'tEXt::Software':'Mirage' + __version__})
 				return pix
 		except:
 			return None

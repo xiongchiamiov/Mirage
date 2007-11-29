@@ -1,5 +1,6 @@
 v0.9.1 - November 25, 2007
 	+ Screenshot support
+	+ Use png attributes to be more fully thumbnail spec compliant
 	+ Allow running without compiled C modules (certain features disabled)
 	+ Bug: Fix freeze involving modified image and navigation
 	+ Bug: Prevent possible crash on invalid image files
