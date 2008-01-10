@@ -807,9 +807,16 @@ class Base:
 			thread = threading.Thread(target=self.thumbpane_update_pending_images, args=(force_upto_imgnum, None))
 			thread.setDaemon(True)
 			thread.start()
-		
+
+	def thumbpane_create_dir(self):
+		if not os.path.exists(os.path.expanduser('~/.thumbnails/')):
+			os.mkdir(os.path.expanduser('~/.thumbnails/'))
+		if not os.path.exists(os.path.expanduser('~/.thumbnails/normal/')):
+			os.mkdir(os.path.expanduser('~/.thumbnails/normal/'))
+
 	def thumbpane_update_pending_images(self, force_upto_imgnum, foo):
 		self.thumbpane_updating = True
+		self.thumbpane_create_dir()
 		# Check to see if any images need their thumbnails generated.
 		curr_coord = 0
 		imgnum = 0
@@ -845,7 +852,7 @@ class Base:
 				if pix:
 					if self.thumbnail_size != 128:
 						# 128 is the size of the saved thumbnail, so convert if different:
-						pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size)
+						pix, image_width, image_height = self.get_pixbuf_of_size(pix, self.thumbnail_size, gtk.gdk.INTERP_TILES)
 					self.thumbnail_loaded[imgnum] = True
 					self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
 					pix = self.pixbuf_add_border(pix)
@@ -879,7 +886,7 @@ class Base:
 					imgfile = imgfile[7:]
 				uri = 'file://' + urllib.pathname2url(imgfile)
 				pix = gtk.gdk.pixbuf_new_from_file(imgfile)
-				pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128)
+				pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128, gtk.gdk.INTERP_TILES)
 				st = os.stat(imgfile)
 				mtime = str(st[stat.ST_MTIME])
 				# Save image to .thumbnails:
@@ -1698,6 +1705,7 @@ class Base:
 		self.open_file_or_folder(action, False)
 
 	def open_file_or_folder(self, action, isfile):
+		self.thumbpane_create_dir()
 		cancel = self.autosave_image()
 		if cancel:
 			return
@@ -1748,26 +1756,16 @@ class Base:
 
 	def update_preview(self, file_chooser, preview):
 		filename = file_chooser.get_preview_filename()
-		pixbuf = None
-		try:
-			pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
-		except:
-			pass
-		if pixbuf == None:
-			try:
-				pixbuf = gtk.gdk.PixbufAnimation(filename).get_static_image()
-				width = pixbuf.get_width()
-				height = pixbuf.get_height()
-				if width > height:
-					pixbuf = pixbuf.scale_simple(128, int(float(height)/width*128), self.zoom_quality)
-				else:
-					pixbuf = pixbuf.scale_simple(int(float(width)/height*128), 128, self.zoom_quality)
-			except:
-				pass
-		if pixbuf == None:
+		if not filename:
+			return
+		filename, thumbfile = self.thumbnail_get_name(filename)
+		pixbuf = self.thumbpane_get_pixbuf(thumbfile, filename, False)
+		if pixbuf:
+			preview.set_from_pixbuf(pixbuf)
+		else:
 			pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 1, 8, 128, 128)
 			pixbuf.fill(0x00000000)
-		preview.set_from_pixbuf(pixbuf)
+			preview.set_from_pixbuf(pixbuf)
 		have_preview = True
 		file_chooser.set_preview_widget_active(have_preview)
 		del pixbuf
@@ -2294,9 +2292,9 @@ class Base:
 		animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 		image_is_anim = False
 		if animtest.is_static_image():
-			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 180)
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 180, self.zoom_quality)
 		else:
-			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180)
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180, self.zoom_quality)
 			image_is_anim = True
 		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
 		vbox_left = gtk.VBox()
@@ -2666,9 +2664,9 @@ class Base:
 			renamebutton.set_image(renameimage)
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 			if animtest.is_static_image():
-				pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 60)
+				pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 60, self.zoom_quality)
 			else:
-				pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 60)
+				pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 60, self.zoom_quality)
 			image = gtk.Image()
 			image.set_from_pixbuf(pixbuf)
 			instructions = gtk.Label(_("Enter the new name") + ":")
@@ -2695,7 +2693,7 @@ class Base:
 					shutil.move(self.currimg_name, new_filename)
 					# Update thumbnail filename:
 					try:
-						shutil.move(self.thumbnail_get_name(self.currimg_name)[1], self.thumbnail_get_name(new_filename)[1])
+						shutil.move(self_get_name(self.currimg_name)[1], self.thumbnail_get_name(new_filename)[1])
 					except:
 						pass
 					self.recent_file_remove_and_refresh_name(self.currimg_name)
@@ -3138,7 +3136,7 @@ class Base:
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 			self.image_modified = True
 		
-	def get_pixbuf_of_size(self, pixbuf, size):
+	def get_pixbuf_of_size(self, pixbuf, size, zoom_quality):
 		# Creates a pixbuf that fits in the specified square of sizexsize
 		# while preserving the aspect ratio
 		# Returns tuple: (scaled_pixbuf, actual_width, actual_height)
@@ -3153,12 +3151,12 @@ class Base:
 				image_width = int(size/float(image_height)*image_width)
 				image_height = size
 		if not pixbuf.get_has_alpha():
-			crop_pixbuf = pixbuf.scale_simple(image_width, image_height, self.zoom_quality)
+			crop_pixbuf = pixbuf.scale_simple(image_width, image_height, zoom_quality)
 		else:
 			colormap = self.imageview.get_colormap()
 			light_grey = colormap.alloc_color('#666666', True, True)
 			dark_grey = colormap.alloc_color('#999999', True, True)
-			crop_pixbuf = pixbuf.composite_color_simple(image_width, image_height, self.zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
+			crop_pixbuf = pixbuf.composite_color_simple(image_width, image_height, zoom_quality, 255, 8, light_grey.pixel, dark_grey.pixel)
 		return (crop_pixbuf, image_width, image_height)
 
 	def pixbuf_add_border(self, pix):
@@ -3181,7 +3179,7 @@ class Base:
 		cropimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 		cropbutton.set_image(cropimage)
 		image = gtk.DrawingArea()
-		crop_pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 400)
+		crop_pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 400, self.zoom_quality)
 		image.set_size_request(image_width, image_height)
 		hbox = gtk.HBox()
 		hbox.pack_start(gtk.Label(), expand=True)
@@ -3462,9 +3460,9 @@ class Base:
 		hbox_total = gtk.HBox()
 		animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 		if animtest.is_static_image():
-			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 96)
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(self.currimg_pixbuf_original, 96, self.zoom_quality)
 		else:
-			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 96)
+			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 96, self.zoom_quality)
 		image = gtk.Image()
 		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
 		hbox_total.pack_start(image, False, False, 10)

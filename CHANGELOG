@@ -2,6 +2,7 @@ v0.9.1 - November 25, 2007
 	+ Screenshot support
 	+ Use png attributes to be more fully thumbnail spec compliant
 	+ Allow running without compiled C modules (certain features disabled)
+	+ Reuse generated thumbnails for open dialog preview if they exist
 	+ Bug: Fix freeze involving modified image and navigation
 	+ Bug: Prevent possible crash on invalid image files
 	+ Bug: Fix occassional wrong height of thumbnails (and gobject assertion)
@@ -9,6 +10,7 @@ v0.9.1 - November 25, 2007
 	+ Bug: Ctrl+mousewheel doesn't zoom when caps/num lock is on
 	+ Bug: Fix horizontal centering of image
 	+ Bug: Fix .desktop file category
+	+ Bug: Create thumbnails dir if it doesn't exist
 
 v0.9 - October 18, 2007
 	+ Thumbnails pane (freedesktop spec compliant using ~/.thumbnails)

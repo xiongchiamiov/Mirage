@@ -1,3 +1,7 @@
+0.9.1
++ Check mtime of thumbnails to see if they need to be updated...
++ use thumbnails for open preview image..
+
 1.0
 + Allow zooming in crop dialog (default to same view as main window so that
   the user can essentially 'crop visible' by clicking ok right away?)
