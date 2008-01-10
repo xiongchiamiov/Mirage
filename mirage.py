@@ -875,23 +875,28 @@ class Base:
 		# Returns a valid pixbuf or None if a pixbuf cannot be generated. Tries to re-use
 		# a thumbnail from ~/.thumbails/normal/, otherwise generates one with the
 		# XDG filename: md5(file:///full/path/to/image).png
+		imgfile = image_url
+		if imgfile[:7] == 'file://':
+			imgfile = imgfile[7:]
 		try:
 			if os.path.exists(thumb_url) and not force_generation:
 				pix = gtk.gdk.pixbuf_new_from_file(thumb_url)
-				return pix
-			else:
-				# Create the 128x128 thumbnail:
-				imgfile = image_url
-				if imgfile[:7] == 'file://':
-					imgfile = imgfile[7:]
-				uri = 'file://' + urllib.pathname2url(imgfile)
-				pix = gtk.gdk.pixbuf_new_from_file(imgfile)
-				pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128, gtk.gdk.INTERP_TILES)
-				st = os.stat(imgfile)
-				mtime = str(st[stat.ST_MTIME])
-				# Save image to .thumbnails:
-				pix.save(thumb_url, "png", {'tEXt::Thumb::URI':uri, 'tEXt::Thumb::MTime':mtime, 'tEXt::Software':'Mirage' + __version__})
-				return pix
+				pix_mtime = pix.get_option('tEXt::Thumb::MTim')
+				if pix_mtime:
+					st = os.stat(imgfile)
+					file_mtime = str(st[stat.ST_MTIME])
+					# If the mtimes match, we're good. if not, regenerate the thumbnail..
+					if pix_mtime == file_mtime:
+						return pix
+			# Create the 128x128 thumbnail:
+			uri = 'file://' + urllib.pathname2url(imgfile)
+			pix = gtk.gdk.pixbuf_new_from_file(imgfile)
+			pix, image_width, image_height = self.get_pixbuf_of_size(pix, 128, gtk.gdk.INTERP_TILES)
+			st = os.stat(imgfile)
+			file_mtime = str(st[stat.ST_MTIME])
+			# Save image to .thumbnails:
+			pix.save(thumb_url, "png", {'tEXt::Thumb::URI':uri, 'tEXt::Thumb::MTime':file_mtime, 'tEXt::Software':'Mirage' + __version__})
+			return pix
 		except:
 			return None
 	
