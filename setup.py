@@ -41,7 +41,7 @@ for lang in ('it', 'de', 'pl', 'es', 'fr', 'ru'):
 	os.system("msgfmt %s -o %s" % (pofile, mofile))
 
 setup(name='Mirage',
-		version='0.9.1',
+		version='0.9.2',
 		description='A fast GTK+ image viewer',
 		author='Scott Horowitz',
 		author_email='stonecrest@gmail.com',

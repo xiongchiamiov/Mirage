@@ -1,7 +1,7 @@
 # $HeadURL$
 # $Id$
 
-__version__ = "0.9.1"
+__version__ = "0.9.2"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -881,7 +881,7 @@ class Base:
 		try:
 			if os.path.exists(thumb_url) and not force_generation:
 				pix = gtk.gdk.pixbuf_new_from_file(thumb_url)
-				pix_mtime = pix.get_option('tEXt::Thumb::MTim')
+				pix_mtime = pix.get_option('tEXt::Thumb::MTime')
 				if pix_mtime:
 					st = os.stat(imgfile)
 					file_mtime = str(st[stat.ST_MTIME])

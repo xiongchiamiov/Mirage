@@ -1,11 +1,14 @@
-v0.9.1 - November 25, 2007
+v0.9.2 - January 28, 2008
+	+ Bug: Fix typo preventing thumbnails from being reused (Lane)
+
+v0.9.1 - January 9, 2008
 	+ Screenshot support
 	+ Use png attributes to be more fully thumbnail spec compliant
 	+ Allow running without compiled C modules (certain features disabled)
 	+ Reuse generated thumbnails for open dialog preview if they exist
 	+ Bug: Fix freeze involving modified image and navigation
 	+ Bug: Prevent possible crash on invalid image files
-	+ Bug: Fix occassional wrong height of thumbnails (and gobject assertion)
+	+ Bug: Fix occasional wrong height of thumbnails (and gobject assertion)
 	+ Bug: Wrong image displayed if discarding modified app and using preload
 	+ Bug: Ctrl+mousewheel doesn't zoom when caps/num lock is on
 	+ Bug: Fix horizontal centering of image
