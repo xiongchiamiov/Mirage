@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: hu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-11-25 20:20-0700\n"
-"PO-Revision-Date: 2008-02-23 21:43+0100\n"
+"PO-Revision-Date: 2008-02-28 19:58+0100\n"
 "Last-Translator: Lisovszki  <lisovszki@gmail.com>\n"
 "Language-Team: hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,8 @@ msgstr ""
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
-#: mirage.py:328
+# livágás
+
 msgid "_File"
 msgstr "_Fájl"
 
@@ -86,7 +87,7 @@ msgstr "Mentés másként"
 
 #: mirage.py:339
 msgid "_Crop..."
-msgstr "_Livágás..."
+msgstr "_Levágás..."
 
 #: mirage.py:339 mirage.py:3174
 msgid "Crop Image"
