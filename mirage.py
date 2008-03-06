@@ -2833,7 +2833,7 @@ class Base:
 		self.about_dialog.set_license(__license__)
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
-		self.about_dialog.set_translator_credits('de - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\nru - mavka <mavka@justos.org>\nit - Daniele Maggio <dado84@freemail.it>')
+		self.about_dialog.set_translator_credits('de - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\nhu - Sandor Lisovszki <lisovszki@dunakanyar.net>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\nru - mavka <mavka@justos.org>\nit - Daniele Maggio <dado84@freemail.it>')
 		gtk.about_dialog_set_url_hook(self.show_website, "http://mirageiv.berlios.de")
 		self.about_dialog.set_website_label("http://mirageiv.berlios.de")
 		icon_path = self.find_path('mirage.png')
