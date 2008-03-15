@@ -316,11 +316,11 @@ msgstr ""
 
 #: mirage.py:368
 msgid "_Properties..."
-msgstr "_Bestandteile..."
+msgstr "_Bildeigenschaften..."
 
 #: mirage.py:368 mirage.py:2285
 msgid "Properties"
-msgstr "Bestandteile"
+msgstr "Bildeigenschaften"
 
 #: mirage.py:369
 msgid "_Configure..."
