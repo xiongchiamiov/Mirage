@@ -381,7 +381,11 @@ class Base:
 			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action),
 			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen),
 			('Prev', None, '', 'Up', _('Previous Image'), self.goto_prev_image),
-			('Next', None, '', 'Down', _('Next Image'), self.goto_next_image)
+			('Next', None, '', 'Down', _('Next Image'), self.goto_next_image),
+			('BackSpace', None, '', 'BackSpace', _('Previous Image'), self.goto_prev_image),
+			('OriginalSize', None, '', '1', _('1:1'), self.zoom_1_to_1_action),
+			('ZoomIn', None, '', 'KP_Add', _('Zoom In'), self.zoom_in),
+			('ZoomOut', None, '', 'KP_Subtract', _('Zoom Out'), self.zoom_out)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
@@ -492,6 +496,10 @@ class Base:
 			      <menuitem action="Full Screen Key"/>
 			      <menuitem action="Prev"/>
 			      <menuitem action="Next"/>
+			      <menuitem action="OriginalSize"/>	
+			      <menuitem action="BackSpace"/>
+			      <menuitem action="ZoomIn"/>
+			      <menuitem action="ZoomOut"/>
 			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
