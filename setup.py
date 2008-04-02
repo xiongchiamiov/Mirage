@@ -32,7 +32,7 @@ def rmgeneric(path, __func__):
 # Create mo files:
 if not os.path.exists("mo/"):
 	os.mkdir("mo/")
-for lang in ('it', 'de', 'pl', 'es', 'fr', 'ru', 'hu', 'cs'):
+for lang in ('it', 'de', 'pl', 'es', 'fr', 'ru', 'hu', 'cs', 'pt_BR'):
 	pofile = "po/" + lang + ".po"
 	mofile = "mo/" + lang + "/mirage.mo"
 	if not os.path.exists("mo/" + lang + "/"):
@@ -68,6 +68,7 @@ setup(name='Mirage',
 			('share/locale/de/LC_MESSAGES', ['mo/de/mirage.mo']),
 			('share/locale/hu/LC_MESSAGES', ['mo/hu/mirage.mo']),
 			('share/locale/cs/LC_MESSAGES', ['mo/cs/mirage.mo']),
+			('share/locale/pt_BR/LC_MESSAGES', ['mo/pt_BR/mirage.mo']),
 			('share/locale/it/LC_MESSAGES', ['mo/it/mirage.mo'])],
 		)
 

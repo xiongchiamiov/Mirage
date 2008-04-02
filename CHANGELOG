@@ -1,3 +1,7 @@
+v0.9.4 - Pending
+	+ Bug: Fix returning from fullscreen mode with no images displayed
+	+ Added Portuguese translation (Danilo)
+
 v0.9.3 - March 26, 2008
 	+ Added shortcuts for consistency with gqview/eog (Benjamin)
 	+ Added Hungarian translation (Sandor)
