@@ -651,6 +651,7 @@ class Base:
 		self.window.connect("destroy", self.destroy)
 		self.window.connect("size-allocate", self.window_resized)
 		self.window.connect('key-press-event', self.topwindow_keypress)
+		self.toolbar.connect('focus', self.toolbar_focused)
 		self.layout.drag_dest_set(gtk.DEST_DEFAULT_HIGHLIGHT | gtk.DEST_DEFAULT_DROP, [("text/uri-list", 0, 80)], gtk.gdk.ACTION_DEFAULT)
 		self.layout.connect('drag_motion', self.motion_cb)
 		self.layout.connect('drag_data_received', self.drop_cb)
@@ -1008,6 +1009,10 @@ class Base:
 					self.zoom_to_fit_or_1_to_1(None, False, False)
 				else:
 					self.zoom_to_fit_window(None, False, False)
+	
+	def toolbar_focused(self, widget, direction):
+		self.layout.grab_focus()
+		return True
 
 	def topwindow_keypress(self, widget, event):
 		# For whatever reason, 'Left' and 'Right' cannot be used as menu
@@ -3607,6 +3612,7 @@ class Base:
 					elif location == "RANDOM":
 						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("All images have been viewed. Would you like to cycle through the images again?"))
 					dialog.set_title(_("Wrap?"))
+					dialog.label.set_property('can-focus', False)
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					self.user_prompt_visible = True
 					response = dialog.run()

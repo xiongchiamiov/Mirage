@@ -1,4 +1,5 @@
 v0.9.4 - Pending
+	+ Prevent toolbar from getting focus on keypresses
 	+ Bug: Fix returning from fullscreen mode with no images displayed
 	+ Added Portuguese translation (Danilo)
 
