@@ -172,6 +172,7 @@ class Base:
 		self.thumbpane_updating = False
 		self.recentfiles = ["", "", "", "", ""]
 		self.screenshot_delay = 2
+		self.thumbpane_bottom_coord_loaded = None
 
 		# Read any passed options/arguments:
 		try:
@@ -809,8 +810,9 @@ class Base:
 		# Load all images up to the bottom ofo the visible thumbpane rect:
 		rect = self.thumbpane.get_visible_rect()
 		bottom_coord = rect.y + rect.height + self.thumbnail_size
-		if bottom_coord > self.thumbpane_bottom_coord_loaded:
-			self.thumbpane_bottom_coord_loaded = bottom_coord
+		if self.thumbpane_bottom_coord_loaded:
+			if bottom_coord > self.thumbpane_bottom_coord_loaded:
+				self.thumbpane_bottom_coord_loaded = bottom_coord
 		# update images:
 		if not self.thumbpane_updating:
 			thread = threading.Thread(target=self.thumbpane_update_pending_images, args=(force_upto_imgnum, None))
