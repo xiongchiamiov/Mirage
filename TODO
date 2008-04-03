@@ -1,3 +1,5 @@
++ Pluralized words using gettext
+
 1.0
 + Allow zooming in crop dialog (default to same view as main window so that
   the user can essentially 'crop visible' by clicking ok right away?)
@@ -12,5 +14,6 @@ Future
 + Ability to specify save compression level?
 + Test on Windows/Mac? (requires new pygtk)
 + Try to make zooming smoother (is this even possible with pygtk?)
++ UPnP support?
 + mirage --add to add image to current instance instead of opening
   new window
