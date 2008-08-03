@@ -1808,10 +1808,10 @@ class Base:
 			self.fullscreen_mode = True
 			self.UIManager.get_widget('/Popup/Full Screen').hide()
 			self.UIManager.get_widget('/Popup/Exit Full Screen').show()
-			self.statusbar.hide()
-			self.statusbar2.hide()
-			self.toolbar.hide()
-			self.menubar.hide()
+			#self.statusbar.hide()
+			#self.statusbar2.hide()
+			#self.toolbar.hide()
+			#self.menubar.hide()
 			self.thumbscroll.hide()
 			self.thumbpane.hide()
 			self.window.fullscreen()
@@ -1822,25 +1822,25 @@ class Base:
 
 	def leave_fullscreen(self, action):
 		if self.fullscreen_mode:
-			self.slideshow_controls_visible = False
-			self.slideshow_window.hide_all()
-			self.slideshow_window2.hide_all()
+			#self.slideshow_controls_visible = False
+			#self.slideshow_window.hide_all()
+			#self.slideshow_window2.hide_all()
 			self.fullscreen_mode = False
-			self.UIManager.get_widget('/Popup/Full Screen').show()
-			self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
-			if self.toolbar_show:
-				self.toolbar.show()
-			self.menubar.show()
-			if self.statusbar_show:
-				self.statusbar.show()
-				self.statusbar2.show()
-			if self.thumbpane_show:
-				self.thumbscroll.show()
-				self.thumbpane.show()
-				self.thumbpane_update_images(False, self.curr_img_in_list)
+			#self.UIManager.get_widget('/Popup/Full Screen').show()
+			#self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
+			#if self.toolbar_show:
+			#	self.toolbar.show()
+			#self.menubar.show()
+			#if self.statusbar_show:
+			#	self.statusbar.show()
+			#	self.statusbar2.show()
+			#if self.thumbpane_show:
+			#	self.thumbscroll.show()
+			#	self.thumbpane.show()
+			#	self.thumbpane_update_images(False, self.curr_img_in_list)
 			self.window.unfullscreen()
-			self.change_cursor(None)
-			self.set_slideshow_sensitivities()
+			#self.change_cursor(None)
+			#self.set_slideshow_sensitivities()
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible'):
@@ -2847,7 +2847,7 @@ class Base:
 		self.about_dialog.set_license(__license__)
 		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
-		self.about_dialog.set_translator_credits('cs - Petr Pisar <petr.pisar@atlas.cz>\nde - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\nhu - Sandor Lisovszki <lisovszki@dunakanyar.net>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\npt_BR - Danilo Martins <mawkee@gmail.com>\nru - mavka <mavka@justos.org>\nit - Daniele Maggio <dado84@freemail.it>')
+		self.about_dialog.set_translator_credits('cs - Petr Pisar <petr.pisar@atlas.cz>\nde - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\nhu - Sandor Lisovszki <lisovszki@dunakanyar.net>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\npt_BR - Danilo Martins <mawkee@gmail.com>\nru - mavka <mavka@justos.org>\nit - Daniele Maggio <dado84@freemail.it>\nzh_CN - Jayden Suen <no.sun@163.com>')
 		gtk.about_dialog_set_url_hook(self.show_website, "http://mirageiv.berlios.de")
 		self.about_dialog.set_website_label("http://mirageiv.berlios.de")
 		icon_path = self.find_path('mirage.png')
