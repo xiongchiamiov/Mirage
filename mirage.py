@@ -29,7 +29,13 @@ import gtk
 import os, sys, getopt, ConfigParser, string, gc
 import random, urllib, gobject, gettext, locale
 import stat, time, subprocess, shutil, filecmp
-import tempfile, socket, md5, threading
+import tempfile, socket, threading
+try:
+	import hashlib
+	HAS_HASHLIB = True
+except:
+	HAS_HASHLIB= False
+	import md5
 try:
 	import imgfuncs
 	HAS_IMGFUNCS = True
@@ -875,7 +881,10 @@ class Base:
 	def thumbnail_get_name(self, image_name):
 		filename = os.path.expanduser('file://' + image_name)
 		uriname = os.path.expanduser('file://' + urllib.pathname2url(image_name))
-		m = md5.new()
+		if HAS_HASHLIB:
+		    m = hashlib.md5()
+		else:
+		    m = md5.new()
 		m.update(uriname)
 		mhex = m.hexdigest()
 		mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
