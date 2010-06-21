@@ -1902,7 +1902,7 @@ class Base:
 			st = os.stat(self.currimg_name)
 			filesize = st[stat.ST_SIZE]/1000
 			ratio = int(100 * self.currimg_zoomratio)
-			status_text = str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
+			status_text = os.path.basename(self.currimg_name)+ ":  " +  str(self.currimg_pixbuf_original.get_width()) + "x" + str(self.currimg_pixbuf_original.get_height()) + "   " + str(filesize) + "KB   " + str(ratio) + "%   "
 		except:
 			status_text=_("Cannot load image.")
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
