@@ -3664,10 +3664,9 @@ class Base:
 			if valid_int(location):
 				prev_img = self.curr_img_in_list
 				self.curr_img_in_list = int(location)
-				self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if not self.fullscreen_mode and (not self.slideshow_mode or (self.slideshow_mode and action != "ss")):
 				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			if location == "PREV":
+			if location == "PREV" or (valid_int(location) and int(location) == prev_img-1):
 				self.load_when_idle = gobject.idle_add(self.load_new_image, True, False, True, True, True, True)
 			else:
 				self.load_when_idle = gobject.idle_add(self.load_new_image, False, False, True, True, True, True)
