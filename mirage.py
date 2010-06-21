@@ -4287,7 +4287,7 @@ class Base:
 				if not self.closing_app and not self.stop_now:
 					while gtk.events_pending():
 						gtk.main_iteration(True)
-					item2 = item + "/" + item2
+					item2 = item + os.sep + item2
 					item_fullpath2 = os.path.abspath(item2)
 					if (not self.open_hidden_files and os.path.basename(item_fullpath2)[0] != '.') or self.open_hidden_files:
 						if os.path.isfile(item_fullpath2) and self.valid_image(item_fullpath2):
@@ -4322,12 +4322,19 @@ class Base:
 	def register_file_with_recent_docs(self, imgfile):
 		self.recent_file_add_and_refresh(imgfile)
 		if os.path.isfile(imgfile) and gtk.check_version(2, 10, 0) == None:
-			gtk_recent_manager = gtk.recent_manager_get_default()
-			uri = ''
-			if imgfile[:7] != 'file://':
-				uri = 'file://'
-			uri = uri + urllib.pathname2url(os.path.abspath(imgfile))
-			gtk_recent_manager.add_item(uri)
+			try:
+				gtk_recent_manager = gtk.recent_manager_get_default()
+				uri = ''
+				if imgfile[:7] != 'file://':
+					uri = 'file://'
+				uri = uri + urllib.pathname2url(os.path.abspath(imgfile))
+				gtk_recent_manager.add_item(uri)
+			except:
+				#Isnt currently functional on win32
+				if sys.platform == "win32":
+					pass
+				else:
+					raise
 
 	def valid_image(self, file):
 		test = gtk.gdk.pixbuf_get_file_info(file)
