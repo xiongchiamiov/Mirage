@@ -2464,7 +2464,7 @@ class Base:
 		gtk.Tooltips().set_tip(openallimages, _("If enabled, opening an image in Mirage will automatically load all images found in that image's directory."))
 		hiddenimages = gtk.CheckButton(_("Allow loading hidden files"))
 		hiddenimages.set_active(self.open_hidden_files)
-		gtk.Tooltips().set_tip(openallimages, _("If checked, opening, Mirage will open hidden files. Otherwise, hidden files will be ignored."))
+		gtk.Tooltips().set_tip(hiddenimages, _("If checked, Mirage will open hidden files. Otherwise, hidden files will be ignored."))
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		gtk.Tooltips().set_tip(openpref1, _("The default 'Open' directory will be the last directory used."))
