@@ -2777,6 +2777,11 @@ class Base:
 						pass
 					self.recent_file_remove_and_refresh_name(self.currimg_name)
 					iter = self.thumblist.get_iter((self.curr_img_in_list,))
+					try:
+						self.thumbnail_loaded.pop(self.curr_img_in_list)
+						self.thumbpane_update_images()
+					except:
+						pass
 					self.thumblist.remove(iter)
 					templist = self.image_list
 					self.image_list = []
