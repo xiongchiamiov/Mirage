@@ -2771,6 +2771,7 @@ class Base:
 			if response  == gtk.RESPONSE_YES:
 				try:
 					os.remove(self.currimg_name)
+					self.image_modified = False
 					try:
 						os.remove(self.thumbnail_get_name(self.currimg_name)[1])
 					except:
