@@ -1186,13 +1186,25 @@ class Base:
 		# Executes the given command using ``os.system``, substituting "%"-macros approprately.
 		def sh_esc(s):
 			import re
-			return re.sub(r'[^/._a-zA-Z0-9]', lambda c: '\\'+c.group(), s)
-		if cmd.strip() == "[NEXT]":
+			return re.sub(r'[^/._a-zA-Z0-9-]', lambda c: '\\'+c.group(), s)
+		cmd = cmd.strip()
+		# [NEXT] and [PREV] are only valid alone or at the end of the command
+		if cmd == "[NEXT]":
 			self.goto_next_image(None)
 			return
-		elif cmd.strip() == "[PREV]":
+		elif cmd == "[PREV]":
 			self.goto_prev_image(None)
 			return
+		# -1=go to previous, 1=go to next, 0=don't change
+		prev_or_next=0
+		if cmd[-6:] == "[NEXT]":
+			prev_or_next=1
+			cmd = cmd[:-6]
+			print "found next"
+		elif cmd[-6:] == "[PREV]":
+			prev_or_next=-1
+			cmd = cmd[:-6]
+			print "found prev"
 		if "%F" in cmd:
 			cmd = cmd.replace("%F", sh_esc(imagename))
 		if "%N" in cmd:
@@ -1216,6 +1228,10 @@ class Base:
 			error_dialog.set_title(_("Invalid Custom Action"))
 			error_dialog.run()
 			error_dialog.destroy()
+		elif prev_or_next == 1:
+			self.goto_next_image(None)
+		elif prev_or_next == -1:
+			self.goto_prev_image(None)
 		self.running_custom_actions = False
 
 	def set_go_sensitivities(self, enable):
@@ -2055,6 +2071,12 @@ class Base:
 			if not (action_command.get_text() == "" or action_name.get_text() == "" or self.shortcut.get_label() == "None"):
 				name = action_name.get_text()
 				command = action_command.get_text()
+				if ((("[NEXT]" in command.strip()) and command.strip()[-6:] != "[NEXT]") or (("[PREV]" in command.strip()) and command.strip()[-6:] != "[PREV]") ):
+					error_dialog = gtk.MessageDialog(self.actions_dialog, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('[PREV] and [NEXT] are only valid alone or at the end of the command'))
+					error_dialog.set_title(_("Invalid Custom Action"))
+					error_dialog.run()
+					error_dialog.destroy()
+					return
 				shortcut = shortcut.get_label()
 				batch = batchmode.get_active()
 				dialog.destroy()
