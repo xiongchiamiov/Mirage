@@ -147,6 +147,7 @@ class Base:
 		self.slideshow_controls_visible = False		# fullscreen slideshow controls
 		self.controls_moving = False
 		self.zoomvalue = 2
+		self.quality_save = 90
 		self.updating_adjustments = False
 		self.disable_screensaver = False
 		self.slideshow_in_fullscreen = False
@@ -261,6 +262,8 @@ class Base:
 				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
 			elif int(round(self.zoomvalue, 0)) == 3:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
+		if conf.has_option('prefs', 'quality_save'):
+			self.quality_save = conf.getint('prefs', 'quality_save')
 		if conf.has_option('prefs', 'disable_screensaver'):
 			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
 		if conf.has_option('prefs', 'slideshow_in_fullscreen'):
@@ -1450,6 +1453,7 @@ class Base:
 		conf.set('prefs', 'slideshow_delay', int(self.slideshow_delay))
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
 		conf.set('prefs', 'zoomquality', self.zoomvalue)
+		conf.set('prefs', 'quality_save', int(self.quality_save))
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
 		conf.set('prefs', 'slideshow_in_fullscreen', self.slideshow_in_fullscreen)
 		conf.set('prefs', 'confirm_delete', self.confirm_delete)
@@ -1613,7 +1617,7 @@ class Base:
 			if filetype == None:
 				filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
 			if self.filetype_is_writable(filetype):
-				self.currimg_pixbuf_original.save(dest_name, filetype)
+				self.currimg_pixbuf_original.save(dest_name, filetype, {'quality': self.save_quality})
 				self.currimg_name = dest_name
 				self.image_list[self.curr_img_in_list] = dest_name
 				self.update_title()
@@ -2559,6 +2563,7 @@ class Base:
 		imagelabel.set_alignment(0, 1)
 		deletebutton = gtk.CheckButton(_("Confirm image delete"))
 		deletebutton.set_active(self.confirm_delete)
+		
 		zoom_hbox = gtk.HBox()
 		zoom_hbox.pack_start(gtk.Label(_('Scaling quality') + ": "), False, False, 0)
 		zoomcombo = gtk.combo_box_new_text()
@@ -2569,6 +2574,7 @@ class Base:
 		zoomcombo.set_active(self.zoomvalue)
 		zoom_hbox.pack_start(zoomcombo, False, False, 0)
 		zoom_hbox.pack_start(gtk.Label(), True, True, 0)
+		
 		hbox_save = gtk.HBox()
 		savelabel = gtk.Label(_("Modified images") + ":")
 		savecombo = gtk.combo_box_new_text()
@@ -2578,19 +2584,28 @@ class Base:
 		savecombo.set_active(self.savemode)
 		hbox_save.pack_start(savelabel, False, False, 0)
 		hbox_save.pack_start(savecombo, False, False, 5)
+		
+		hbox_quality = gtk.HBox()
+		qualitylabel = gtk.Label(_("Quality to save in:"))
+		qspin_adj = gtk.Adjustment(self.quality_save, 0, 100, 1, 100, 0)
+		qualityspin = gtk.SpinButton(qspin_adj, 1.0, 0)
+		qualityspin.set_numeric(True)
+		hbox_quality.pack_start(qualitylabel, False, False, 0)
+		hbox_quality.pack_start(qualityspin, False, False, 5)
 		table_image.attach(gtk.Label(), 1, 3, 1, 2,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(imagelabel, 1, 3, 2, 3,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table_image.attach(gtk.Label(), 1, 3, 3, 4,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(zoom_hbox, 1, 3, 4, 5,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 5, 6,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(hbox_save, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_image.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_image.attach(deletebutton, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_image.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_image.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(hbox_quality, 1, 3, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 9, 10,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(deletebutton, 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_image.attach(gtk.Label(), 1, 3, 13, 14,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_image.attach(gtk.Label(), 1, 3, 14, 15,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# Add tabs:
 		notebook = gtk.Notebook()
 		notebook.append_page(table_behavior, gtk.Label(_("Behavior")))
@@ -2638,6 +2653,7 @@ class Base:
 			self.savemode = savecombo.get_active()
 			self.start_in_fullscreen = fullscreen.get_active()
 			self.confirm_delete = deletebutton.get_active()
+			self.quality_save = qualityspin.get_value()
 			self.thumbnail_size = int(self.thumbnail_sizes[thumbsize.get_active()])
 			if self.thumbnail_size != prev_thumbnail_size:
 				gobject.idle_add(self.thumbpane_set_size)
