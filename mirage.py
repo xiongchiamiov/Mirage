@@ -539,7 +539,6 @@ class Base:
 		self.window.add_accel_group(self.UIManager.get_accel_group())
 		self.menubar = self.UIManager.get_widget('/MainMenu')
 		vbox.pack_start(self.menubar, False, False, 0)
-		self.set_slideshow_sensitivities()
 		self.toolbar = self.UIManager.get_widget('/MainToolbar')
 		vbox.pack_start(self.toolbar, False, False, 0)
 		self.layout = gtk.Layout()
@@ -685,7 +684,6 @@ class Base:
 			pass
 
 		# Show GUI:
-		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 		if not self.toolbar_show:
 			self.toolbar.set_property('visible', False)
 			self.toolbar.set_no_show_all(True)
@@ -719,6 +717,10 @@ class Base:
 		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
+		
+		#sets the visibility of some menu entries
+		self.set_slideshow_sensitivities()
+		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
 		if opts != []:
 			for o, a in opts:
 				if o in ("-f", "--fullscreen"):
