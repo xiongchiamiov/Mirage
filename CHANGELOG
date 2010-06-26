@@ -1,8 +1,25 @@
-v0.9.4 - Pending
+v0.9.4 - June 26, 2010
+	+ Mirage now requires PyGTK 2.12.0
+	+ Added the ability to set the quality for saving images
+	+ Added windows support
+	+ Fixed DeprecationWarnings for old tooltip API in pygtk
+	+ Fixed DeprecationWarnings for md5
 	+ Prevent toolbar from getting focus on keypresses
 	+ Bug: Fix returning from fullscreen mode with no images displayed
-	+ Added Portuguese translation (Danilo)
-	+ Added Chinese translation (Jayden)
+	+ Bug: delete_image() could cause some thumbnails to not get loaded
+	+ Bug: If a image modified image was deleted mirage would ask to save the image
+	+ Bug: Hopefully fixed image preloading
+	+ Bug: Fixed wrong tooltip for hidden images
+	+ Bug: Some menu entries was visible while they shouldnt have been
+	+ Bug: Fixed parsing of custom commands
+	+ Changes: Properties now show "file modified" instead of "file date"
+	+ Changes: Slideshow delay is choosen with a spinner
+	+ Changes: Fixed DeprecationWarnings for old tooltip API in pygtk
+	+ Changes: Fixed DeprecationWarnings for md5
+	+ Feature request: Show filename in statusbar
+	+ Translation: Added Portuguese translation (Danilo)
+	+ Translation: Added Chinese translation (Jayden)
+	+ Translation: Updated the po-files
 
 v0.9.3 - March 26, 2008
 	+ Added shortcuts for consistency with gqview/eog (Benjamin)

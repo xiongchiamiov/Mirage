@@ -1,7 +1,7 @@
 # $HeadURL$
 # $Id$
 
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -2885,7 +2885,7 @@ class Base:
 		self.about_dialog.set_version(__version__)
 		self.about_dialog.set_comments(_('A fast GTK+ Image Viewer.'))
 		self.about_dialog.set_license(__license__)
-		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>'])
+		self.about_dialog.set_authors(['Scott Horowitz <stonecrest@gmail.com>', 'Fredric Johansson <fredric.miscmail@gmail.com>'])
 		self.about_dialog.set_artists(['William Rea <sillywilly@gmail.com>'])
 		self.about_dialog.set_translator_credits('cs - Petr Pisar <petr.pisar@atlas.cz>\nde - Bjoern Martensen <bjoern.martensen@gmail.com>\nes - Isidro Arribas <cdhotfire@gmail.com>\nfr - Mike Massonnet <mmassonnet@gmail.com>\nhu - Sandor Lisovszki <lisovszki@dunakanyar.net>\npl - Tomasz Dominikowski <dominikowski@gmail.com>\npt_BR - Danilo Martins <mawkee@gmail.com>\nru - mavka <mavka@justos.org>\nit - Daniele Maggio <dado84@freemail.it>\nzh_CN - Jayden Suen <no.sun@163.com>')
 		gtk.about_dialog_set_url_hook(self.show_website, "http://mirageiv.berlios.de")
