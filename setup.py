@@ -41,10 +41,12 @@ for lang in ('it', 'de', 'pl', 'es', 'fr', 'ru', 'hu', 'cs', 'pt_BR', 'zh_CN'):
 	os.system("msgfmt %s -o %s" % (pofile, mofile))
 
 setup(name='Mirage',
-		version='0.9.3',
+		version='0.9.4',
 		description='A fast GTK+ image viewer',
 		author='Scott Horowitz',
 		author_email='stonecrest@gmail.com',
+		maintainer= 'Fredric Johansson',
+		maintainer_email='fredric.miscmail@gmail.com',
 		url='http://mirageiv.berlios.de',
 		classifiers=[
 			'Environment :: X11 Applications',
