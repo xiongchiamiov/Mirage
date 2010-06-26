@@ -141,9 +141,8 @@ class Base:
 		self.last_mode = self.open_mode_smart
 		self.listwrap_mode = 0					# 0=no, 1=yes, 2=ask
 		self.user_prompt_visible = False			# the "wrap?" prompt
-		self.slideshow_delay = 1					# self.delayoptions[self.slideshow_delay] seconds
+		self.slideshow_delay = 1					# seconds
 		self.slideshow_mode = False
-		self.delayoptions = [2,3,5,10,15,30]			# in seconds
 		self.slideshow_random = False
 		self.slideshow_controls_visible = False		# fullscreen slideshow controls
 		self.controls_moving = False
@@ -639,16 +638,13 @@ class Base:
 		except:
 			self.ss_randomize.set_label("Rand")
 		self.ss_randomize.connect('toggled', self.random_changed)
-		self.ss_delaycombo = gtk.combo_box_new_text()
-		self.ss_delaycombo.append_text(str(self.delayoptions[0]) + ' ' + _('seconds'))
-		self.ss_delaycombo.append_text(str(self.delayoptions[1]) + ' ' + _('seconds'))
-		self.ss_delaycombo.append_text(str(self.delayoptions[2]) + ' ' + _('seconds'))
-		self.ss_delaycombo.append_text(str(self.delayoptions[3]) + ' ' + _('seconds'))
-		self.ss_delaycombo.append_text(str(self.delayoptions[4]) + ' ' + _('seconds'))
-		self.ss_delaycombo.append_text(str(self.delayoptions[5]) + ' ' + _('seconds'))
-		self.ss_delaycombo.connect('changed', self.delay_changed)
+		
+		spin_adj = gtk.Adjustment(self.slideshow_delay, 0, 50000, 1,100, 0)
+		self.ss_delayspin = gtk.SpinButton(spin_adj, 1.0, 0)
+		self.ss_delayspin.set_numeric(True)
+		self.ss_delayspin.connect('changed', self.delay_changed)
 		self.slideshow_controls2.pack_start(self.ss_randomize, False, False, 0)
-		self.slideshow_controls2.pack_start(self.ss_delaycombo, False, False, 0)
+		self.slideshow_controls2.pack_start(self.ss_delayspin, False, False, 0)
 		self.slideshow_controls2.pack_start(self.ss_exit, False, False, 0)
 		self.slideshow_window2.add(self.slideshow_controls2)
 		self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
@@ -1360,13 +1356,13 @@ class Base:
 		print "                       " + _("i.e. mirage -o 'echo file is %F')")
 
 	def delay_changed(self, action):
-		self.curr_slideshow_delay = self.ss_delaycombo.get_active()
+		self.curr_slideshow_delay = self.ss_delayspin.get_value()
 		if self.slideshow_mode:
 			gobject.source_remove(self.timer_delay)
 			if self.curr_slideshow_random:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
+				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
 			else:
-				self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
+				self.timer_delay = gobject.timeout_add((self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
 		self.window.set_focus(self.layout)
 
 	def random_changed(self, action):
@@ -1457,7 +1453,7 @@ class Base:
 		conf.set('prefs', 'open_mode', self.open_mode)
 		conf.set('prefs', 'last_mode', self.last_mode)
 		conf.set('prefs', 'listwrap_mode', self.listwrap_mode)
-		conf.set('prefs', 'slideshow_delay', self.slideshow_delay)
+		conf.set('prefs', 'slideshow_delay', int(self.slideshow_delay))
 		conf.set('prefs', 'slideshow_random', self.slideshow_random)
 		conf.set('prefs', 'zoomquality', self.zoomvalue)
 		conf.set('prefs', 'disable_screensaver', self.disable_screensaver)
@@ -2281,7 +2277,7 @@ class Base:
 			while gtk.events_pending():
 				gtk.main_iteration()
 			self.screenshot_delay = int(delay.get_text())
-			gobject.timeout_add(self.screenshot_delay*1000, self._screenshot_grab, area1.get_active())
+			gobject.timeout_add(int(self.screenshot_delay*1000), self._screenshot_grab, area1.get_active())
 		else:
 			dialog.destroy()
 	
@@ -2535,16 +2531,11 @@ class Base:
 		slideshowlabel.set_markup('<b>' + _('Slideshow Mode') + '</b>')
 		slideshowlabel.set_alignment(0, 1)
 		hbox_delay = gtk.HBox()
-		hbox_delay.pack_start(gtk.Label(_("Delay between images") + ":"), False, False, 0)
-		delaycombo = gtk.combo_box_new_text()
-		delaycombo.append_text(str(self.delayoptions[0]) + ' ' + _('seconds'))
-		delaycombo.append_text(str(self.delayoptions[1]) + ' ' + _('seconds'))
-		delaycombo.append_text(str(self.delayoptions[2]) + ' ' + _('seconds'))
-		delaycombo.append_text(str(self.delayoptions[3]) + ' ' + _('seconds'))
-		delaycombo.append_text(str(self.delayoptions[4]) + ' ' + _('seconds'))
-		delaycombo.append_text(str(self.delayoptions[5]) + ' ' + _('seconds'))
-		delaycombo.set_active(self.slideshow_delay)
-		hbox_delay.pack_start(delaycombo, False, False, 5)
+		hbox_delay.pack_start(gtk.Label(_("Delay between images in seconds") + ":"), False, False, 0)
+		spin_adj = gtk.Adjustment(self.slideshow_delay, 0, 50000, 1, 10, 0)
+		delayspin = gtk.SpinButton(spin_adj, 1.0, 0)
+		delayspin.set_numeric(True)
+		hbox_delay.pack_start(delayspin, False, False, 5)
 		randomize = gtk.CheckButton(_("Randomize order of images"))
 		randomize.set_active(self.slideshow_random)
 		gtk.Tooltips().set_tip(randomize, _("If enabled, a random image will be chosen during slideshow mode (without loading any image twice)."))
@@ -2644,7 +2635,7 @@ class Base:
 			preloading_images_prev = self.preloading_images
 			self.preloading_images = preloadnav.get_active()
 			self.listwrap_mode = combobox2.get_active()
-			self.slideshow_delay = delaycombo.get_active()
+			self.slideshow_delay = delayspin.get_value()
 			self.curr_slideshow_delay = self.slideshow_delay
 			self.slideshow_random = randomize.get_active()
 			self.curr_slideshow_random = self.slideshow_random
@@ -3673,9 +3664,9 @@ class Base:
 			self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode:
 				if self.curr_slideshow_random:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
 				else:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
 			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
 		
 	def set_go_navigation_sensitivities(self, skip_initial_check):
@@ -4395,10 +4386,10 @@ class Base:
 				self.update_title()
 				self.set_slideshow_sensitivities()
 				if not self.curr_slideshow_random:
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_next_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
 				else:
 					self.reinitialize_randomlist()
-					self.timer_delay = gobject.timeout_add(self.delayoptions[self.curr_slideshow_delay]*1000, self.goto_random_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
 				self.ss_start.hide()
 				self.ss_stop.show()
 				timer_screensaver = gobject.timeout_add(1000, self.disable_screensaver_in_slideshow_mode)
@@ -4424,7 +4415,7 @@ class Base:
 		if not self.slideshow_controls_visible and not self.controls_moving:
 			self.slideshow_controls_visible = True
 
-			self.ss_delaycombo.set_active(self.curr_slideshow_delay)
+			self.ss_delayspin.set_value(self.curr_slideshow_delay)
 			self.ss_randomize.set_active(self.curr_slideshow_random)
 
 			if self.slideshow_mode:
