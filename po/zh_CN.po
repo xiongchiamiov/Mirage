@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mirage 0.9.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-25 20:20-0700\n"
+"POT-Creation-Date: 2010-06-26 15:56+0200\n"
 "PO-Revision-Date: 2008-07-28 17:16+0800\n"
 "Last-Translator: Jayden Suen <no.sun@163.com>\n"
 "Language-Team: Chinese <no.sun@163.com>\n"
@@ -18,1016 +18,1000 @@ msgstr ""
 "X-Poedit-Country: CHINA\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: mirage.py:328
+#: mirage.py:337
 msgid "_File"
 msgstr "文件(_F)"
 
-#: mirage.py:329
+#: mirage.py:338
 msgid "_Edit"
 msgstr "编辑(_E)"
 
-#: mirage.py:330
+#: mirage.py:339
 msgid "_View"
 msgstr "查看(_V)"
 
-#: mirage.py:331
+#: mirage.py:340
 msgid "_Go"
 msgstr "转到(_G)"
 
-#: mirage.py:332
+#: mirage.py:341
 msgid "_Help"
 msgstr "帮助(_H)"
 
-#: mirage.py:333
+#: mirage.py:342
 msgid "_Custom Actions"
 msgstr "自定义操作(_C)"
 
-#: mirage.py:334
+#: mirage.py:343
 msgid "_Open Image..."
 msgstr "打开图片...(_O)"
 
-#: mirage.py:334
+#: mirage.py:343
 msgid "Open Image"
 msgstr "打开图片"
 
-#: mirage.py:335
+#: mirage.py:344
 msgid "_Open Remote image..."
 msgstr "打开远程图片...(_N)"
 
-#: mirage.py:335
+#: mirage.py:344
 msgid "Open Remote Image"
 msgstr "打开远程图片"
 
-#: mirage.py:336
+#: mirage.py:345
 msgid "Open _Folder..."
 msgstr "打开文件夹...(_F)"
 
-#: mirage.py:336
+#: mirage.py:345
 msgid "Open Folder"
 msgstr "打开文件夹"
 
-#: mirage.py:337
+#: mirage.py:346
 msgid "_Save Image"
 msgstr "保存图片(_S)"
 
-#: mirage.py:337
+#: mirage.py:346
 msgid "Save Image"
 msgstr "保存图片"
 
-#: mirage.py:338
+#: mirage.py:347
 msgid "Save Image _As..."
 msgstr "另存为...(_A)"
 
-#: mirage.py:338
+#: mirage.py:347
 msgid "Save Image As"
 msgstr "另存为"
 
-#: mirage.py:339
+#: mirage.py:348
 msgid "_Crop..."
 msgstr "剪裁...(_C)"
 
-#: mirage.py:339
-#: mirage.py:3174
+#: mirage.py:348 mirage.py:3235
 msgid "Crop Image"
 msgstr "剪裁图片"
 
-#: mirage.py:340
+#: mirage.py:349
 msgid "Re_size..."
 msgstr "调整大小..."
 
-#: mirage.py:340
-#: mirage.py:3419
+#: mirage.py:349 mirage.py:3480
 msgid "Resize Image"
 msgstr "调整图片尺寸"
 
-#: mirage.py:341
+#: mirage.py:350
 msgid "Saturation..."
 msgstr "饱和度..."
 
-#: mirage.py:341
+#: mirage.py:350
 msgid "Modify saturation"
 msgstr "调整饱和度"
 
-#: mirage.py:342
+#: mirage.py:351
 msgid "_Quit"
 msgstr "退出(_Q)"
 
-#: mirage.py:342
+#: mirage.py:351
 msgid "Quit"
 msgstr "退出"
 
-#: mirage.py:343
+#: mirage.py:352
 msgid "_Previous Image"
 msgstr "上一张图片(_P)"
 
-#: mirage.py:343
-#: mirage.py:383
+#: mirage.py:352 mirage.py:391
 msgid "Previous Image"
 msgstr "上一张图片"
 
-#: mirage.py:344
+#: mirage.py:353
 msgid "_Next Image"
 msgstr "下一张图片(_N)"
 
-#: mirage.py:344
-#: mirage.py:384
+#: mirage.py:353 mirage.py:392
 msgid "Next Image"
 msgstr "下一张图片"
 
-#: mirage.py:345
+#: mirage.py:354
 msgid "_Previous"
 msgstr "向前(_P)"
 
-#: mirage.py:345
+#: mirage.py:354
 msgid "Previous"
 msgstr "向前"
 
-#: mirage.py:346
+#: mirage.py:355
 msgid "_Next"
 msgstr "向后(_N)"
 
-#: mirage.py:346
-#: mirage.py:375
+#: mirage.py:355
 msgid "Next"
 msgstr "向后"
 
-#: mirage.py:347
+#: mirage.py:356
 msgid "_Random Image"
 msgstr "随机图片(_R)"
 
-#: mirage.py:347
+#: mirage.py:356
 msgid "Random Image"
 msgstr "随机图片"
 
-#: mirage.py:348
+#: mirage.py:357
 msgid "_First Image"
 msgstr "第一张图片(_F)"
 
-#: mirage.py:348
+#: mirage.py:357
 msgid "First Image"
 msgstr "第一张图片"
 
-#: mirage.py:349
+#: mirage.py:358
 msgid "_Last Image"
 msgstr "最后一张图片(_L)"
 
-#: mirage.py:349
+#: mirage.py:358
 msgid "Last Image"
 msgstr "最后一张图片"
 
-#: mirage.py:350
+#: mirage.py:359
 msgid "Zoom _In"
 msgstr "放大图片(_I)"
 
-#: mirage.py:350
-#: mirage.py:373
-#: mirage.py:374
-#: mirage.py:379
+#: mirage.py:359 mirage.py:381 mirage.py:382 mirage.py:386 mirage.py:394
 msgid "Zoom In"
 msgstr "放大图片"
 
-#: mirage.py:351
+#: mirage.py:360
 msgid "Zoom _Out"
 msgstr "缩小图片(_O)"
 
-#: mirage.py:351
-#: mirage.py:372
-#: mirage.py:378
+#: mirage.py:360 mirage.py:380 mirage.py:385 mirage.py:395
 msgid "Zoom Out"
 msgstr "缩小图片"
 
-#: mirage.py:352
+#: mirage.py:361
 msgid "Zoom To _Fit"
 msgstr "适合窗口(_F)"
 
-#: mirage.py:352
-#: mirage.py:376
-#: mirage.py:380
+#: mirage.py:361 mirage.py:383 mirage.py:387
 msgid "Fit"
 msgstr "适合窗口"
 
-#: mirage.py:353
+#: mirage.py:362
 msgid "_1:1"
 msgstr "1:1(_1)"
 
-#: mirage.py:353
-#: mirage.py:377
-#: mirage.py:381
+#: mirage.py:362 mirage.py:384 mirage.py:388 mirage.py:393
 msgid "1:1"
 msgstr "1:1"
 
-#: mirage.py:354
+#: mirage.py:363
 msgid "Rotate _Left"
 msgstr "逆时针旋转(_L)"
 
-#: mirage.py:354
+#: mirage.py:363
 msgid "Rotate Left"
 msgstr "逆时针旋转"
 
-#: mirage.py:355
+#: mirage.py:364
 msgid "Rotate _Right"
 msgstr "顺时针旋转(_R)"
 
-#: mirage.py:355
+#: mirage.py:364
 msgid "Rotate Right"
 msgstr "顺时针旋转"
 
-#: mirage.py:356
+#: mirage.py:365
 msgid "Flip _Vertically"
 msgstr "上下翻转(_V)"
 
-#: mirage.py:356
+#: mirage.py:365
 msgid "Flip Vertically"
 msgstr "上下翻转"
 
-#: mirage.py:357
+#: mirage.py:366
 msgid "Flip _Horizontally"
 msgstr "左右翻转(_H)"
 
-#: mirage.py:357
+#: mirage.py:366
 msgid "Flip Horizontally"
 msgstr "左右翻转"
 
-#: mirage.py:358
+#: mirage.py:367
 msgid "_About"
 msgstr "关于(_A)"
 
-#: mirage.py:358
+#: mirage.py:367
 msgid "About"
 msgstr "关于"
 
-#: mirage.py:359
+#: mirage.py:368
 msgid "_Contents"
 msgstr "内容(_C)"
 
-#: mirage.py:359
+#: mirage.py:368
 msgid "Contents"
 msgstr "内容"
 
-#: mirage.py:360
+#: mirage.py:369
 msgid "_Preferences..."
 msgstr "首选项...(_P)"
 
-#: mirage.py:360
+#: mirage.py:369
 msgid "Preferences"
 msgstr "首选项"
 
-#: mirage.py:361
+#: mirage.py:370
 msgid "_Full Screen"
 msgstr "全屏(_F)"
 
-#: mirage.py:361
+#: mirage.py:370
 msgid "Full Screen"
 msgstr "全屏"
 
-#: mirage.py:362
+#: mirage.py:371
 msgid "E_xit Full Screen"
 msgstr "离开全屏(_x)"
 
-#: mirage.py:362
-#: mirage.py:371
+#: mirage.py:371 mirage.py:390
 msgid "Exit Full Screen"
 msgstr "离开全屏"
 
-#: mirage.py:363
+#: mirage.py:372
 msgid "_Start Slideshow"
 msgstr "播放幻灯片(_S)"
 
-#: mirage.py:363
+#: mirage.py:372
 msgid "Start Slideshow"
 msgstr "播放幻灯片"
 
-#: mirage.py:364
+#: mirage.py:373
 msgid "_Stop Slideshow"
 msgstr "停止幻灯片(_S)"
 
-#: mirage.py:364
+#: mirage.py:373
 msgid "Stop Slideshow"
 msgstr "停止幻灯片"
 
-#: mirage.py:365
+#: mirage.py:374
 msgid "_Delete..."
 msgstr "删除(_D)"
 
-#: mirage.py:365
-#: mirage.py:2720
+#: mirage.py:374 mirage.py:2775
 msgid "Delete Image"
 msgstr "删除图片"
 
-#: mirage.py:366
+#: mirage.py:375
 msgid "Re_name..."
 msgstr "重命名...(_n)"
 
-#: mirage.py:366
-#: mirage.py:2653
+#: mirage.py:375 mirage.py:2708
 msgid "Rename Image"
 msgstr "重命名图片"
 
-#: mirage.py:367
+#: mirage.py:376
 msgid "Take _Screenshot..."
 msgstr "截图(_S)"
 
-#: mirage.py:367
+#: mirage.py:376
 msgid "Take Screenshot"
 msgstr "截图"
 
-#: mirage.py:368
+#: mirage.py:377
 msgid "_Properties..."
 msgstr "属性...(_P)"
 
-#: mirage.py:368
-#: mirage.py:2285
+#: mirage.py:377 mirage.py:2333
 msgid "Properties"
 msgstr "属性"
 
-#: mirage.py:369
+#: mirage.py:378
 msgid "_Configure..."
 msgstr "配置...(_C)"
 
-#: mirage.py:369
+#: mirage.py:378
 msgid "Custom Actions"
 msgstr "自定义操作"
 
-#: mirage.py:387
+#: mirage.py:389
+#, fuzzy
+msgid "Fullscreen"
+msgstr "全屏"
+
+#: mirage.py:398
 msgid "_Status Bar"
 msgstr "状态栏(_S)"
 
-#: mirage.py:387
+#: mirage.py:398
 msgid "Status Bar"
 msgstr "状态栏"
 
-#: mirage.py:388
+#: mirage.py:399
 msgid "_Toolbar"
 msgstr "工具栏(_T)"
 
-#: mirage.py:388
+#: mirage.py:399
 msgid "Toolbar"
 msgstr "工具栏"
 
-#: mirage.py:389
+#: mirage.py:400
 msgid "_Thumbnails Pane"
 msgstr "缩略图(_T)"
 
-#: mirage.py:389
+#: mirage.py:400
 msgid "Thumbnails Pane"
 msgstr "缩略图"
 
-#: mirage.py:628
-#: mirage.py:629
-#: mirage.py:630
-#: mirage.py:631
-#: mirage.py:632
-#: mirage.py:633
-#: mirage.py:2510
-#: mirage.py:2511
-#: mirage.py:2512
-#: mirage.py:2513
-#: mirage.py:2514
-#: mirage.py:2515
-msgid "seconds"
-msgstr "秒"
-
-#: mirage.py:1173
-#: mirage.py:1906
+#: mirage.py:1219 mirage.py:1948
 msgid "Action"
 msgstr "命令"
 
-#: mirage.py:1176
+#: mirage.py:1222
 #, python-format
 msgid "Action return code: %s"
 msgstr "命令返回值: %s"
 
-#: mirage.py:1178
+#: mirage.py:1224
 msgid "Unable to launch"
 msgstr "不能启动"
 
-#: mirage.py:1180
+#: mirage.py:1226
 msgid "Please specify a valid command from Edit > Custom Actions."
 msgstr "请在 编辑 > 自定义操作 中设置有效的命令。"
 
-#: mirage.py:1182
-#: mirage.py:2063
+#: mirage.py:1228 mirage.py:2076 mirage.py:2111
 msgid "Invalid Custom Action"
 msgstr "自定义操作无效"
 
-#: mirage.py:1303
+#: mirage.py:1353
 msgid "Version: Mirage"
 msgstr "版本: Mirage"
 
-#: mirage.py:1304
+#: mirage.py:1354
 msgid "Website: http://mirageiv.berlios.de"
 msgstr "主页: http://mirageiv.berlios.de"
 
-#: mirage.py:1309
+#: mirage.py:1359
 msgid "Usage: mirage [OPTION]... FILES|FOLDERS..."
 msgstr "用法: mirage [选项]... 文件|文件夹..."
 
-#: mirage.py:1311
+#: mirage.py:1361
 msgid "Options"
 msgstr "选项"
 
-#: mirage.py:1312
+#: mirage.py:1362
 msgid "Show this help and exit"
 msgstr "显示帮助后退出"
 
-#: mirage.py:1313
+#: mirage.py:1363
 msgid "Show version information and exit"
 msgstr "显示版本信息后退出"
 
-#: mirage.py:1314
+#: mirage.py:1364
 msgid "Show more detailed information"
 msgstr "显示更多信息"
 
-#: mirage.py:1315
+#: mirage.py:1365
 msgid "Recursively include all images found in"
 msgstr "包含所有找到的图片"
 
-#: mirage.py:1316
+#: mirage.py:1366
 msgid "subdirectories of FOLDERS"
 msgstr "文件夹的子目录"
 
-#: mirage.py:1317
+#: mirage.py:1367
 msgid "Start in slideshow mode"
 msgstr "以幻灯片模式开启程序"
 
-#: mirage.py:1318
+#: mirage.py:1368
 msgid "Start in fullscreen mode"
 msgstr "以全屏模式开启程序"
 
-#: mirage.py:1319
+#: mirage.py:1369
 msgid "Execute 'cmd' when an image is loaded"
 msgstr "载入图片后运行命令'cmd'"
 
-#: mirage.py:1320
+#: mirage.py:1370
 msgid "(uses same syntax as custom actions,"
 msgstr "(语法格式同自定义操作，"
 
-#: mirage.py:1321
+#: mirage.py:1371
 msgid "i.e. mirage -o 'echo file is %F')"
 msgstr "例如 mirage -o 'echo file is %F')"
 
-#: mirage.py:1555
+#: mirage.py:1606
 msgid "Save As"
 msgstr "另存为"
 
-#: mirage.py:1596
+#: mirage.py:1647
 msgid "The"
 msgstr "The"
 
-#: mirage.py:1597
-#: mirage.py:1608
+#: mirage.py:1648 mirage.py:1659
 msgid "Save"
 msgstr "保存"
 
-#: mirage.py:1607
+#: mirage.py:1658
 msgid "Unable to save "
 msgstr "无法保存"
 
-#: mirage.py:1624
+#: mirage.py:1675
 msgid "The current image has been modified. Save changes?"
 msgstr "当前图片被修改过。是否要保存？"
 
-#: mirage.py:1628
+#: mirage.py:1679
 msgid "Save?"
 msgstr "保存？"
 
-#: mirage.py:1666
+#: mirage.py:1717
 msgid "Open Remote"
 msgstr "打开远程文件"
 
-#: mirage.py:1671
+#: mirage.py:1722
 msgid "Image Location (URL)"
 msgstr "图片地址(URL)"
 
-#: mirage.py:1701
+#: mirage.py:1753
 msgid "Open"
 msgstr "打开"
 
-#: mirage.py:1704
+#: mirage.py:1756
 msgid "Images"
 msgstr "图片"
 
-#: mirage.py:1708
+#: mirage.py:1760
 msgid "All files"
 msgstr "所有文件"
 
-#: mirage.py:1718
+#: mirage.py:1770
 msgid "Include images in subdirectories"
 msgstr "包含子目录中的图片"
 
-#: mirage.py:1877
+#: mirage.py:1919
 msgid "Cannot load image."
 msgstr "不能载入图片。"
 
-#: mirage.py:1881
+#: mirage.py:1923
 msgid "Custom actions"
 msgstr "自定义操作"
 
-#: mirage.py:1881
-#: mirage.py:4375
+#: mirage.py:1923 mirage.py:4443
 msgid "of"
 msgstr "of"
 
-#: mirage.py:1883
+#: mirage.py:1925
 msgid "Scanning"
 msgstr "正在扫描"
 
-#: mirage.py:1887
+#: mirage.py:1929
 msgid "Configure Custom Actions"
 msgstr "配置自定义操作"
 
-#: mirage.py:1905
+#: mirage.py:1947
 msgid "Batch"
 msgstr "批处理"
 
-#: mirage.py:1907
-#: mirage.py:2005
+#: mirage.py:1949 mirage.py:2047
 msgid "Shortcut"
 msgstr "快捷键"
 
-#: mirage.py:1919
+#: mirage.py:1961
 msgid "Add action"
 msgstr "添加"
 
-#: mirage.py:1923
+#: mirage.py:1965
 msgid "Edit selected action."
 msgstr "编辑。"
 
-#: mirage.py:1927
+#: mirage.py:1969
 msgid "Remove selected action."
 msgstr "删除。"
 
-#: mirage.py:1931
+#: mirage.py:1973
 msgid "Move selected action up."
 msgstr "上移。"
 
-#: mirage.py:1935
+#: mirage.py:1977
 msgid "Move selected action down."
 msgstr "下移。"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "Parameters"
 msgstr "变量"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "File path, name, and extension"
 msgstr "文件路径，名称和扩展名"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "File path"
 msgstr "文件路径"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "File name without file extension"
 msgstr "名称"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "File extension (i.e. \".png\")"
 msgstr "扩展名(例如\".png\")"
 
-#: mirage.py:1938
+#: mirage.py:1980
 msgid "List of files, space-separated"
 msgstr "文件列表"
 
-#: mirage.py:1941
+#: mirage.py:1983
 msgid "Operations"
 msgstr "操作"
 
-#: mirage.py:1941
+#: mirage.py:1983
 msgid "Go to next image"
 msgstr "转到下一张图片"
 
-#: mirage.py:1941
+#: mirage.py:1983
 msgid "Go to previous image"
 msgstr "转到上一张图片"
 
-#: mirage.py:1960
-msgid "Here you can define custom actions with shortcuts. Actions use the built-in parameters and operations listed below and can have multiple statements separated by a semicolon. Batch actions apply to all images in the list."
+#: mirage.py:2002
+msgid ""
+"Here you can define custom actions with shortcuts. Actions use the built-in "
+"parameters and operations listed below and can have multiple statements "
+"separated by a semicolon. Batch actions apply to all images in the list."
 msgstr "你可以使用下面列出的内置变量和操作定义快捷键和相应的命令。"
 
-#: mirage.py:1996
+#: mirage.py:2038
 msgid "Add Custom Action"
 msgstr "添加自定义操作"
 
-#: mirage.py:1998
+#: mirage.py:2040
 msgid "Edit Custom Action"
 msgstr "编辑自定义操作"
 
-#: mirage.py:2001
+#: mirage.py:2043
 msgid "Action Name"
 msgstr "操作名称"
 
-#: mirage.py:2003
+#: mirage.py:2045
 msgid "Command"
 msgstr "命令"
 
-#: mirage.py:2019
+#: mirage.py:2061
 msgid "Perform action on all images (Batch)"
 msgstr "作用于所有图片"
 
-#: mirage.py:2062
+#: mirage.py:2075
+msgid "[PREV] and [NEXT] are only valid alone or at the end of the command"
+msgstr ""
+
+#: mirage.py:2110
 msgid "Incomplete custom action specified."
 msgstr "自定义操作不完整。"
 
-#: mirage.py:2140
+#: mirage.py:2188
 msgid "Action Shortcut"
 msgstr "操作快捷键"
 
-#: mirage.py:2141
+#: mirage.py:2189
 msgid "Press the desired shortcut for the action."
 msgstr "请按要使用的快捷键。"
 
-#: mirage.py:2158
-#: mirage.py:2165
+#: mirage.py:2206 mirage.py:2213
 msgid "The shortcut "
 msgstr "快捷键"
 
-#: mirage.py:2158
-#: mirage.py:2165
+#: mirage.py:2206 mirage.py:2213
 msgid " is already used for "
 msgstr "已被用于"
 
-#: mirage.py:2159
-#: mirage.py:2166
+#: mirage.py:2207 mirage.py:2214
 msgid "Invalid Shortcut"
 msgstr "无效快捷键"
 
-#: mirage.py:2208
+#: mirage.py:2256
 msgid "Screenshot"
 msgstr "截图"
 
-#: mirage.py:2209
+#: mirage.py:2257
 msgid "Snap"
 msgstr "快照"
 
-#: mirage.py:2214
+#: mirage.py:2262
 msgid "Location"
 msgstr "位置"
 
-#: mirage.py:2217
+#: mirage.py:2265
 msgid "Entire screen"
 msgstr "整个屏幕"
 
-#: mirage.py:2218
+#: mirage.py:2266
 msgid "Window under mouse cursor"
 msgstr "鼠标坐在窗口"
 
-#: mirage.py:2223
+#: mirage.py:2271
 msgid "Delay"
 msgstr "延时"
 
-#: mirage.py:2231
+#: mirage.py:2279
 msgid " seconds"
 msgstr "秒"
 
-#: mirage.py:2299
+#: mirage.py:2347
 msgid "File name"
 msgstr "文件名"
 
-#: mirage.py:2301
-msgid "File date"
-msgstr "文件日期"
+#: mirage.py:2349
+#, fuzzy
+msgid "File modified"
+msgstr "文件名"
 
-#: mirage.py:2303
+#: mirage.py:2351
 msgid "Dimensions"
 msgstr "尺寸"
 
-#: mirage.py:2305
+#: mirage.py:2353
 msgid "File size"
 msgstr "文件大小"
 
-#: mirage.py:2307
+#: mirage.py:2355
 msgid "File type"
 msgstr "文件类型"
 
-#: mirage.py:2309
+#: mirage.py:2357
 msgid "Transparency"
 msgstr "透明度"
 
-#: mirage.py:2311
+#: mirage.py:2359
 msgid "Animation"
 msgstr "动画"
 
-#: mirage.py:2313
+#: mirage.py:2361
 msgid "Bits per sample"
 msgstr "Bits per sample"
 
-#: mirage.py:2315
+#: mirage.py:2363
 msgid "Channels"
 msgstr "通道"
 
-#: mirage.py:2334
-#: mirage.py:2340
-#: mirage.py:2485
+#: mirage.py:2382 mirage.py:2388 mirage.py:2533
 msgid "Yes"
 msgstr "是"
 
-#: mirage.py:2336
-#: mirage.py:2338
-#: mirage.py:2484
+#: mirage.py:2384 mirage.py:2386 mirage.py:2532
 msgid "No"
 msgstr "否"
 
-#: mirage.py:2375
+#: mirage.py:2423
 msgid "Mirage Preferences"
 msgstr "Mirage首选项"
 
-#: mirage.py:2381
-#: mirage.py:2583
+#: mirage.py:2429 mirage.py:2637
 msgid "Interface"
 msgstr "界面"
 
-#: mirage.py:2384
+#: mirage.py:2432
 msgid "Background color"
 msgstr "背景色"
 
-#: mirage.py:2388
+#: mirage.py:2436
 msgid "Sets the background color for the application."
 msgstr "设置程序的背景色"
 
-#: mirage.py:2392
+#: mirage.py:2440
 msgid "Open Mirage in fullscreen mode"
 msgstr "以全屏模式打开Mirage"
 
-#: mirage.py:2395
+#: mirage.py:2443
 msgid "Thumbnail size"
 msgstr "缩略图大小"
 
-#: mirage.py:2421
+#: mirage.py:2469
 msgid "Open Behavior"
 msgstr "打开选项"
 
-#: mirage.py:2424
+#: mirage.py:2472
 msgid "Open new image in"
 msgstr "图片打开方式"
 
-#: mirage.py:2426
+#: mirage.py:2474
 msgid "Smart Mode"
 msgstr "聪明模式"
 
-#: mirage.py:2427
+#: mirage.py:2475
 msgid "Zoom To Fit Mode"
 msgstr "适合窗口模式"
 
-#: mirage.py:2428
+#: mirage.py:2476
 msgid "1:1 Mode"
 msgstr "1:1 模式"
 
-#: mirage.py:2429
+#: mirage.py:2477
 msgid "Last Active Mode"
 msgstr "最后活动模式"
 
-#: mirage.py:2432
+#: mirage.py:2480
 msgid "Load all images in current directory"
 msgstr "在当前目录载入所有图片"
 
-#: mirage.py:2434
-msgid "If enabled, opening an image in Mirage will automatically load all images found in that image's directory."
-msgstr "如果选定此项，在Mirage中打开一个图片会自动载入图片所在目录中的所有图片。"
+#: mirage.py:2482
+msgid ""
+"If enabled, opening an image in Mirage will automatically load all images "
+"found in that image's directory."
+msgstr ""
+"如果选定此项，在Mirage中打开一个图片会自动载入图片所在目录中的所有图片。"
 
-#: mirage.py:2435
+#: mirage.py:2483
 msgid "Allow loading hidden files"
 msgstr "载入隐藏文件"
 
-#: mirage.py:2437
-msgid "If checked, opening, Mirage will open hidden files. Otherwise, hidden files will be ignored."
+#: mirage.py:2485
+#, fuzzy
+msgid ""
+"If checked, Mirage will open hidden files. Otherwise, hidden files will be "
+"ignored."
 msgstr "如果选定此项，Mirage将打开隐藏文件，否则忽略隐藏文件。"
 
-#: mirage.py:2439
+#: mirage.py:2487
 msgid "Use last chosen directory"
 msgstr "最后使用的目录"
 
-#: mirage.py:2440
+#: mirage.py:2488
 msgid "The default 'Open' directory will be the last directory used."
 msgstr "默认打开目录是最后使用的目录。"
 
-#: mirage.py:2441
+#: mirage.py:2489
 msgid "Use this fixed directory"
 msgstr "使用固定目录"
 
-#: mirage.py:2443
+#: mirage.py:2491
 msgid "The default 'Open' directory will be this specified directory."
 msgstr "默认打开目录是这个特定目录。"
 
-#: mirage.py:2476
-#: mirage.py:2582
+#: mirage.py:2524 mirage.py:2636
 msgid "Navigation"
 msgstr "导航"
 
-#: mirage.py:2478
+#: mirage.py:2526
 msgid "Preload images for faster navigation"
 msgstr "为快速导航重新载入图片"
 
-#: mirage.py:2480
-msgid "If enabled, the next and previous images in the list will be preloaded during idle time. Note that the speed increase comes at the expense of memory usage, so it is recommended to disable this option on machines with limited ram."
-msgstr "如果选定此项，预读取列表中的上一张和下一张图片。 这会使用更多的内存，在内存受限的机器上推荐禁用此选项。"
+#: mirage.py:2528
+msgid ""
+"If enabled, the next and previous images in the list will be preloaded "
+"during idle time. Note that the speed increase comes at the expense of "
+"memory usage, so it is recommended to disable this option on machines with "
+"limited ram."
+msgstr ""
+"如果选定此项，预读取列表中的上一张和下一张图片。 这会使用更多的内存，在内存受"
+"限的机器上推荐禁用此选项。"
 
-#: mirage.py:2482
+#: mirage.py:2530
 msgid "Wrap around imagelist"
 msgstr " 回绕图片列表"
 
-#: mirage.py:2486
+#: mirage.py:2534
 msgid "Prompt User"
 msgstr "提示用户"
 
-#: mirage.py:2505
-#: mirage.py:4377
+#: mirage.py:2553 mirage.py:4445
 msgid "Slideshow Mode"
 msgstr "幻灯片模式"
 
-#: mirage.py:2508
-msgid "Delay between images"
+#: mirage.py:2556
+#, fuzzy
+msgid "Delay between images in seconds"
 msgstr "图片停留"
 
-#: mirage.py:2518
+#: mirage.py:2561
 msgid "Randomize order of images"
 msgstr "乱序"
 
-#: mirage.py:2520
-msgid "If enabled, a random image will be chosen during slideshow mode (without loading any image twice)."
+#: mirage.py:2563
+msgid ""
+"If enabled, a random image will be chosen during slideshow mode (without "
+"loading any image twice)."
 msgstr "如果选定此项，播放幻灯片时采取随机顺序(单一图片不重复)."
 
-#: mirage.py:2521
+#: mirage.py:2564
 msgid "Disable screensaver in slideshow mode"
 msgstr "播放幻灯片时禁用屏幕保护"
 
-#: mirage.py:2523
-msgid "If enabled, xscreensaver will be temporarily disabled during slideshow mode."
+#: mirage.py:2566
+msgid ""
+"If enabled, xscreensaver will be temporarily disabled during slideshow mode."
 msgstr "如果选定此项，播放幻灯片时临时禁用屏幕保护。"
 
-#: mirage.py:2524
+#: mirage.py:2567
 msgid "Always start in fullscreen mode"
 msgstr "总是以全屏模式开始"
 
-#: mirage.py:2525
-msgid "If enabled, starting a slideshow will put the application in fullscreen mode."
+#: mirage.py:2568
+msgid ""
+"If enabled, starting a slideshow will put the application in fullscreen mode."
 msgstr "如果选定此项，开始播放幻灯片将自动进入全屏模式。"
 
-#: mirage.py:2543
+#: mirage.py:2586
 msgid "Image Editing"
 msgstr "正在编辑图片"
 
-#: mirage.py:2545
+#: mirage.py:2588
 msgid "Confirm image delete"
 msgstr "确认删除图片"
 
-#: mirage.py:2548
+#: mirage.py:2592
 msgid "Scaling quality"
 msgstr "缩放品质"
 
-#: mirage.py:2550
+#: mirage.py:2594
 msgid "Nearest (Fastest)"
 msgstr "最近点算法(速度最快)"
 
-#: mirage.py:2551
+#: mirage.py:2595
 msgid "Tiles"
 msgstr "拼贴算法"
 
-#: mirage.py:2552
+#: mirage.py:2596
 msgid "Bilinear"
 msgstr "双线性算法"
 
-#: mirage.py:2553
+#: mirage.py:2597
 msgid "Hyper (Best)"
 msgstr "平滑算法(质量最好)"
 
-#: mirage.py:2558
+#: mirage.py:2603
 msgid "Modified images"
 msgstr "修改图片"
 
-#: mirage.py:2560
+#: mirage.py:2605
 msgid "Ignore Changes"
 msgstr "忽略更改"
 
-#: mirage.py:2561
+#: mirage.py:2606
 msgid "Auto-Save"
 msgstr "自动保存"
 
-#: mirage.py:2562
+#: mirage.py:2607
 msgid "Prompt For Action"
 msgstr "提示操作"
 
-#: mirage.py:2581
+#: mirage.py:2613
+#, fuzzy
+msgid "Quality to save in:"
+msgstr "无法保存"
+
+#: mirage.py:2635
 msgid "Behavior"
 msgstr "行为"
 
-#: mirage.py:2584
+#: mirage.py:2638
 msgid "Slideshow"
 msgstr "幻灯片"
 
-#: mirage.py:2585
+#: mirage.py:2639
 msgid "Image"
 msgstr "图片"
 
-#: mirage.py:2659
+#: mirage.py:2714
 msgid "Rename"
 msgstr "重命名"
 
-#: mirage.py:2670
+#: mirage.py:2725
 msgid "Enter the new name"
 msgstr "填写新名称"
 
-#: mirage.py:2702
-#: mirage.py:2703
+#: mirage.py:2757 mirage.py:2758
 msgid "Unable to rename"
 msgstr "无法重命名"
 
-#: mirage.py:2722
+#: mirage.py:2777
 msgid "Are you sure you wish to permanently delete"
 msgstr "确定要永久删除吗"
 
-#: mirage.py:2777
-#: mirage.py:2778
+#: mirage.py:2838 mirage.py:2839
 msgid "Unable to delete"
 msgstr "无法删除"
 
-#: mirage.py:2786
+#: mirage.py:2847
 msgid "Choose directory"
 msgstr "选择文件夹"
 
-#: mirage.py:2825
+#: mirage.py:2886
 msgid "A fast GTK+ Image Viewer."
 msgstr "GTK+高速看图程序"
 
-#: mirage.py:2867
+#: mirage.py:2928
 msgid "Unable to launch a suitable browser."
 msgstr "无法运行浏览器"
 
-#: mirage.py:3175
+#: mirage.py:3236
 msgid "Crop"
 msgstr "剪裁"
 
-#: mirage.py:3217
-#: mirage.py:3430
+#: mirage.py:3278 mirage.py:3491
 msgid "Width"
 msgstr "宽"
 
-#: mirage.py:3224
-#: mirage.py:3441
+#: mirage.py:3285 mirage.py:3502
 msgid "Height"
 msgstr "高"
 
-#: mirage.py:3370
+#: mirage.py:3431
 msgid "Saturation"
 msgstr "饱和度"
 
-#: mirage.py:3371
+#: mirage.py:3432
 msgid "Saturate"
 msgstr "饱和度"
 
-#: mirage.py:3382
+#: mirage.py:3443
 msgid "Saturation level:"
 msgstr "饱和级别"
 
-#: mirage.py:3420
+#: mirage.py:3481
 msgid "Resize"
 msgstr "调整图片尺寸"
 
-#: mirage.py:3434
-#: mirage.py:3446
+#: mirage.py:3495 mirage.py:3507
 msgid "pixels"
 msgstr "像素"
 
-#: mirage.py:3448
+#: mirage.py:3509
 msgid "Preserve aspect ratio"
 msgstr "保持图片纵横比"
 
-#: mirage.py:3589
-msgid "You are viewing the first image in the list. Wrap around to the last image?"
+#: mirage.py:3650
+msgid ""
+"You are viewing the first image in the list. Wrap around to the last image?"
 msgstr "正在显示图片列表中的第一张图片，是否回绕到最后一张图片？"
 
-#: mirage.py:3591
-msgid "You are viewing the last image in the list. Wrap around to the first image?"
+#: mirage.py:3652
+msgid ""
+"You are viewing the last image in the list. Wrap around to the first image?"
 msgstr "正在显示图片列表中的最后一张图片，是否回绕到第一张图片？"
 
-#: mirage.py:3593
-msgid "All images have been viewed. Would you like to cycle through the images again?"
+#: mirage.py:3654
+msgid ""
+"All images have been viewed. Would you like to cycle through the images "
+"again?"
 msgstr "所有图片都看过了，是否要再看一遍？"
 
-#: mirage.py:3594
+#: mirage.py:3655
 msgid "Wrap?"
 msgstr "回绕"
 
-#: mirage.py:3693
-#: mirage.py:3806
-#: mirage.py:3823
-#: mirage.py:3886
-#: mirage.py:4180
+#: mirage.py:3754 mirage.py:3867 mirage.py:3884 mirage.py:3947 mirage.py:4241
 msgid "Loading"
 msgstr "载入中"
 
-#: mirage.py:3967
-#: mirage.py:4019
+#: mirage.py:4028 mirage.py:4080
 msgid "Preloading"
 msgstr "正在预读"
 
-#: mirage.py:4090
-#: mirage.py:4270
+#: mirage.py:4151 mirage.py:4331
 msgid "Skipping"
 msgstr "正在略过"
 
-#: mirage.py:4147
-#: mirage.py:4266
+#: mirage.py:4208 mirage.py:4327
 msgid "Found"
 msgstr "发现"
 
+#~ msgid "seconds"
+#~ msgstr "秒"
+
+#~ msgid "File date"
+#~ msgstr "文件日期"
