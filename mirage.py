@@ -374,24 +374,22 @@ class Base:
 			('Properties', gtk.STOCK_PROPERTIES, _('_Properties...'), None, _('Properties'), self.show_properties),
 			('Custom Actions', None, _('_Configure...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
-			('Escape', None, '', 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
-			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
-			('Plus', None, '', 'plus', _('Zoom In'), self.zoom_in),
-			('Equal', None, '', 'equal', _('Zoom In'), self.zoom_in),
-			('Space', None, '', 'space', _('Next'), self.goto_next_image),
-			('Ctrl-KP_Insert', None, '', '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
-			('Ctrl-KP_End', None, '', '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
-			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
-			('Ctrl-KP_Add', None, '', '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in),
-			('Ctrl-KP_0', None, '', '<Ctrl>KP_0', _('Fit'), self.zoom_to_fit_window_action),
-			('Ctrl-KP_1', None, '', '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action),
-			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen),
-			('Prev', None, '', 'Up', _('Previous Image'), self.goto_prev_image),
-			('Next', None, '', 'Down', _('Next Image'), self.goto_next_image),
-			('BackSpace', None, '', 'BackSpace', _('Previous Image'), self.goto_prev_image),
-			('OriginalSize', None, '', '1', _('1:1'), self.zoom_1_to_1_action),
-			('ZoomIn', None, '', 'KP_Add', _('Zoom In'), self.zoom_in),
-			('ZoomOut', None, '', 'KP_Subtract', _('Zoom Out'), self.zoom_out)
+			('Minus', None,  _('Zoom Out'), 'minus', _('Zoom Out'), self.zoom_out),
+			('Plus', None,  _('Zoom In'), 'plus', _('Zoom In'), self.zoom_in),
+			('Equal', None, _('Zoom In'), 'equal', _('Zoom In'), self.zoom_in),
+			('Ctrl-KP_Insert', None, _('Fit'), '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
+			('Ctrl-KP_End', None, _('1:1'), '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
+			('Ctrl-KP_Subtract', None, _('Zoom Out'), '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
+			('Ctrl-KP_Add', None, _('Zoom In'), '<Ctrl>KP_Add', _('Zoom In'), self.zoom_in),
+			('Ctrl-KP_0', None, _('Fit'), '<Ctrl>KP_0', _('Fit'), self.zoom_to_fit_window_action),
+			('Ctrl-KP_1', None, _('1:1'), '<Ctrl>KP_1', _('1:1'), self.zoom_1_to_1_action),
+			('Full Screen Key', None, _('Fullscreen'), '<Shift>Return', None, self.enter_fullscreen),
+			('Escape', None, _('Exit Full Screen'), 'Escape', _('Exit Full Screen'), self.leave_fullscreen),
+			('Prev', None, _('Previous Image'), 'Up', _('Previous Image'), self.goto_prev_image),
+			('Next', None, _('Next Image'), 'Down', _('Next Image'), self.goto_next_image),
+			('OriginalSize', None, '1:1', '1', _('1:1'), self.zoom_1_to_1_action),
+			('ZoomIn', None, _('Zoom In'), 'KP_Add', _('Zoom In'), self.zoom_in),
+			('ZoomOut', None, _('Zoom Out'), 'KP_Subtract', _('Zoom Out'), self.zoom_out)
 			)
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
@@ -489,23 +487,19 @@ class Base:
 			    </menu>
 			    <menu action="MiscKeysMenuHidden">
 			      <menuitem action="Minus"/>
-			      <menuitem action="Escape"/>
+			      <menuitem action="Ctrl-KP_Subtract"/>
 			      <menuitem action="Plus"/>
 			      <menuitem action="Equal"/>
-			      <menuitem action="Space"/>
-			      <menuitem action="Ctrl-KP_Insert"/>
-			      <menuitem action="Ctrl-KP_End"/>
-			      <menuitem action="Ctrl-KP_Subtract"/>
 			      <menuitem action="Ctrl-KP_Add"/>
+			      <menuitem action="Ctrl-KP_Insert"/>
 			      <menuitem action="Ctrl-KP_0"/>
+			      <menuitem action="Ctrl-KP_End"/>
 			      <menuitem action="Ctrl-KP_1"/>
+			      <menuitem action="OriginalSize"/>	
 			      <menuitem action="Full Screen Key"/>
+			      <menuitem action="Escape"/>
 			      <menuitem action="Prev"/>
 			      <menuitem action="Next"/>
-			      <menuitem action="OriginalSize"/>	
-			      <menuitem action="BackSpace"/>
-			      <menuitem action="ZoomIn"/>
-			      <menuitem action="ZoomOut"/>
 			    </menu>
 			  </menubar>
 			  <toolbar name="MainToolbar">
