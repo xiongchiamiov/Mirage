@@ -30,6 +30,13 @@ import os, sys, getopt, ConfigParser, string, gc
 import random, urllib, gobject, gettext, locale
 import stat, time, subprocess, shutil, filecmp
 import tempfile, socket, threading
+
+try:
+ 	import mirage_numacomp
+ 	HAVE_NUMACOMP = True
+except:
+ 	HAVE_NUMACOMP = False
+
 try:
 	import hashlib
 	HAS_HASHLIB = True
@@ -172,6 +179,8 @@ class Base:
 		self.merge_id_recent = None
 		self.actionGroupRecent = None
 		self.open_hidden_files = False
+		self.use_numacomp = False
+		self.case_numacomp = False
 		self.thumbnail_sizes = ["128", "96", "72", "64", "48", "32"]
 		self.thumbnail_size = 128 					# Default to 128 x 128
 		self.thumbnail_loaded = []
@@ -242,6 +251,13 @@ class Base:
 			self.open_all_images = conf.getboolean('prefs', 'open_all')
 		if conf.has_option('prefs', 'hidden'):
 			self.open_hidden_files = conf.getboolean('prefs', 'hidden')
+		if conf.has_option('prefs', 'use_numacomp'):
+			if HAVE_NUMACOMP:
+				self.use_numacomp = conf.getboolean('prefs', 'use_numacomp')
+			else:
+				self.usenumacomp = False
+		if conf.has_option('prefs', 'casesensitive_numacomp'):
+			self.case_numacomp = conf.getboolean('prefs', 'casesensitive_numacomp')
 		if conf.has_option('prefs', 'open_mode'):
 			self.open_mode = conf.getint('prefs', 'open_mode')
 		if conf.has_option('prefs', 'last_mode'):
@@ -1468,6 +1484,8 @@ class Base:
 		conf.set('prefs', 'bgcolor-blue', self.bgcolor.blue)
 		conf.set('prefs', 'open_all', self.open_all_images)
 		conf.set('prefs', 'hidden', self.open_hidden_files)
+		conf.set('prefs', 'use_numacomp', self.use_numacomp)
+		conf.set('prefs', 'casesensitive_numacomp', self.case_numacomp)
 		conf.set('prefs', 'use_last_dir', self.use_last_dir)
 		conf.set('prefs', 'last_dir', self.last_dir)
 		conf.set('prefs', 'fixed_dir', self.fixed_dir)
@@ -2489,6 +2507,17 @@ class Base:
 		hiddenimages = gtk.CheckButton(_("Allow loading hidden files"))
 		hiddenimages.set_active(self.open_hidden_files)
 		hiddenimages.set_tooltip_text(_("If checked, Mirage will open hidden files. Otherwise, hidden files will be ignored."))
+		#Numacomp sorting options
+		usenumacomp = gtk.CheckButton(_("Use Numerical aware sort"))
+		usenumacomp.set_active(self.use_numacomp)
+		usenumacomp.set_tooltip_text(_("If checked, Mirage will sort the images based on a numerical aware sort."))
+		usenumacomp.set_sensitive(HAVE_NUMACOMP)
+		case_numacomp = gtk.CheckButton(_("Casesensitive sort"))
+		case_numacomp.set_active(self.case_numacomp)
+		case_numacomp.set_tooltip_text(_("If checked, a case-sensitive sort will be used"))
+		case_numacomp.set_sensitive(usenumacomp.get_active())
+		usenumacomp.connect('toggled', self.toggle_sensitivy_of_other,case_numacomp) 		
+		
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		openpref1.set_tooltip_text(_("The default 'Open' directory will be the last directory used."))
@@ -2519,11 +2548,14 @@ class Base:
 		table_behavior.attach(gtk.Label(), 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_behavior.attach(openallimages, 1, 2, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_behavior.attach(hiddenimages, 1, 2, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(gtk.Label(), 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_behavior.attach(openpref1, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(openpref2, 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_behavior.attach(hbox_defaultdir, 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
-		table_behavior.attach(gtk.Label(), 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
+		table_behavior.attach(usenumacomp, 1, 2, 8, 9, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(case_numacomp, 1, 2, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 50, 0)
+		table_behavior.attach(gtk.Label(), 1, 2, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_behavior.attach(openpref1, 1, 2, 11, 12, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(openpref2, 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_behavior.attach(hbox_defaultdir, 1, 2, 13, 14, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
+		table_behavior.attach(gtk.Label(), 1, 2, 14, 15, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
+		
 		# "Navigation" tab:
 		table_navigation = gtk.Table(14, 2, False)
 		navlabel = gtk.Label()
@@ -2665,6 +2697,8 @@ class Base:
 				self.zoom_quality = gtk.gdk.INTERP_HYPER
 			self.open_all_images = openallimages.get_active()
 			self.open_hidden_files = hiddenimages.get_active()
+			self.use_numacomp = usenumacomp.get_active()
+			self.case_numacomp = case_numacomp.get_active()
 			if openpref1.get_active():
 				self.use_last_dir = True
 			else:
@@ -2705,6 +2739,13 @@ class Base:
 			self.defaultdir.set_sensitive(True)
 		else:
 			self.defaultdir.set_sensitive(False)
+
+	def toggle_sensitivy_of_other(self,toggled_button,to_sensitive):
+		"""Set widget to_sensitive as sensitive if toggled_button is active."""
+		if toggled_button.get_active():
+			to_sensitive.set_sensitive(True)
+		else:
+			to_sensitive.set_sensitive(False)
 
 	def rename_image(self, action):
 		if len(self.image_list) > 0:
@@ -4288,6 +4329,8 @@ class Base:
 					gtk.main_iteration(True)
 		if not first_image_loaded_successfully:
 			self.image_load_failed(False, init_image)
+		else:
+			self.curr_img_in_list =  self.image_list.index(self.currimg_name)
 		self.searching_for_images = False
 		self.update_statusbar()
 		self.set_go_navigation_sensitivities(False)
@@ -4299,7 +4342,15 @@ class Base:
 
 	def add_folderlist_images(self, folderlist, go_buttons_enabled):
 		if len(folderlist) > 0:
-			folderlist.sort(locale.strcoll)
+			#Sort based on a numerical aware sort or normal alphabetical sort
+			if self.use_numacomp and HAVE_NUMACOMP:
+				#Use case-sensitive sort?
+				if self.case_numacomp:
+					folderlist.sort(cmp=numacomp.numacomp)
+				else:
+					folderlist.sort(cmp=numacomp.numacompi)
+			else:
+				folderlist.sort(locale.strcoll)
 			folderlist = list(set(folderlist))
 			for item in folderlist:
 				if not self.closing_app:
@@ -4311,7 +4362,15 @@ class Base:
 		if len(self.image_list) > 0:
 			self.set_go_navigation_sensitivities(True)
 			self.image_list = list(set(self.image_list))
-			self.image_list.sort(locale.strcoll)
+			#Sort based on a numerical aware sort or normal alphabetical sort
+			if self.use_numacomp and HAVE_NUMACOMP:
+				#Use case-sensitive sort?
+				if self.case_numacomp:
+					self.image_list.sort(cmp=numacomp.numacomp)
+				else:
+					self.image_list.sort(cmp=numacomp.numacompi)
+			else:
+				self.image_list.sort(locale.strcoll)
 
 	def expand_directory(self, item, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg):
 		if not self.stop_now and not self.closing_app:
@@ -4339,7 +4398,15 @@ class Base:
 				self.update_title()
 			# Sort the filelist and folderlist alphabetically:
 			if len(filelist) > 0:
-				filelist.sort(locale.strcoll)
+				#Use numerical aware sort?
+				if self.use_numacomp and HAVE_NUMACOMP:
+					#Use case-sensitive sort?
+					if self.case_numacomp:
+						filelist.sort(cmp=numacomp.numacomp)
+					else:
+						filelist.sort(cmp=numacomp.numacompi)
+				else:
+					filelist.sort(locale.strcoll)
 				for item2 in filelist:
 					if not item2 in self.image_list:
 						self.image_list.append(item2)
@@ -4350,7 +4417,15 @@ class Base:
 							go_buttons_enabled = True
 			# Recurse into the folderlist:
 			if len(folderlist) > 0:
-				folderlist.sort(locale.strcoll)
+				#Use numerical aware sort?
+				if self.use_numacomp and HAVE_NUMACOMP:
+					#Use case-sensitive sort?
+					if self.case_numacomp:
+						folderlist.sort(cmp=numacomp.numacomp)
+					else:
+						folderlist.sort(cmp=numacomp.numacompi)
+				else:
+					folderlist.sort(locale.strcoll)
 				for item2 in folderlist:
 					if not self.stop_now:
 						self.expand_directory(item2, stop_when_second_image_found, go_buttons_enabled, update_window_title, print_found_msg)

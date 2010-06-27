@@ -2,8 +2,8 @@ Mirage, a fast and simple GTK+ Image Viewer
 Copyright 2007 Scott Horowitz <stonecrest@gmail.com>
 
 REQUIREMENTS:
-	(Required) PyGTK 2.6.0 or newer
-	(Required) GTK 2.6.0 or newer
+	(Required) PyGTK 2.10.0 or newer
+	(Required) GTK 2.12.0 or newer
 	(Optional) Gnome-python if you want Mirage's toolbar to follow your Gnome setting
 	(Building) GCC
 	(Building) python-dev (on some distros)
@@ -27,3 +27,6 @@ FEATURES:
 	+ Command-line access
 	+ Configurable interface
 	+ Available in many languages
+
+It includes the python module "numacomp" originally written by Greg Smith and modified by
+Fredric Johansson for use in mirage
