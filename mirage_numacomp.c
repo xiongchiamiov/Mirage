@@ -215,8 +215,8 @@ static PyMethodDef numacomp_methods[] = {
 };
 
 DL_EXPORT(void)
-initnumacomp(void) 
+initmirage_numacomp(void) 
 {
-	Py_InitModule("numacomp", numacomp_methods);
+	Py_InitModule("mirage_numacomp", numacomp_methods);
 }
 

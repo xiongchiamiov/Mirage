@@ -32,10 +32,11 @@ import stat, time, subprocess, shutil, filecmp
 import tempfile, socket, threading
 
 try:
- 	import mirage_numacomp
+ 	import mirage_numacomp as numacomp
  	HAVE_NUMACOMP = True
 except:
  	HAVE_NUMACOMP = False
+	print "mirage_numacomp.so not found, unable to do numerical aware sorting."
 
 try:
 	import hashlib
