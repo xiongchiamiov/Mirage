@@ -6,7 +6,7 @@ REQUIREMENTS:
 	(Required) GTK 2.12.0 or newer
 	(Optional) Gnome-python if you want Mirage's toolbar to follow your Gnome setting
 	(Building) GCC
-	(Building) python-dev (on some distros)
+	(Building) python-dev and libX11-dev (on some distros)
 
 INSTALLATION:
 	Just run 'python setup.py install' as root.
