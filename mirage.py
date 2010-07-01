@@ -96,7 +96,6 @@ class Base:
 		# Initialize vars:
 		width=600
 		height=400
-		bgcolor_found = False
 		# Current image:
 		self.curr_img_in_list = 0
 		self.currimg_name = ""
@@ -112,6 +111,7 @@ class Base:
 		# In this case, self.curr_img_in_list will increment while
 		# self.loaded_img_in_list will retain the current loaded image.
 		self.loaded_img_in_list = 0
+		
 		# Next preloaded image:
 		self.preloadimg_next_in_list = -1
 		self.preloadimg_next_name = ""
@@ -121,6 +121,7 @@ class Base:
 		self.preloadimg_next_pixbuf_original = None
 		self.preloadimg_next_zoomratio = 1
 		self.preloadimg_next_is_animation = False
+		
 		# Previous preloaded image:
 		self.preloadimg_prev_in_list = -1
 		self.preloadimg_prev_name = ""
@@ -130,6 +131,7 @@ class Base:
 		self.preloadimg_prev_pixbuf_original = None
 		self.preloadimg_prev_zoomratio = 1
 		self.preloadimg_prev_is_animation = False
+		
 		# Settings, misc:
 		self.toolbar_show = True
 		self.thumbpane_show = True
@@ -220,102 +222,7 @@ class Base:
 					sys.exit(2)
 
 		# Load config from disk:
-		conf = ConfigParser.ConfigParser()
-		if os.path.isfile(os.path.expanduser('~/.config/mirage/miragerc')):
-			conf.read(os.path.expanduser('~/.config/mirage/miragerc'))
-		elif os.path.isfile(os.path.expanduser('~/.miragerc')):
-			conf.read(os.path.expanduser('~/.miragerc'))
-			os.remove(os.path.expanduser('~/.miragerc'))
-		if conf.has_option('window', 'w'):
-			width = conf.getint('window', 'w')
-		if conf.has_option('window', 'h'):
-			height = conf.getint('window', 'h')
-		if conf.has_option('window', 'toolbar'):
-			self.toolbar_show = conf.getboolean('window', 'toolbar')
-		if conf.has_option('window', 'statusbar'):
-			self.statusbar_show = conf.getboolean('window', 'statusbar')
-		if conf.has_option('window', 'thumbpane'):
-			self.thumbpane_show = conf.getboolean('window', 'thumbpane')
-		if conf.has_option('prefs', 'bgcolor-red'):
-			bgr = conf.getint('prefs', 'bgcolor-red')
-			bgg = conf.getint('prefs', 'bgcolor-green')
-			bgb = conf.getint('prefs', 'bgcolor-blue')
-			bgcolor_found = True
-			self.bgcolor = gtk.gdk.Color(red=bgr, green=bgg, blue=bgb)
-		if conf.has_option('prefs', 'use_last_dir'):
-			self.use_last_dir = conf.getboolean('prefs', 'use_last_dir')
-		if conf.has_option('prefs', 'last_dir'):
-			self.last_dir = conf.get('prefs', 'last_dir')
-		if conf.has_option('prefs', 'fixed_dir'):
-			self.fixed_dir = conf.get('prefs', 'fixed_dir')
-		if conf.has_option('prefs', 'open_all'):
-			self.open_all_images = conf.getboolean('prefs', 'open_all')
-		if conf.has_option('prefs', 'hidden'):
-			self.open_hidden_files = conf.getboolean('prefs', 'hidden')
-		if conf.has_option('prefs', 'use_numacomp'):
-			if HAVE_NUMACOMP:
-				self.use_numacomp = conf.getboolean('prefs', 'use_numacomp')
-			else:
-				self.usenumacomp = False
-		if conf.has_option('prefs', 'casesensitive_numacomp'):
-			self.case_numacomp = conf.getboolean('prefs', 'casesensitive_numacomp')
-		if conf.has_option('prefs', 'open_mode'):
-			self.open_mode = conf.getint('prefs', 'open_mode')
-		if conf.has_option('prefs', 'last_mode'):
-			self.last_mode = conf.getint('prefs', 'last_mode')
-		if conf.has_option('prefs', 'listwrap_mode'):
-			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
-		if conf.has_option('prefs', 'slideshow_delay'):
-			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
-		if conf.has_option('prefs', 'slideshow_random'):
-			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
-		if conf.has_option('prefs', 'zoomquality'):
-			self.zoomvalue = conf.getint('prefs', 'zoomquality')
-			if int(round(self.zoomvalue, 0)) == 0:
-				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif int(round(self.zoomvalue, 0)) == 1:
-				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif int(round(self.zoomvalue, 0)) == 2:
-				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif int(round(self.zoomvalue, 0)) == 3:
-				self.zoom_quality = gtk.gdk.INTERP_HYPER
-		if conf.has_option('prefs', 'quality_save'):
-			self.quality_save = conf.getint('prefs', 'quality_save')
-		if conf.has_option('prefs', 'disable_screensaver'):
-			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
-		if conf.has_option('prefs', 'slideshow_in_fullscreen'):
-			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
-		if conf.has_option('prefs', 'preloading_images'):
-			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
-		if conf.has_option('prefs', 'thumbsize'):
-			self.thumbnail_size = conf.getint('prefs', 'thumbsize')
-		if conf.has_option('prefs', 'screenshot_delay'):
-			self.screenshot_delay = conf.getint('prefs', 'screenshot_delay')
-		if conf.has_option('actions', 'num_actions'):
-			num_actions = conf.getint('actions', 'num_actions')
-			self.action_names = []
-			self.action_commands = []
-			self.action_shortcuts = []
-			self.action_batch = []
-			for i in range(num_actions):
-				if conf.has_option('actions', 'names[' + str(i) + ']') and conf.has_option('actions', 'commands[' + str(i) + ']') and conf.has_option('actions', 'shortcuts[' + str(i) + ']') and conf.has_option('actions', 'batch[' + str(i) + ']'):
-					self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
-					self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
-					self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
-					self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
-		if conf.has_option('prefs', 'savemode'):
-			self.savemode = conf.getint('prefs', 'savemode')
-		if conf.has_option('prefs', 'start_in_fullscreen'):
-			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
-		if conf.has_option('prefs', 'confirm_delete'):
-			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
-		self.recentfiles = []
-		if conf.has_option('recent', 'num_recent'):
-			num_recent = conf.getint('recent', 'num_recent')
-			for i in range(num_recent):
-				self.recentfiles.append('')
-				if conf.has_option('recent', 'urls[' + str(i) + ',0]'):
-					self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
+		self.read_config_and_set_settings()
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
@@ -592,7 +499,7 @@ class Base:
 		self.table.attach(self.hscroll, 1, 2, 1, 2, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
 		self.table.attach(self.vscroll, 2, 3, 0, 1, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
 		vbox.pack_start(self.table, True, True, 0)
-		if not bgcolor_found:
+		if not self.bgcolor:
 			self.bgcolor = gtk.gdk.Color(0, 0, 0) # Default to black
 		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.imageview = gtk.Image()
@@ -764,6 +671,103 @@ class Base:
 				if o in ("-s", "--slideshow"):
 					self.toggle_slideshow(None)
 
+	def read_config_and_set_settings(self):
+		conf = ConfigParser.ConfigParser()
+		if os.path.isfile(os.path.expanduser('~/.config/mirage/miragerc')):
+			conf.read(os.path.expanduser('~/.config/mirage/miragerc'))
+		elif os.path.isfile(os.path.expanduser('~/.miragerc')):
+			conf.read(os.path.expanduser('~/.miragerc'))
+			os.remove(os.path.expanduser('~/.miragerc'))
+		if conf.has_option('window', 'w'):
+			width = conf.getint('window', 'w')
+		if conf.has_option('window', 'h'):
+			height = conf.getint('window', 'h')
+		if conf.has_option('window', 'toolbar'):
+			self.toolbar_show = conf.getboolean('window', 'toolbar')
+		if conf.has_option('window', 'statusbar'):
+			self.statusbar_show = conf.getboolean('window', 'statusbar')
+		if conf.has_option('window', 'thumbpane'):
+			self.thumbpane_show = conf.getboolean('window', 'thumbpane')
+		if conf.has_option('prefs', 'bgcolor-red'):
+			bgr = conf.getint('prefs', 'bgcolor-red')
+			bgg = conf.getint('prefs', 'bgcolor-green')
+			bgb = conf.getint('prefs', 'bgcolor-blue')
+			self.bgcolor = gtk.gdk.Color(red=bgr, green=bgg, blue=bgb)
+		if conf.has_option('prefs', 'use_last_dir'):
+			self.use_last_dir = conf.getboolean('prefs', 'use_last_dir')
+		if conf.has_option('prefs', 'last_dir'):
+			self.last_dir = conf.get('prefs', 'last_dir')
+		if conf.has_option('prefs', 'fixed_dir'):
+			self.fixed_dir = conf.get('prefs', 'fixed_dir')
+		if conf.has_option('prefs', 'open_all'):
+			self.open_all_images = conf.getboolean('prefs', 'open_all')
+		if conf.has_option('prefs', 'hidden'):
+			self.open_hidden_files = conf.getboolean('prefs', 'hidden')
+		if conf.has_option('prefs', 'use_numacomp'):
+			if HAVE_NUMACOMP:
+				self.use_numacomp = conf.getboolean('prefs', 'use_numacomp')
+			else:
+				self.usenumacomp = False
+		if conf.has_option('prefs', 'casesensitive_numacomp'):
+			self.case_numacomp = conf.getboolean('prefs', 'casesensitive_numacomp')
+		if conf.has_option('prefs', 'open_mode'):
+			self.open_mode = conf.getint('prefs', 'open_mode')
+		if conf.has_option('prefs', 'last_mode'):
+			self.last_mode = conf.getint('prefs', 'last_mode')
+		if conf.has_option('prefs', 'listwrap_mode'):
+			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
+		if conf.has_option('prefs', 'slideshow_delay'):
+			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
+		if conf.has_option('prefs', 'slideshow_random'):
+			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
+		if conf.has_option('prefs', 'zoomquality'):
+			self.zoomvalue = conf.getint('prefs', 'zoomquality')
+			if int(round(self.zoomvalue, 0)) == 0:
+				self.zoom_quality = gtk.gdk.INTERP_NEAREST
+			elif int(round(self.zoomvalue, 0)) == 1:
+				self.zoom_quality = gtk.gdk.INTERP_TILES
+			elif int(round(self.zoomvalue, 0)) == 2:
+				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
+			elif int(round(self.zoomvalue, 0)) == 3:
+				self.zoom_quality = gtk.gdk.INTERP_HYPER
+		if conf.has_option('prefs', 'quality_save'):
+			self.quality_save = conf.getint('prefs', 'quality_save')
+		if conf.has_option('prefs', 'disable_screensaver'):
+			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
+		if conf.has_option('prefs', 'slideshow_in_fullscreen'):
+			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
+		if conf.has_option('prefs', 'preloading_images'):
+			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
+		if conf.has_option('prefs', 'thumbsize'):
+			self.thumbnail_size = conf.getint('prefs', 'thumbsize')
+		if conf.has_option('prefs', 'screenshot_delay'):
+			self.screenshot_delay = conf.getint('prefs', 'screenshot_delay')
+		if conf.has_option('actions', 'num_actions'):
+			num_actions = conf.getint('actions', 'num_actions')
+			self.action_names = []
+			self.action_commands = []
+			self.action_shortcuts = []
+			self.action_batch = []
+			for i in range(num_actions):
+				if conf.has_option('actions', 'names[' + str(i) + ']') and conf.has_option('actions', 'commands[' + str(i) + ']') and conf.has_option('actions', 'shortcuts[' + str(i) + ']') and conf.has_option('actions', 'batch[' + str(i) + ']'):
+					self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
+					self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
+					self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
+					self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
+		if conf.has_option('prefs', 'savemode'):
+			self.savemode = conf.getint('prefs', 'savemode')
+		if conf.has_option('prefs', 'start_in_fullscreen'):
+			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
+		if conf.has_option('prefs', 'confirm_delete'):
+			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
+		self.recentfiles = []
+		if conf.has_option('recent', 'num_recent'):
+			num_recent = conf.getint('recent', 'num_recent')
+			for i in range(num_recent):
+				self.recentfiles.append('')
+				if conf.has_option('recent', 'urls[' + str(i) + ',0]'):
+					self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
+		
 	def refresh_recent_files_menu(self):
 		if self.merge_id_recent:
 			self.UIManager.remove_ui(self.merge_id_recent)
