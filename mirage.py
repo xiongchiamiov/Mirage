@@ -35,7 +35,7 @@ try:
  	import mirage_numacomp as numacomp
  	HAVE_NUMACOMP = True
 except:
- 	HAVE_NUMACOMP = False
+	HAVE_NUMACOMP = False
 	print "mirage_numacomp.so not found, unable to do numerical aware sorting."
 
 try:
@@ -315,6 +315,8 @@ class Base:
 			('Full Screen Key', None, '', '<Shift>Return', None, self.enter_fullscreen),
 			('Prev', None, '', 'Up', _('Previous Image'), self.goto_prev_image),
 			('Next', None, '', 'Down', _('Next Image'), self.goto_next_image),
+			('PgUp', None, '', 'Page_Up', _('Previous Image'), self.goto_prev_image),
+			('PgDn', None, '', 'Page_Down', _('Next Image'), self.goto_next_image),
 			('BackSpace', None, '', 'BackSpace', _('Previous Image'), self.goto_prev_image),
 			('OriginalSize', None, '', '1', _('1:1'), self.zoom_1_to_1_action),
 			('ZoomIn', None, '', 'KP_Add', _('Zoom In'), self.zoom_in),
@@ -429,6 +431,8 @@ class Base:
 			      <menuitem action="Full Screen Key"/>
 			      <menuitem action="Prev"/>
 			      <menuitem action="Next"/>
+			      <menuitem action="PgUp"/>
+			      <menuitem action="PgDn"/>
 			      <menuitem action="OriginalSize"/>	
 			      <menuitem action="BackSpace"/>
 			      <menuitem action="ZoomIn"/>
