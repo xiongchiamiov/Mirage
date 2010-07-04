@@ -1666,7 +1666,7 @@ class Base:
 			if filetype == None:
 				filetype = gtk.gdk.pixbuf_get_file_info(self.currimg_name)[0]['name']
 			if self.filetype_is_writable(filetype):
-				self.currimg_pixbuf_original.save(dest_name, filetype, {'quality': self.save_quality})
+				self.currimg_pixbuf_original.save(dest_name, filetype, {'quality': str(self.quality_save)})
 				self.currimg_name = dest_name
 				self.image_list[self.curr_img_in_list] = dest_name
 				self.update_title()
