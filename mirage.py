@@ -827,7 +827,7 @@ class Base:
 			      <menu action="ActionSubMenu">
 			"""
 		for i in range(len(self.action_names)):
-			uiDescription = uiDescription + """<menuitem action=\"""" + self.action_names[len(self.action_names)-i-1] + """\" position="top"/>"""
+			uiDescription = uiDescription + """<menuitem action=\"""" + self.action_names[len(self.action_names)-i-1].replace('&','&amp;') + """\" position="top"/>"""
 		uiDescription = uiDescription + """</menu></menu></menubar></ui>"""
 		self.merge_id = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupCustom, 0)
@@ -1231,11 +1231,9 @@ class Base:
 		if cmd[-6:] == "[NEXT]":
 			prev_or_next=1
 			cmd = cmd[:-6]
-			print "found next"
 		elif cmd[-6:] == "[PREV]":
 			prev_or_next=-1
 			cmd = cmd[:-6]
-			print "found prev"
 		if "%F" in cmd:
 			cmd = cmd.replace("%F", sh_esc(imagename))
 		if "%N" in cmd:
@@ -2269,7 +2267,7 @@ class Base:
 				pb = gtk.STOCK_APPLY
 			else:
 				pb = None
-			self.actionstore.append([pb, '<big><b>' + self.action_names[i] + '</b></big>\n<small>' + self.action_commands[i] + '</small>', self.action_shortcuts[i]])
+			self.actionstore.append([pb, '<big><b>' + self.action_names[i].replace('&','&amp;') + '</b></big>\n<small>' + self.action_commands[i].replace('&','&amp;') + '</small>', self.action_shortcuts[i]])
 		self.tvcolumn0.clear()
 		self.tvcolumn1.clear()
 		self.tvcolumn2.clear()
