@@ -158,6 +158,7 @@ class Base:
 		self.controls_moving = False
 		self.zoomvalue = 2
 		self.quality_save = 90
+		self.bgcolor = False
 		self.updating_adjustments = False
 		self.disable_screensaver = False
 		self.slideshow_in_fullscreen = False
