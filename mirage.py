@@ -221,6 +221,9 @@ class Base:
 					self.print_usage()
 					sys.exit(2)
 
+		# Determine config dir, first try the environment variable XDG_CONFIG_HOME
+		# according to XDG specification and as a fallback use ~/.config/mirage
+		self.config_dir = (os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) + '/mirage'
 		# Load config from disk:
 		self.read_config_and_set_settings()
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
@@ -228,10 +231,6 @@ class Base:
 		self.curr_slideshow_delay = self.slideshow_delay
 		# Same for randomization:
 		self.curr_slideshow_random = self.slideshow_random
-
-		# Read accel_map file, if it exists
-		if os.path.isfile(os.path.expanduser('~/.config/mirage/accel_map')):
-			gtk.accel_map_load(os.path.expanduser('~/.config/mirage/accel_map'))
 			
 		self.blank_image = gtk.gdk.pixbuf_new_from_file(self.find_path("mirage_blank.png"))
 
@@ -677,100 +676,100 @@ class Base:
 
 	def read_config_and_set_settings(self):
 		conf = ConfigParser.ConfigParser()
-		if os.path.isfile(os.path.expanduser('~/.config/mirage/miragerc')):
-			conf.read(os.path.expanduser('~/.config/mirage/miragerc'))
-		elif os.path.isfile(os.path.expanduser('~/.miragerc')):
-			conf.read(os.path.expanduser('~/.miragerc'))
-			os.remove(os.path.expanduser('~/.miragerc'))
-		if conf.has_option('window', 'w'):
-			width = conf.getint('window', 'w')
-		if conf.has_option('window', 'h'):
-			height = conf.getint('window', 'h')
-		if conf.has_option('window', 'toolbar'):
-			self.toolbar_show = conf.getboolean('window', 'toolbar')
-		if conf.has_option('window', 'statusbar'):
-			self.statusbar_show = conf.getboolean('window', 'statusbar')
-		if conf.has_option('window', 'thumbpane'):
-			self.thumbpane_show = conf.getboolean('window', 'thumbpane')
-		if conf.has_option('prefs', 'bgcolor-red'):
-			bgr = conf.getint('prefs', 'bgcolor-red')
-			bgg = conf.getint('prefs', 'bgcolor-green')
-			bgb = conf.getint('prefs', 'bgcolor-blue')
-			self.bgcolor = gtk.gdk.Color(red=bgr, green=bgg, blue=bgb)
-		if conf.has_option('prefs', 'use_last_dir'):
-			self.use_last_dir = conf.getboolean('prefs', 'use_last_dir')
-		if conf.has_option('prefs', 'last_dir'):
-			self.last_dir = conf.get('prefs', 'last_dir')
-		if conf.has_option('prefs', 'fixed_dir'):
-			self.fixed_dir = conf.get('prefs', 'fixed_dir')
-		if conf.has_option('prefs', 'open_all'):
-			self.open_all_images = conf.getboolean('prefs', 'open_all')
-		if conf.has_option('prefs', 'hidden'):
-			self.open_hidden_files = conf.getboolean('prefs', 'hidden')
-		if conf.has_option('prefs', 'use_numacomp'):
-			if HAVE_NUMACOMP:
-				self.use_numacomp = conf.getboolean('prefs', 'use_numacomp')
-			else:
-				self.usenumacomp = False
-		if conf.has_option('prefs', 'casesensitive_numacomp'):
-			self.case_numacomp = conf.getboolean('prefs', 'casesensitive_numacomp')
-		if conf.has_option('prefs', 'open_mode'):
-			self.open_mode = conf.getint('prefs', 'open_mode')
-		if conf.has_option('prefs', 'last_mode'):
-			self.last_mode = conf.getint('prefs', 'last_mode')
-		if conf.has_option('prefs', 'listwrap_mode'):
-			self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
-		if conf.has_option('prefs', 'slideshow_delay'):
-			self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
-		if conf.has_option('prefs', 'slideshow_random'):
-			self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
-		if conf.has_option('prefs', 'zoomquality'):
-			self.zoomvalue = conf.getint('prefs', 'zoomquality')
-			if int(round(self.zoomvalue, 0)) == 0:
-				self.zoom_quality = gtk.gdk.INTERP_NEAREST
-			elif int(round(self.zoomvalue, 0)) == 1:
-				self.zoom_quality = gtk.gdk.INTERP_TILES
-			elif int(round(self.zoomvalue, 0)) == 2:
-				self.zoom_quality = gtk.gdk.INTERP_BILINEAR
-			elif int(round(self.zoomvalue, 0)) == 3:
-				self.zoom_quality = gtk.gdk.INTERP_HYPER
-		if conf.has_option('prefs', 'quality_save'):
-			self.quality_save = conf.getint('prefs', 'quality_save')
-		if conf.has_option('prefs', 'disable_screensaver'):
-			self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
-		if conf.has_option('prefs', 'slideshow_in_fullscreen'):
-			self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
-		if conf.has_option('prefs', 'preloading_images'):
-			self.preloading_images = conf.getboolean('prefs', 'preloading_images')
-		if conf.has_option('prefs', 'thumbsize'):
-			self.thumbnail_size = conf.getint('prefs', 'thumbsize')
-		if conf.has_option('prefs', 'screenshot_delay'):
-			self.screenshot_delay = conf.getint('prefs', 'screenshot_delay')
-		if conf.has_option('actions', 'num_actions'):
-			num_actions = conf.getint('actions', 'num_actions')
-			self.action_names = []
-			self.action_commands = []
-			self.action_shortcuts = []
-			self.action_batch = []
-			for i in range(num_actions):
-				if conf.has_option('actions', 'names[' + str(i) + ']') and conf.has_option('actions', 'commands[' + str(i) + ']') and conf.has_option('actions', 'shortcuts[' + str(i) + ']') and conf.has_option('actions', 'batch[' + str(i) + ']'):
-					self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
-					self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
-					self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
-					self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
-		if conf.has_option('prefs', 'savemode'):
-			self.savemode = conf.getint('prefs', 'savemode')
-		if conf.has_option('prefs', 'start_in_fullscreen'):
-			self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
-		if conf.has_option('prefs', 'confirm_delete'):
-			self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
-		self.recentfiles = []
-		if conf.has_option('recent', 'num_recent'):
-			num_recent = conf.getint('recent', 'num_recent')
-			for i in range(num_recent):
-				self.recentfiles.append('')
-				if conf.has_option('recent', 'urls[' + str(i) + ',0]'):
-					self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
+		if os.path.isfile(self.config_dir + '/miragerc'):
+			conf.read(self.config_dir + '/miragerc')
+			if conf.has_option('window', 'w'):
+				width = conf.getint('window', 'w')
+			if conf.has_option('window', 'h'):
+				height = conf.getint('window', 'h')
+			if conf.has_option('window', 'toolbar'):
+				self.toolbar_show = conf.getboolean('window', 'toolbar')
+			if conf.has_option('window', 'statusbar'):
+				self.statusbar_show = conf.getboolean('window', 'statusbar')
+			if conf.has_option('window', 'thumbpane'):
+				self.thumbpane_show = conf.getboolean('window', 'thumbpane')
+			if conf.has_option('prefs', 'bgcolor-red'):
+				bgr = conf.getint('prefs', 'bgcolor-red')
+				bgg = conf.getint('prefs', 'bgcolor-green')
+				bgb = conf.getint('prefs', 'bgcolor-blue')
+				self.bgcolor = gtk.gdk.Color(red=bgr, green=bgg, blue=bgb)
+			if conf.has_option('prefs', 'use_last_dir'):
+				self.use_last_dir = conf.getboolean('prefs', 'use_last_dir')
+			if conf.has_option('prefs', 'last_dir'):
+				self.last_dir = conf.get('prefs', 'last_dir')
+			if conf.has_option('prefs', 'fixed_dir'):
+				self.fixed_dir = conf.get('prefs', 'fixed_dir')
+			if conf.has_option('prefs', 'open_all'):
+				self.open_all_images = conf.getboolean('prefs', 'open_all')
+			if conf.has_option('prefs', 'hidden'):
+				self.open_hidden_files = conf.getboolean('prefs', 'hidden')
+			if conf.has_option('prefs', 'use_numacomp'):
+				if HAVE_NUMACOMP:
+					self.use_numacomp = conf.getboolean('prefs', 'use_numacomp')
+				else:
+					self.usenumacomp = False
+			if conf.has_option('prefs', 'casesensitive_numacomp'):
+				self.case_numacomp = conf.getboolean('prefs', 'casesensitive_numacomp')
+			if conf.has_option('prefs', 'open_mode'):
+				self.open_mode = conf.getint('prefs', 'open_mode')
+			if conf.has_option('prefs', 'last_mode'):
+				self.last_mode = conf.getint('prefs', 'last_mode')
+			if conf.has_option('prefs', 'listwrap_mode'):
+				self.listwrap_mode = conf.getint('prefs', 'listwrap_mode')
+			if conf.has_option('prefs', 'slideshow_delay'):
+				self.slideshow_delay = conf.getint('prefs', 'slideshow_delay')
+			if conf.has_option('prefs', 'slideshow_random'):
+				self.slideshow_random = conf.getboolean('prefs', 'slideshow_random')
+			if conf.has_option('prefs', 'zoomquality'):
+				self.zoomvalue = conf.getint('prefs', 'zoomquality')
+				if int(round(self.zoomvalue, 0)) == 0:
+					self.zoom_quality = gtk.gdk.INTERP_NEAREST
+				elif int(round(self.zoomvalue, 0)) == 1:
+					self.zoom_quality = gtk.gdk.INTERP_TILES
+				elif int(round(self.zoomvalue, 0)) == 2:
+					self.zoom_quality = gtk.gdk.INTERP_BILINEAR
+				elif int(round(self.zoomvalue, 0)) == 3:
+					self.zoom_quality = gtk.gdk.INTERP_HYPER
+			if conf.has_option('prefs', 'quality_save'):
+				self.quality_save = conf.getint('prefs', 'quality_save')
+			if conf.has_option('prefs', 'disable_screensaver'):
+				self.disable_screensaver = conf.getboolean('prefs', 'disable_screensaver')
+			if conf.has_option('prefs', 'slideshow_in_fullscreen'):
+				self.slideshow_in_fullscreen = conf.getboolean('prefs', 'slideshow_in_fullscreen')
+			if conf.has_option('prefs', 'preloading_images'):
+				self.preloading_images = conf.getboolean('prefs', 'preloading_images')
+			if conf.has_option('prefs', 'thumbsize'):
+				self.thumbnail_size = conf.getint('prefs', 'thumbsize')
+			if conf.has_option('prefs', 'screenshot_delay'):
+				self.screenshot_delay = conf.getint('prefs', 'screenshot_delay')
+			if conf.has_option('actions', 'num_actions'):
+				num_actions = conf.getint('actions', 'num_actions')
+				self.action_names = []
+				self.action_commands = []
+				self.action_shortcuts = []
+				self.action_batch = []
+				for i in range(num_actions):
+					if conf.has_option('actions', 'names[' + str(i) + ']') and conf.has_option('actions', 'commands[' + str(i) + ']') and conf.has_option('actions', 'shortcuts[' + str(i) + ']') and conf.has_option('actions', 'batch[' + str(i) + ']'):
+						self.action_names.append(conf.get('actions', 'names[' + str(i) + ']'))
+						self.action_commands.append(conf.get('actions', 'commands[' + str(i) + ']'))
+						self.action_shortcuts.append(conf.get('actions', 'shortcuts[' + str(i) + ']'))
+						self.action_batch.append(conf.getboolean('actions', 'batch[' + str(i) + ']'))
+			if conf.has_option('prefs', 'savemode'):
+				self.savemode = conf.getint('prefs', 'savemode')
+			if conf.has_option('prefs', 'start_in_fullscreen'):
+				self.start_in_fullscreen = conf.getboolean('prefs', 'start_in_fullscreen')
+			if conf.has_option('prefs', 'confirm_delete'):
+				self.confirm_delete = conf.getboolean('prefs', 'confirm_delete')
+			self.recentfiles = []
+			if conf.has_option('recent', 'num_recent'):
+				num_recent = conf.getint('recent', 'num_recent')
+				for i in range(num_recent):
+					self.recentfiles.append('')
+					if conf.has_option('recent', 'urls[' + str(i) + ',0]'):
+						self.recentfiles[i] = conf.get('recent', 'urls[' + str(i) + ',0]')
+			# Read accel_map file, if it exists
+			if os.path.isfile(self.config_dir + '/accel_map'):
+				gtk.accel_map_load(self.config_dir + '/accel_map')
 		
 	def refresh_recent_files_menu(self):
 		if self.merge_id_recent:
@@ -1523,14 +1522,12 @@ class Base:
 		for i in range(len(self.recentfiles)):
 			conf.set('recent', 'num[' + str(i) + ']', len(self.recentfiles[i]))
 			conf.set('recent', 'urls[' + str(i) + ',0]', self.recentfiles[i])
-		if not os.path.exists(os.path.expanduser('~/.config/')):
-			os.mkdir(os.path.expanduser('~/.config/'))
-		if not os.path.exists(os.path.expanduser('~/.config/mirage/')):
-			os.mkdir(os.path.expanduser('~/.config/mirage/'))
-		conf.write(file(os.path.expanduser('~/.config/mirage/miragerc'), 'w'))
+		if not os.path.exists(self.config_dir):
+			os.makedirs(self.config_dir)
+		conf.write(file(self.config_dir + '/miragerc', 'w'))
 
 		# Also, save accel_map:
-		gtk.accel_map_save(os.path.expanduser('~/.config/mirage/accel_map'))
+		gtk.accel_map_save(self.config_dir + '/accel_map')
 
 		return
 
