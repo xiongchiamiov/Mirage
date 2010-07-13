@@ -94,8 +94,8 @@ class Base:
 		self.min_zoomratio = 0.02
 
 		# Initialize vars:
-		width=600
-		height=400
+		self.window_width=600
+		self.window_height=400
 		# Current image:
 		self.curr_img_in_list = 0
 		self.currimg_name = ""
@@ -520,7 +520,7 @@ class Base:
 		vbox.pack_start(hbox_statusbar, False, False, 0)
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
-		self.window.set_default_size(width,height)
+		self.window.set_default_size(self.window_width,self.window_height)
 		
 		# Slideshow control:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
@@ -680,9 +680,9 @@ class Base:
 		if os.path.isfile(self.config_dir + '/miragerc'):
 			conf.read(self.config_dir + '/miragerc')
 			if conf.has_option('window', 'w'):
-				width = conf.getint('window', 'w')
+				self.window_width = conf.getint('window', 'w')
 			if conf.has_option('window', 'h'):
-				height = conf.getint('window', 'h')
+				self.window_height = conf.getint('window', 'h')
 			if conf.has_option('window', 'toolbar'):
 				self.toolbar_show = conf.getboolean('window', 'toolbar')
 			if conf.has_option('window', 'statusbar'):
