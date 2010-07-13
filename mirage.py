@@ -227,12 +227,16 @@ class Base:
 		self.config_dir = (os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) + '/mirage'
 		# Load config from disk:
 		self.read_config_and_set_settings()
+		
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.slideshow_delay
 		# Same for randomization:
 		self.curr_slideshow_random = self.slideshow_random
-			
+
+		# Find application images/pixmaps
+		self.resource_path_list = False
+		
 		self.blank_image = gtk.gdk.pixbuf_new_from_file(self.find_path("mirage_blank.png"))
 
 		# Define the main menubar and toolbar:
@@ -1012,22 +1016,36 @@ class Base:
 		composite_pix.copy_area(0, 0, imgwidth2, imgheight2, blank_pix, leftcoord, topcoord)
 		return blank_pix
 
-	def find_path(self, filename):
-		if os.path.exists(os.path.join(sys.prefix, 'share', 'pixmaps', filename)):
-			full_filename = os.path.join(sys.prefix, 'share', 'pixmaps', filename)
-		elif os.path.exists(os.path.join(sys.prefix, 'share', 'mirage', filename)):
-			full_filename = os.path.join(sys.prefix, 'share', 'mirage', filename)
-		elif os.path.exists(os.path.join(os.path.split(__file__)[0], filename)):
-			full_filename = os.path.join(os.path.split(__file__)[0], filename)
-		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'pixmaps', filename)):
-			full_filename = os.path.join(os.path.split(__file__)[0], 'pixmaps', filename)
-		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'share', filename)):
- 			full_filename = os.path.join(os.path.split(__file__)[0], 'share', filename)
-		elif os.path.exists(os.path.join(os.path.split(__file__)[0], 'share', 'mirage', filename)):
- 			full_filename = os.path.join(os.path.split(__file__)[0], 'share', 'mirage', filename)
-		elif os.path.exists(os.path.join(__file__.split('/lib')[0], 'share', 'pixmaps', filename)):
- 			full_filename = os.path.join(__file__.split('/lib')[0], 'share', 'pixmaps', filename)
-		return full_filename
+	def find_path(self, filename, exit_on_fail=True):
+		""" Find a pixmap or icon by looking through standard dirs.
+			If the image isn't found exit with error status 1 unless
+			exit_on_fail is set to False, then return None """
+		if not self.resource_path_list:
+			#If executed from mirage in bin this points to the basedir
+			basedir_mirage = os.path.split(sys.path[0])[0]
+			#If executed from mirage.py module in python lib this points to the basedir
+			f0 = os.path.split(__file__)[0].split('/lib')[0]
+			self.resource_path_list = list(set(filter(os.path.isdir, [
+				os.path.join(basedir_mirage, 'share', 'mirage'),
+				os.path.join(basedir_mirage, 'share', 'pixmaps'),
+				os.path.join(sys.prefix, 'share', 'mirage'),
+				os.path.join(sys.prefix, 'share', 'pixmaps'),
+				os.path.join(sys.prefix, 'local', 'share', 'mirage'),
+				os.path.join(sys.prefix, 'local', 'share', 'pixmaps'),
+				sys.path[0], #If it's run non-installed
+				os.path.join(f0, 'share', 'mirage'),
+				os.path.join(f0, 'share', 'pixmaps'),
+				])))
+		for path in self.resource_path_list:
+			pix = os.path.join(path, filename)
+			if os.path.exists(pix):
+				return pix
+		# If we reached here, we didn't find the pixmap
+		if exit_on_fail:
+			print _("Couldn't find the image %s. Please check your installation.") % filename
+			sys.exit(1)
+		else:
+			return None
 
 	def gconf_key_changed(self, client, cnxn_id, entry, label):
 		if entry.value.type == gconf.VALUE_STRING:
