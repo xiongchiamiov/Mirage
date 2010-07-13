@@ -1,16 +1,16 @@
-Sonata provides a quick and easy way of creating a translation for 
+Mirage provides a quick and easy way of creating a translation for 
 your language. If you find this software useful and are capable of
 adding a language that has not yet been translated, it would be
 greatly appreciated.
 
 1. Download the latest messages.po file. Please use the SVN
 version, which can be found at:
-http://svn.berlios.de/svnroot/repos/mirage/trunk/po/messages.po
+http://svn.berlios.de/viewvc/mirageiv/trunk/po/messages.po
 
 2. Use poedit (http://www.poedit.org/) to create translations for
 all of the strings.
 
 3. Join the sonata-translators mailing list:
-https://lists.berlios.de/mailman/listinfo/mirage-translations
+https://lists.berlios.de/mailman/listinfo/mirageiv-translations
 
 4. Submit your po file and keep it updated for future releases ;-)
