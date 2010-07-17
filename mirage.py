@@ -82,9 +82,13 @@ class Base:
 		gtk.gdk.threads_init()
 
 		try:
-			gettext.install('mirage', '/usr/share/locale', unicode=1)
+			t = gettext.translation('mirage', '/usr/share/locale')
 		except:
-			gettext.install('mirage', '/usr/local/share/locale', unicode=1)
+			try:
+				t = gettext.translation('mirage', '/usr/local/share/locale')
+			except:
+				print "Couldn't find translations"
+		t.install(unicode=1)
 
 		# Constants
 		self.open_mode_smart = 0
