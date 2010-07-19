@@ -269,9 +269,9 @@ class Base:
 			('GoMenu', None, _('_Go')),
 			('HelpMenu', None, _('_Help')),
 			('ActionSubMenu', None, _('_Custom Actions')),
-			('Open Image', gtk.STOCK_OPEN, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
+			('Open Image', gtk.STOCK_FILE, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
 			('Open Remote Image', gtk.STOCK_NETWORK, _('_Open Remote image...'), None, _('Open Remote Image'), self.open_file_remote),
-			('Open Folder', gtk.STOCK_OPEN, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
+			('Open Folder', gtk.STOCK_DIRECTORY, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('_Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
 			('Save As', gtk.STOCK_SAVE, _('Save Image _As...'), '<Shift><Ctrl>S', _('Save Image As'), self.save_image_as),
 			('Crop', None, _('_Crop...'), None, _('Crop Image'), self.crop_image),
@@ -447,13 +447,13 @@ class Base:
 			  <toolbar name="MainToolbar">
 			    <toolitem action="Open Image"/>
 			    <separator name="FM1"/>
+			    <toolitem action="Previous2"/>
+			    <toolitem action="Next2"/>
+			    <separator name="FM2"/>
 			    <toolitem action="Out"/>
 			    <toolitem action="In"/>
 			    <toolitem action="1:1"/>
 			    <toolitem action="Fit"/>
-			    <separator name="FM2"/>
-			    <toolitem action="Previous2"/>
-			    <toolitem action="Next2"/>
 			  </toolbar>
 			</ui>
 			"""

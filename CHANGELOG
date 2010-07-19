@@ -13,6 +13,7 @@ v0.9.5 - Future
 	+ Changes: now uses $XDG_CONFIG_HOME/mirage as config directory if possible
 		(patch taken from debian)
 	+ Changes: Switched zooming directions for Ctrl+Mousewheel up/down.
+	+ Changes: Small interface changes
 	
 v0.9.4 - June 26, 2010
 	+ Mirage now requires PyGTK 2.12.0
