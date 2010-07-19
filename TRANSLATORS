@@ -10,7 +10,7 @@ http://svn.berlios.de/viewvc/mirageiv/trunk/po/messages.po
 2. Use poedit (http://www.poedit.org/) to create translations for
 all of the strings.
 
-3. Join the sonata-translators mailing list:
+3. Join the mirageiv-translators mailing list:
 https://lists.berlios.de/mailman/listinfo/mirageiv-translations
 
 4. Submit your po file and keep it updated for future releases ;-)
