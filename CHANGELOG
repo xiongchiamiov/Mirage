@@ -5,6 +5,7 @@ v0.10.0 - Future
 v0.9.5 - Future
 	+ Added a windows icon
 	+ Added new shortcuts PgUP/PgDN for previous/next image
+	+ Added option to disable the backgroundcolor in windowed mode
 	+ Bug: & in custom actions caused an error when mirage tried to open custom
 		action dialog (bug #17329)
 	+ Bug: Save image didn't work. (bug #17330)

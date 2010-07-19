@@ -80,7 +80,6 @@ class Base:
 	def __init__(self):
 		
 		gtk.gdk.threads_init()
-
 		try:
 			t = gettext.translation('mirage', '/usr/share/locale')
 		except:
@@ -100,6 +99,7 @@ class Base:
 		# Initialize vars:
 		self.window_width=600
 		self.window_height=400
+		self.simple_bgcolor = False
 		# Current image:
 		self.curr_img_in_list = 0
 		self.currimg_name = ""
@@ -513,7 +513,10 @@ class Base:
 		vbox.pack_start(self.table, True, True, 0)
 		if not self.bgcolor:
 			self.bgcolor = gtk.gdk.Color(0, 0, 0) # Default to black
-		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+		if self.simple_bgcolor:
+			self.layout.modify_bg(gtk.STATE_NORMAL, None)
+		else:
+			self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.imageview = gtk.Image()
 		self.layout.add(self.imageview)
 
@@ -554,7 +557,10 @@ class Base:
 		self.slideshow_controls.pack_start(self.ss_stop, False, False, 0)
 		self.slideshow_controls.pack_start(self.ss_forward, False, False, 0)
 		self.slideshow_window.add(self.slideshow_controls)
-		self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+		if self.simple_bgcolor:
+			self.slideshow_window.modify_bg(gtk.STATE_NORMAL, None)
+		else:
+			self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		self.slideshow_window2 = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls2 = gtk.HBox()
 		try:
@@ -585,7 +591,10 @@ class Base:
 		self.slideshow_controls2.pack_start(self.ss_delayspin, False, False, 0)
 		self.slideshow_controls2.pack_start(self.ss_exit, False, False, 0)
 		self.slideshow_window2.add(self.slideshow_controls2)
-		self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+		if self.simple_bgcolor:
+			self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, None)
+		else:
+			self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 
 		# Connect signals
 		self.window.connect("delete_event", self.delete_event)
@@ -697,6 +706,8 @@ class Base:
 				self.statusbar_show = conf.getboolean('window', 'statusbar')
 			if conf.has_option('window', 'thumbpane'):
 				self.thumbpane_show = conf.getboolean('window', 'thumbpane')
+			if conf.has_option('prefs', 'simple-bgcolor'):
+				self.simple_bgcolor = conf.getboolean('prefs', 'simple-bgcolor')
 			if conf.has_option('prefs', 'bgcolor-red'):
 				bgr = conf.getint('prefs', 'bgcolor-red')
 				bgg = conf.getint('prefs', 'bgcolor-green')
@@ -1508,6 +1519,7 @@ class Base:
 		conf.set('window', 'statusbar', self.statusbar_show)
 		conf.set('window', 'thumbpane', self.thumbpane_show)
 		conf.add_section('prefs')
+		conf.set('prefs', 'simple-bgcolor', self.simple_bgcolor)
 		conf.set('prefs', 'bgcolor-red', self.bgcolor.red)
 		conf.set('prefs', 'bgcolor-green', self.bgcolor.green)
 		conf.set('prefs', 'bgcolor-blue', self.bgcolor.blue)
@@ -1889,7 +1901,11 @@ class Base:
 			self.window.fullscreen()
 			self.timer_id = gobject.timeout_add(2000, self.hide_cursor)
 			self.set_slideshow_sensitivities()
+			if self.simple_bgcolor:
+				self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
 		else:
+			if self.simple_bgcolor:
+				self.layout.modify_bg(gtk.STATE_NORMAL, None)
 			self.leave_fullscreen(action)
 
 	def leave_fullscreen(self, action):
@@ -1913,6 +1929,8 @@ class Base:
 			self.window.unfullscreen()
 			self.change_cursor(None)
 			self.set_slideshow_sensitivities()
+			if self.simple_bgcolor:
+				self.layout.modify_bg(gtk.STATE_NORMAL, None)
 
 	def toggle_status_bar(self, action):
 		if self.statusbar.get_property('visible'):
@@ -2481,13 +2499,24 @@ class Base:
 		bglabel.set_alignment(0, 1)
 		color_hbox = gtk.HBox(False, 0)
 		colortext = gtk.Label(_('Background color') + ':  ')
-		colorbutton = gtk.ColorButton(self.bgcolor)
-		colorbutton.connect('color-set', self.bgcolor_selected)
-		colorbutton.set_size_request(150, -1)
-		colorbutton.set_tooltip_text(_("Sets the background color for the application."))
+		self.colorbutton = gtk.ColorButton(self.bgcolor)
+		self.colorbutton.connect('color-set', self.bgcolor_selected)
+		self.colorbutton.set_size_request(150, -1)
+		self.colorbutton.set_tooltip_text(_("Sets the background color for the application."))
 		color_hbox.pack_start(colortext, False, False, 0)
-		color_hbox.pack_start(colorbutton, False, False, 0)
+		color_hbox.pack_start(self.colorbutton, False, False, 0)
 		color_hbox.pack_start(gtk.Label(), True, True, 0)
+		
+		simplecolor_hbox = gtk.HBox(False, 0)
+		simplecolortext = gtk.Label('Simple background color: ')
+		simplecolorbutton = gtk.CheckButton()
+		simplecolorbutton.connect('toggled', self.simple_bgcolor_selected)
+		simplecolor_hbox.pack_start(simplecolortext, False, False, 0)
+		simplecolor_hbox.pack_start(simplecolorbutton, False, False, 0)
+		simplecolor_hbox.pack_start(gtk.Label(), True, True, 0)
+		if self.simple_bgcolor:
+				simplecolorbutton.set_active(True)
+		
 		fullscreen = gtk.CheckButton(_("Open Mirage in fullscreen mode"))
 		fullscreen.set_active(self.start_in_fullscreen)
 		thumbbox = gtk.HBox()
@@ -2504,16 +2533,17 @@ class Base:
 		table_settings.attach(gtk.Label(), 1, 3, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		table_settings.attach(bglabel, 1, 3, 2, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 3, 4, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_settings.attach(color_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
-		table_settings.attach(thumbbox, 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 7, 8,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(fullscreen, 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 9, 10, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
-		table_settings.attach(gtk.Label(), 1, 3, 10, 11,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(simplecolor_hbox, 1, 2, 4, 5, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(color_hbox, 1, 2, 5, 6, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 6, 7, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
+		table_settings.attach(thumbbox, 1, 3, 7, 8, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 8, 9,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(fullscreen, 1, 3, 9, 10,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 10, 11, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 11, 12,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 12, 13,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_settings.attach(gtk.Label(), 1, 3, 13, 14,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
+		table_settings.attach(gtk.Label(), 1, 3, 14, 15,  gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		# "Behavior" tab:
 		table_behavior = gtk.Table(14, 2, False)
 		openlabel = gtk.Label()
@@ -2943,9 +2973,18 @@ class Base:
 		# When the user selects a color, store this color in self.bgcolor (which will
 		# later be saved to .miragerc) and set this background color:
 		self.bgcolor = widget.get_property('color')
-		self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
-		self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
-		self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+		if not self.simple_bgcolor:
+			self.layout.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+			self.slideshow_window.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+			self.slideshow_window2.modify_bg(gtk.STATE_NORMAL, self.bgcolor)
+
+	def simple_bgcolor_selected(self, widget):
+		if widget.get_active():
+			self.simple_bgcolor = True
+			self.layout.modify_bg(gtk.STATE_NORMAL, None)
+		else:
+			self.simple_bgcolor = False
+			self.bgcolor_selected(self.colorbutton)
 
 	def show_about(self, action):
 		# Help > About
