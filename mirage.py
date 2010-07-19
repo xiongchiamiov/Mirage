@@ -268,15 +268,15 @@ class Base:
 			('ViewMenu', None, _('_View')),
 			('GoMenu', None, _('_Go')),
 			('HelpMenu', None, _('_Help')),
-			('ActionSubMenu', None, _('_Custom Actions')),
+			('ActionSubMenu', None, _('Custom _Actions')),
 			('Open Image', gtk.STOCK_FILE, _('_Open Image...'), '<Ctrl>O', _('Open Image'), self.open_file),
-			('Open Remote Image', gtk.STOCK_NETWORK, _('_Open Remote image...'), None, _('Open Remote Image'), self.open_file_remote),
+			('Open Remote Image', gtk.STOCK_NETWORK, _('Open _Remote image...'), None, _('Open Remote Image'), self.open_file_remote),
 			('Open Folder', gtk.STOCK_DIRECTORY, _('Open _Folder...'), '<Ctrl>F', _('Open Folder'), self.open_folder),
 			('Save', gtk.STOCK_SAVE, _('_Save Image'), '<Ctrl>S', _('Save Image'), self.save_image),
 			('Save As', gtk.STOCK_SAVE, _('Save Image _As...'), '<Shift><Ctrl>S', _('Save Image As'), self.save_image_as),
 			('Crop', None, _('_Crop...'), None, _('Crop Image'), self.crop_image),
-			('Resize', None, _('Re_size...'), None, _('Resize Image'), self.resize_image),
-			('Saturation', None, _('Saturation...'), None, _('Modify saturation'), self.saturation),
+			('Resize', None, _('R_esize...'), None, _('Resize Image'), self.resize_image),
+			('Saturation', None, _('_Saturation...'), None, _('Modify saturation'), self.saturation),
 			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
 			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.goto_prev_image),
 			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.goto_next_image),
@@ -295,14 +295,14 @@ class Base:
 			('Flip Horizontally', None, _('Flip _Horizontally'), '<Ctrl>H', _('Flip Horizontally'), self.flip_image_horiz),
 			('About', gtk.STOCK_ABOUT, _('_About'), None, _('About'), self.show_about),
 			('Contents', gtk.STOCK_HELP, _('_Contents'), 'F1', _('Contents'), self.show_help),
-			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), None, _('Preferences'), self.show_prefs),
+			('Preferences', gtk.STOCK_PREFERENCES, _('_Preferences...'), '<Ctrl>P', _('Preferences'), self.show_prefs),
 			('Full Screen', fullscreen_icon, _('_Full Screen'), 'F11', _('Full Screen'), self.enter_fullscreen),
 			('Exit Full Screen', leave_fullscreen_icon, _('E_xit Full Screen'), None, _('Exit Full Screen'), self.leave_fullscreen),
 			('Start Slideshow', gtk.STOCK_MEDIA_PLAY, _('_Start Slideshow'), 'F5', _('Start Slideshow'), self.toggle_slideshow),
 			('Stop Slideshow', gtk.STOCK_MEDIA_STOP, _('_Stop Slideshow'), 'F5', _('Stop Slideshow'), self.toggle_slideshow),
 			('Delete Image', gtk.STOCK_DELETE, _('_Delete...'), 'Delete', _('Delete Image'), self.delete_image),
 			('Rename Image', None, _('Re_name...'), 'F2', _('Rename Image'), self.rename_image),
-			('Take Screenshot', None, _('Take _Screenshot...'), None, _('Take Screenshot'), self.screenshot),
+			('Take Screenshot', None, _('_Take Screenshot...'), None, _('Take Screenshot'), self.screenshot),
 			('Properties', gtk.STOCK_PROPERTIES, _('_Properties...'), None, _('Properties'), self.show_properties),
 			('Custom Actions', None, _('_Configure...'), None, _('Custom Actions'), self.show_custom_actions),
 			('MiscKeysMenuHidden', None, 'Keys'),
@@ -330,7 +330,7 @@ class Base:
 		toggle_actions = (
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.statusbar_show),
 			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.toolbar_show),
-			('Thumbnails Pane', None, _('_Thumbnails Pane'), None, _('Thumbnails Pane'), self.toggle_thumbpane, self.thumbpane_show)
+			('Thumbnails Pane', None, _('Thumbnails _Pane'), None, _('Thumbnails Pane'), self.toggle_thumbpane, self.thumbpane_show)
 				)
 
 		# Populate keys[]:
@@ -2320,7 +2320,7 @@ class Base:
 			return
 		# Dialog:
 		dialog = gtk.Dialog(_("Screenshot"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		snapbutton = dialog.add_button(_("Snap"), gtk.RESPONSE_ACCEPT)
+		snapbutton = dialog.add_button(_("_Snap"), gtk.RESPONSE_ACCEPT)
 		snapimage = gtk.Image()
 		snapimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 		snapbutton.set_image(snapimage)
@@ -2812,7 +2812,7 @@ class Base:
 			self.rename_txt.set_text(filename)
 			self.rename_txt.set_activates_default(True)
 			cancelbutton = rename_dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-			renamebutton = rename_dialog.add_button(_("Rename"), gtk.RESPONSE_ACCEPT)
+			renamebutton = rename_dialog.add_button(_("_Rename"), gtk.RESPONSE_ACCEPT)
 			renameimage = gtk.Image()
 			renameimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 			renamebutton.set_image(renameimage)
@@ -3343,7 +3343,7 @@ class Base:
 
 	def crop_image(self, action):
 		dialog = gtk.Dialog(_("Crop Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		cropbutton = dialog.add_button(_("Crop"), gtk.RESPONSE_ACCEPT)
+		cropbutton = dialog.add_button(_("C_rop"), gtk.RESPONSE_ACCEPT)
 		cropimage = gtk.Image()
 		cropimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 		cropbutton.set_image(cropimage)
@@ -3539,7 +3539,7 @@ class Base:
 
 	def saturation(self, action):
 		dialog = gtk.Dialog(_("Saturation"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		resizebutton = dialog.add_button(_("Saturate"), gtk.RESPONSE_ACCEPT)
+		resizebutton = dialog.add_button(_("_Saturate"), gtk.RESPONSE_ACCEPT)
 		resizeimage = gtk.Image()
 		resizeimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 		resizebutton.set_image(resizeimage)
@@ -3588,7 +3588,7 @@ class Base:
 
 	def resize_image(self, action):
 		dialog = gtk.Dialog(_("Resize Image"), self.window, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT))
-		resizebutton = dialog.add_button(_("Resize"), gtk.RESPONSE_ACCEPT)
+		resizebutton = dialog.add_button(_("_Resize"), gtk.RESPONSE_ACCEPT)
 		resizeimage = gtk.Image()
 		resizeimage.set_from_stock(gtk.STOCK_OK, gtk.ICON_SIZE_BUTTON)
 		resizebutton.set_image(resizeimage)
