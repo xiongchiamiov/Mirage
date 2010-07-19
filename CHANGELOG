@@ -12,6 +12,7 @@ v0.9.5 - Future
 	+ Bug: Fixed gettext files not found if installed into /usr/local (bug #17359)
 	+ Changes: now uses $XDG_CONFIG_HOME/mirage as config directory if possible
 		(patch taken from debian)
+	+ Changes: Switched zooming directions for Ctrl+Mousewheel up/down.
 	
 v0.9.4 - June 26, 2010
 	+ Mirage now requires PyGTK 2.12.0

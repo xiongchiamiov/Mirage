@@ -3051,9 +3051,9 @@ class Base:
 			# Zooming of the image by Ctrl-mousewheel
 			if event.state & gtk.gdk.CONTROL_MASK:
 				if event.direction == gtk.gdk.SCROLL_UP:
-					self.zoom_out(None)
-				elif event.direction == gtk.gdk.SCROLL_DOWN:
 					self.zoom_in(None)
+				elif event.direction == gtk.gdk.SCROLL_DOWN:
+					self.zoom_out(None)
 				return True
 			# Navigation of images with mousewheel:
 			else:
