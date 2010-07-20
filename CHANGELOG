@@ -15,6 +15,7 @@ v0.9.5 - Future
 	+ Changes: Switched zooming directions for Ctrl+Mousewheel up/down.
 	+ Changes: Small interface changes
 	+ Changes: Updated mnemonics (bug #17350 and patch 3020)
+	+ Changes: Improvements to localized strings
 	
 v0.9.4 - June 26, 2010
 	+ Mirage now requires PyGTK 2.12.0

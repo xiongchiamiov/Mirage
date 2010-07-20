@@ -141,7 +141,7 @@ class Base:
 		self.opendialogpath = ""
 		self.zoom_quality = gtk.gdk.INTERP_BILINEAR
 		self.recursive = False
-		self.verbose = False
+		self.verbose = True
 		self.image_loaded = False
 		self.open_all_images = True				# open all images in the directory(ies)
 		self.use_last_dir = True
@@ -310,7 +310,7 @@ class Base:
 			('Minus', None, '', 'minus', _('Zoom Out'), self.zoom_out),
 			('Plus', None, '', 'plus', _('Zoom In'), self.zoom_in),
 			('Equal', None, '', 'equal', _('Zoom In'), self.zoom_in),
-			('Space', None, '', 'space', _('Next'), self.goto_next_image),
+			('Space', None, '', 'space', _('Next Image'), self.goto_next_image),
 			('Ctrl-KP_Insert', None, '', '<Ctrl>KP_Insert', _('Fit'), self.zoom_to_fit_window_action),
 			('Ctrl-KP_End', None, '', '<Ctrl>KP_End', _('1:1'), self.zoom_1_to_1_action),
 			('Ctrl-KP_Subtract', None, '', '<Ctrl>KP_Subtract', _('Zoom Out'), self.zoom_out),
@@ -1275,14 +1275,12 @@ class Base:
 		if "%L" in cmd:
 			cmd = cmd.replace("%L", " ".join([sh_esc(s) for s in self.image_list]))
 		if self.verbose:
-			print _("Action") + ":", cmd
+			print _("Action: %s") % cmd
 		shell_rc = os.system(cmd) >> 8
 		if self.verbose:
 			print _("Action return code: %s") % shell_rc
 		if shell_rc != 0:
-			msg = _('Unable to launch') \
-			    + ' \"' + cmd + '\". ' \
-			    + _('Please specify a valid command from Edit > Custom Actions.')
+			msg = _('Unable to launch \"%s\". Please specify a valid command from Edit > Custom Actions.') % cmd
 			error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, msg)
 			error_dialog.set_title(_("Invalid Custom Action"))
 			error_dialog.run()
@@ -1426,8 +1424,8 @@ class Base:
 		print "  -s, --slideshow      " + _("Start in slideshow mode")
 		print "  -f, --fullscreen     " + _("Start in fullscreen mode")
 		print "  -o, --onload 'cmd'   " + _("Execute 'cmd' when an image is loaded")
-		print "                       " + _("(uses same syntax as custom actions,")
-		print "                       " + _("i.e. mirage -o 'echo file is %F')")
+		print "                       " + _("uses same syntax as custom actions,")
+		print "                       " + _("i.e. mirage -o 'echo file is %F'")
 
 	def delay_changed(self, action):
 		self.curr_slideshow_delay = self.ss_delayspin.get_value()
@@ -1704,7 +1702,7 @@ class Base:
 				gobject.idle_add(self.thumbpane_set_image, dest_name, self.curr_img_in_list, True)
 				self.image_modified = False
 			else:
-				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, _('The') + ' ' + filetype + ' ' + 'format is not supported for saving. Do you wish to save the file in a different format?')
+				error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_YES_NO, _('The %s format is not supported for saving. Do you wish to save the file in a different format?') % filetype)
 				error_dialog.set_title(_("Save"))
 				response = error_dialog.run()
 				if response == gtk.RESPONSE_YES:
@@ -1715,7 +1713,7 @@ class Base:
 				else:
 					error_dialog.destroy()
 		except:
-			error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to save ') + dest_name)
+			error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('Unable to save %s') % dest_name)
 			error_dialog.set_title(_("Save"))
 			error_dialog.run()
 			error_dialog.destroy()
@@ -1779,7 +1777,7 @@ class Base:
 		location.set_size_request(300, -1)
 		location.set_activates_default(True)
 		hbox = gtk.HBox()
-		hbox.pack_start(gtk.Label(_("Image Location (URL)") + ":"), False, False, 5)
+		hbox.pack_start(gtk.Label(_("Image Location (URL):"), False, False, 5))
 		hbox.pack_start(location, True, True, 5)
 		dialog.vbox.pack_start(hbox, True, True, 10)
 		dialog.set_default_response(gtk.RESPONSE_OK)
@@ -1986,9 +1984,9 @@ class Base:
 		self.statusbar.push(self.statusbar.get_context_id(""), status_text)
 		status_text = ""
 		if self.running_custom_actions:
-			status_text = _('Custom actions') + ': ' + str(self.curr_custom_action) + ' ' + _('of') + ' ' + str(self.num_custom_actions)
+			status_text = _('Custom actions: %(current)i of  %(total)i') % {'current': self.curr_custom_action,'total': self.num_custom_actions}
 		elif self.searching_for_images:
-			status_text = _('Scanning') + '...'
+			status_text = _('Scanning...')
 		self.statusbar2.push(self.statusbar2.get_context_id(""), status_text)
 
 	def show_custom_actions(self, action):
@@ -2106,11 +2104,11 @@ class Base:
 			self.dialog_name = gtk.Dialog(_("Edit Custom Action"), self.actions_dialog, gtk.DIALOG_MODAL, (gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT, gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
 		self.dialog_name.set_modal(True)
 		table = gtk.Table(2, 4, False)
-		action_name_label = gtk.Label(_("Action Name") + ":")
+		action_name_label = gtk.Label(_("Action Name:"))
 		action_name_label.set_alignment(0, 0.5)
-		action_command_label = gtk.Label(_("Command") + ":")
+		action_command_label = gtk.Label(_("Command:"))
 		action_command_label.set_alignment(0, 0.5)
-		shortcut_label = gtk.Label(_("Shortcut") + ":")
+		shortcut_label = gtk.Label(_("Shortcut:"))
 		shortcut_label.set_alignment(0, 0.5)
 		table.attach(action_name_label, 0, 1, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table.attach(action_command_label, 0, 1, 1, 2, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
@@ -2269,14 +2267,14 @@ class Base:
 			# Validate to make sure the shortcut hasn't already been used:
 			for i in range(len(self.keys)):
 				if shortcut == self.keys[i][1]:
-					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.keys[i][0] + '\'.')
+					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut \'%(shortcut)s\' is already used for \'%(key)s\'.') % {'shortcut': shortcut, 'key': self.keys[i][0]})
 					error_dialog.set_title(_("Invalid Shortcut"))
 					error_dialog.run()
 					error_dialog.destroy()
 					return
 			for i in range(len(self.action_shortcuts)):
 				if shortcut == self.action_shortcuts[i]:
-					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut ') + '\'' + shortcut + '\'' + _(' is already used for ') + '\'' + self.action_names[i] + '\'.')
+					error_dialog = gtk.MessageDialog(self.dialog_shortcut, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_CLOSE, _('The shortcut \'%(shortcut)s\' is already used for \'%(key)s\'.') % {'shortcut': shortcut, 'key': self.action_names[i]})
 					error_dialog.set_title(_("Invalid Shortcut"))
 					error_dialog.run()
 					error_dialog.destroy()
@@ -2329,7 +2327,7 @@ class Base:
 		loc.set_alignment(0, 0)
 		area = gtk.RadioButton()
 		area1 = gtk.RadioButton(group=area, label=_("Entire screen"))
-		area2 = gtk.RadioButton(group=area, label=_("Window under mouse cursor"))
+		area2 = gtk.RadioButton(group=area, label=_("Window under pointer"))
 		if not HAS_XMOUSE:
 			area2.set_sensitive(False)
 		area1.set_active(True)
@@ -2410,23 +2408,23 @@ class Base:
 			image_is_anim = True
 		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
 		vbox_left = gtk.VBox()
-		filename = gtk.Label(_("File name") + ":")
+		filename = gtk.Label(_("File name:"))
 		filename.set_alignment(1, 1)
-		filedate = gtk.Label(_("File modified") + ":")
+		filedate = gtk.Label(_("File modified:"))
 		filedate.set_alignment(1, 1)
-		imagesize = gtk.Label(_("Dimensions") + ":")
+		imagesize = gtk.Label(_("Dimensions:"))
 		imagesize.set_alignment(1, 1)
-		filesize = gtk.Label(_("File size") + ":")
+		filesize = gtk.Label(_("File size:"))
 		filesize.set_alignment(1, 1)
-		filetype = gtk.Label(_("File type") + ":")
+		filetype = gtk.Label(_("File type:"))
 		filetype.set_alignment(1, 1)
-		transparency = gtk.Label(_("Transparency") + ":")
+		transparency = gtk.Label(_("Transparency:"))
 		transparency.set_alignment(1, 1)
-		animation = gtk.Label(_("Animation") + ":")
+		animation = gtk.Label(_("Animation:"))
 		animation.set_alignment(1, 1)
-		bits = gtk.Label(_("Bits per sample") + ":")
+		bits = gtk.Label(_("Bits per sample:"))
 		bits.set_alignment(1, 1)
-		channels = gtk.Label(_("Channels") + ":")
+		channels = gtk.Label(_("Channels:"))
 		channels.set_alignment(1, 1)
 		vbox_left.pack_start(filename, False, False, 2)
 		vbox_left.pack_start(filedate, False, False, 2)
@@ -2495,7 +2493,7 @@ class Base:
 		bglabel.set_markup('<b>' + _('Interface') + '</b>')
 		bglabel.set_alignment(0, 1)
 		color_hbox = gtk.HBox(False, 0)
-		colortext = gtk.Label(_('Background color') + ':  ')
+		colortext = gtk.Label(_('Background color:  '))
 		self.colorbutton = gtk.ColorButton(self.bgcolor)
 		self.colorbutton.connect('color-set', self.bgcolor_selected)
 		self.colorbutton.set_size_request(150, -1)
@@ -2517,7 +2515,7 @@ class Base:
 		fullscreen = gtk.CheckButton(_("Open Mirage in fullscreen mode"))
 		fullscreen.set_active(self.start_in_fullscreen)
 		thumbbox = gtk.HBox()
-		thumblabel = gtk.Label(_("Thumbnail size") + ":  ")
+		thumblabel = gtk.Label(_("Thumbnail size:  "))
 		thumbbox.pack_start(thumblabel, False, False, 0)
 		thumbsize = gtk.combo_box_new_text()
 		option = 0
@@ -2547,7 +2545,7 @@ class Base:
 		openlabel.set_markup('<b>' + _('Open Behavior') + '</b>')
 		openlabel.set_alignment(0, 1)
 		hbox_openmode = gtk.HBox()
-		hbox_openmode.pack_start(gtk.Label(_('Open new image in') + ':'), False, False, 0)
+		hbox_openmode.pack_start(gtk.Label(_('Open new image in:')), False, False, 0)
 		combobox = gtk.combo_box_new_text()
 		combobox.append_text(_("Smart Mode"))
 		combobox.append_text(_("Zoom To Fit Mode"))
@@ -2575,7 +2573,7 @@ class Base:
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		openpref1.set_tooltip_text(_("The default 'Open' directory will be the last directory used."))
-		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory") + ":")
+		openpref2 = gtk.RadioButton(group=openpref, label=_("Use this fixed directory:"))
 		openpref2.connect('toggled', self.prefs_use_fixed_dir_clicked)
 		openpref2.set_tooltip_text(_("The default 'Open' directory will be this specified directory."))
 		hbox_defaultdir = gtk.HBox()
@@ -2619,7 +2617,7 @@ class Base:
 		preloadnav.set_active(self.preloading_images)
 		preloadnav.set_tooltip_text(_("If enabled, the next and previous images in the list will be preloaded during idle time. Note that the speed increase comes at the expense of memory usage, so it is recommended to disable this option on machines with limited ram."))
 		hbox_listwrap = gtk.HBox()
-		hbox_listwrap.pack_start(gtk.Label(_("Wrap around imagelist") + ":"), False, False, 0)
+		hbox_listwrap.pack_start(gtk.Label(_("Wrap around imagelist:")), False, False, 0)
 		combobox2 = gtk.combo_box_new_text()
 		combobox2.append_text(_("No"))
 		combobox2.append_text(_("Yes"))
@@ -2645,7 +2643,7 @@ class Base:
 		slideshowlabel.set_markup('<b>' + _('Slideshow Mode') + '</b>')
 		slideshowlabel.set_alignment(0, 1)
 		hbox_delay = gtk.HBox()
-		hbox_delay.pack_start(gtk.Label(_("Delay between images in seconds") + ":"), False, False, 0)
+		hbox_delay.pack_start(gtk.Label(_("Delay between images in seconds:")), False, False, 0)
 		spin_adj = gtk.Adjustment(self.slideshow_delay, 0, 50000, 1, 10, 0)
 		delayspin = gtk.SpinButton(spin_adj, 1.0, 0)
 		delayspin.set_numeric(True)
@@ -2681,7 +2679,7 @@ class Base:
 		deletebutton.set_active(self.confirm_delete)
 		
 		zoom_hbox = gtk.HBox()
-		zoom_hbox.pack_start(gtk.Label(_('Scaling quality') + ": "), False, False, 0)
+		zoom_hbox.pack_start(gtk.Label(_('Scaling quality: ')), False, False, 0)
 		zoomcombo = gtk.combo_box_new_text()
 		zoomcombo.append_text(_("Nearest (Fastest)"))
 		zoomcombo.append_text(_("Tiles"))
@@ -2692,7 +2690,7 @@ class Base:
 		zoom_hbox.pack_start(gtk.Label(), True, True, 0)
 		
 		hbox_save = gtk.HBox()
-		savelabel = gtk.Label(_("Modified images") + ":")
+		savelabel = gtk.Label(_("Modified images:"))
 		savecombo = gtk.combo_box_new_text()
 		savecombo.append_text(_("Ignore Changes"))
 		savecombo.append_text(_("Auto-Save"))
@@ -2823,7 +2821,7 @@ class Base:
 				pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 60, self.zoom_quality)
 			image = gtk.Image()
 			image.set_from_pixbuf(pixbuf)
-			instructions = gtk.Label(_("Enter the new name") + ":")
+			instructions = gtk.Label(_("Enter the new name:"))
 			instructions.set_alignment(0, 1)
 			hbox = gtk.HBox()
 			hbox.pack_start(image, False, False, 10)
@@ -2855,7 +2853,7 @@ class Base:
 					self.register_file_with_recent_docs(self.currimg_name)
 					self.update_title()
 				except:
-					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to rename') + ' ' + self.currimg_name)
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to rename %s') % self.currimg_name)
 					error_dialog.set_title(_("Unable to rename"))
 					error_dialog.run()
 					error_dialog.destroy()
@@ -2875,7 +2873,7 @@ class Base:
 				self.toggle_slideshow(None)
 			delete_dialog = gtk.Dialog(_('Delete Image'), self.window, gtk.DIALOG_MODAL)
 			if self.confirm_delete:
-				permlabel = gtk.Label(_('Are you sure you wish to permanently delete') + ' ' + os.path.split(self.currimg_name)[1] + '?')
+				permlabel = gtk.Label(_('Are you sure you wish to permanently delete %s?') % os.path.split(self.currimg_name)[1])
 				permlabel.set_line_wrap(True)
 				permlabel.set_alignment(0, 0.1)
 				warningicon = gtk.Image()
@@ -2936,7 +2934,7 @@ class Base:
 					# Select new item:
 					self.thumbpane_select(self.curr_img_in_list)
 				except:
-					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete') + ' ' + self.currimg_name)
+					error_dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL, gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, _('Unable to delete %s') % self.currimg_name)
 					error_dialog.set_title(_("Unable to delete"))
 					error_dialog.run()
 					error_dialog.destroy()
@@ -3385,14 +3383,14 @@ class Base:
 		width.set_numeric(True)
 		width.set_update_policy(gtk.UPDATE_IF_VALID)
 		width.set_wrap(False)
-		width_label = gtk.Label(_("Width") + ":")
+		width_label = gtk.Label(_("Width:"))
 		width_label.set_alignment(0, 0.7)
 		height_adj = gtk.Adjustment(self.currimg_pixbuf_original.get_height(), 1, self.currimg_pixbuf_original.get_height(), 1, 10, 0)
 		height = gtk.SpinButton(height_adj, 0, 0)
 		height.set_numeric(True)
 		height.set_update_policy(gtk.UPDATE_IF_VALID)
 		height.set_wrap(False)
-		height_label = gtk.Label(_("Height") + ":")
+		height_label = gtk.Label(_("Height:"))
 		width_label.set_size_request(height_label.size_request()[0], -1)
 		height_label.set_alignment(0, 0.7)
 		hbox_width = gtk.HBox()
@@ -3598,7 +3596,7 @@ class Base:
 		width.set_numeric(True)
 		width.set_update_policy(gtk.UPDATE_IF_VALID)
 		width.set_wrap(False)
-		width_label = gtk.Label(_("Width") + ":")
+		width_label = gtk.Label(_("Width:"))
 		width_label.set_alignment(0, 0.7)
 		hbox_width.pack_start(width_label, False, False, 10)
 		hbox_width.pack_start(width, False, False, 0)
@@ -3609,7 +3607,7 @@ class Base:
 		height.set_numeric(True)
 		height.set_update_policy(gtk.UPDATE_IF_VALID)
 		height.set_wrap(False)
-		height_label = gtk.Label(_("Height") + ":")
+		height_label = gtk.Label(_("Height:"))
 		width_label.set_size_request(height_label.size_request()[0], -1)
 		height_label.set_alignment(0, 0.7)
 		hbox_height.pack_start(height_label, False, False, 10)
@@ -3861,7 +3859,7 @@ class Base:
 		else:
 			self.currmg_name = filename
 		if self.verbose and self.currimg_name != "":
-			print _("Loading") + ":", self.currimg_name
+			print _("Loading: %s") % self.currimg_name
 		self.update_title()
 		self.put_error_image_to_window()
 		self.image_loaded = False
@@ -3974,7 +3972,7 @@ class Base:
 				self.currimg_is_animation = self.preloadimg_prev_is_animation
 				used_prev = True
 				if self.verbose and self.currimg_name != "":
-					print _("Loading") + ":", self.currimg_name
+					print _("Loading: %s") % self.currimg_name
 				self.put_zoom_image_to_window(True)
 				if not self.currimg_is_animation:
 					self.set_image_sensitivities(True)
@@ -3991,7 +3989,7 @@ class Base:
 				self.currimg_is_animation = self.preloadimg_next_is_animation
 				used_next = True
 				if self.verbose and self.currimg_name != "":
-					print _("Loading") + ":", self.currimg_name
+					print _("Loading: %s") % self.currimg_name
 				self.put_zoom_image_to_window(True)
 				if not self.currimg_is_animation:
 					self.set_image_sensitivities(True)
@@ -4054,7 +4052,7 @@ class Base:
 			self.currimg_zoomratio = 1
 			self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if self.verbose and self.currimg_name != "":
-				print _("Loading") + ":", self.currimg_name
+				print _("Loading: %s") % self.currimg_name
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 			if animtest.is_static_image() or (use_current_pixbuf_original and not self.currimg_is_animation):
 				self.currimg_is_animation = False
@@ -4135,7 +4133,7 @@ class Base:
 					self.preloadimg_next_pixbuf = self.preloadimg_next_pixbuf_original
 				gc.collect()
 				if self.verbose:
-					print _("Preloading") + ":", self.preloadimg_next_name
+					print _("Preloading: %s") % self.preloadimg_next_name
 		except:
 			self.preloadimg_next_in_list = -1
 
@@ -4187,7 +4185,7 @@ class Base:
 					self.preloadimg_prev_pixbuf = self.preloadimg_prev_pixbuf_original
 				gc.collect()
 				if self.verbose:
-					print _("Preloading") + ":", self.preloadimg_prev_name
+					print _("Preloading: %s") % self.preloadimg_prev_name
 		except:
 			self.preloadimg_prev_in_list = -1
 
@@ -4258,7 +4256,7 @@ class Base:
 				if os.path.basename(item)[0] != '.':
 					tmplist.append(item)
 				elif self.verbose:
-					print _("Skipping") + ":", item
+					print _("Skipping: %s") % item
 			inputlist = tmplist
 			if len(inputlist) == 0:
 				# All files/dirs were hidden, exit..
@@ -4315,7 +4313,7 @@ class Base:
 						self.image_list.append(item)
 						if self.verbose:
 							self.images_found += 1
-							print _("Found") + ":", item, "[" + str(self.images_found) + "]"
+							print _("Found: %(item)s [%(number)i]") % {'item': item, 'number': self.images_found}
 				else:
 					# If it's a directory that was explicitly selected or passed to
 					# the program, get all the files in the dir.
@@ -4348,7 +4346,7 @@ class Base:
 					if self.slideshow_mode:
 						self.toggle_slideshow(None)
 					if self.verbose and self.currimg_name != "":
-						print _("Loading") + ":", self.currimg_name
+						print _("Loading: %s") % self.currimg_name
 					try:
 						self.load_new_image2(False, False, True, True)
 						# Calling load_new_image2 will reset the following two vars
@@ -4452,11 +4450,11 @@ class Base:
 							filelist.append(item2)
 							if self.verbose and print_found_msg:
 								self.images_found += 1
-								print _("Found") + ":", item_fullpath2, "[" + str(self.images_found) + "]"
+								print _("Found: %(fullpath)s [%(number)i]") % {'fullpath': item_fullpath2, 'number': self.images_found}
 						elif os.path.isdir(item_fullpath2) and self.recursive:
 							folderlist.append(item_fullpath2)
 					elif self.verbose:
-						print _("Skipping") + ":", item_fullpath2
+						print _("Skipping: %s") % item_fullpath2
 			if len(self.image_list)>0 and update_window_title:
 				self.update_title()
 			# Sort the filelist and folderlist alphabetically:
@@ -4584,7 +4582,7 @@ class Base:
 		if len(self.image_list) == 0:
 			title = "Mirage"
 		else:
-			title = "Mirage - [" + str(self.curr_img_in_list+1) + ' ' + _('of') + ' ' + str(len(self.image_list)) + "] " + os.path.basename(self.currimg_name)
+			title = "Mirage - " +_("[%(current)i of %(total)i]") % {'current': self.curr_img_in_list+1, 'total': len(self.image_list)} + ' ' + os.path.basename(self.currimg_name)
 			if self.slideshow_mode:
 				title = title + ' - ' + _('Slideshow Mode')
 		self.window.set_title(title)
