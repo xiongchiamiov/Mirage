@@ -2,7 +2,7 @@ v0.10.0 - Future
 	+ Added Numerical Aware Comparison (numacomp) as a sorting option.
 	+ Changes: various code updates
 
-v0.9.5 - Future
+v0.9.5 - July 20, 2010
 	+ Added a windows icon
 	+ Added new shortcuts PgUP/PgDN for previous/next image
 	+ Added option to disable the backgroundcolor in windowed mode
