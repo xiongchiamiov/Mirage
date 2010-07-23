@@ -141,7 +141,7 @@ class Base:
 		self.opendialogpath = ""
 		self.zoom_quality = gtk.gdk.INTERP_BILINEAR
 		self.recursive = False
-		self.verbose = True
+		self.verbose = False
 		self.image_loaded = False
 		self.open_all_images = True				# open all images in the directory(ies)
 		self.use_last_dir = True

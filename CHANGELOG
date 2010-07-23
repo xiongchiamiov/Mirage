@@ -4,7 +4,7 @@ v0.10.0 - Future
 
 v0.9.5.1 - July 23, 2010
 	+ Bug: Mirage showed verbose output by default
-	+ Bug: Misplaced comma in Open Remote Image dialog
+	+ Bug: Misplaced parenthesis in Open Remote Image dialog code
 	
 v0.9.5 - July 20, 2010
 	+ Added a windows icon
