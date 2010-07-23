@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mirage\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-20 16:18+0200\n"
+"POT-Creation-Date: 2010-07-23 14:40+0200\n"
 "PO-Revision-Date: 2008-03-27 18:15-0300\n"
 "Last-Translator: Danilo Martins <mawkee@gmail.com>\n"
 "Language-Team: Danilo Martins <mawkee@gmail.com>\n"
@@ -739,12 +739,17 @@ msgstr "Interface"
 
 #: mirage.py:2496
 #, fuzzy
-msgid "Background color:  "
+msgid "Background color:"
 msgstr "Cor de fundo"
 
 #: mirage.py:2500
 msgid "Sets the background color for the application."
 msgstr "Configura a cor de fundo para a aplicação"
+
+#: mirage.py:2506
+#, fuzzy
+msgid "Simple background color:"
+msgstr "Cor de fundo"
 
 #: mirage.py:2515
 msgid "Open Mirage in fullscreen mode"
@@ -752,7 +757,7 @@ msgstr "Abrir Mirage em modo de tela cheia"
 
 #: mirage.py:2518
 #, fuzzy
-msgid "Thumbnail size:  "
+msgid "Thumbnail size:"
 msgstr "Tamanho da miniatura"
 
 #: mirage.py:2545
@@ -924,7 +929,7 @@ msgstr "Confirmar exclusão de imagens"
 
 #: mirage.py:2682
 #, fuzzy
-msgid "Scaling quality: "
+msgid "Scaling quality:"
 msgstr "Qualidade de Escala"
 
 #: mirage.py:2684

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mirage 0.7.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-20 16:18+0200\n"
+"POT-Creation-Date: 2010-07-23 14:40+0200\n"
 "PO-Revision-Date: 2006-08-18 22:08+0400\n"
 "Last-Translator: Roxana Kolosova <mavka@justos.org>\n"
 "Language-Team: Russian <ru@li.org>\n"
@@ -746,12 +746,17 @@ msgstr "Интерфейс"
 
 #: mirage.py:2496
 #, fuzzy
-msgid "Background color:  "
+msgid "Background color:"
 msgstr "Цвет фона"
 
 #: mirage.py:2500
 msgid "Sets the background color for the application."
 msgstr ""
+
+#: mirage.py:2506
+#, fuzzy
+msgid "Simple background color:"
+msgstr "Цвет фона"
 
 #: mirage.py:2515
 #, fuzzy
@@ -760,7 +765,7 @@ msgstr "Запускать показ в полноэкранном режиме
 
 #: mirage.py:2518
 #, fuzzy
-msgid "Thumbnail size:  "
+msgid "Thumbnail size:"
 msgstr "Удалить изображение"
 
 #: mirage.py:2545
@@ -917,7 +922,7 @@ msgid "Confirm image delete"
 msgstr ""
 
 #: mirage.py:2682
-msgid "Scaling quality: "
+msgid "Scaling quality:"
 msgstr ""
 
 #: mirage.py:2684

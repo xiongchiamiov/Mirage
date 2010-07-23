@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Mirage 0.9.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-20 16:18+0200\n"
+"POT-Creation-Date: 2010-07-23 14:40+0200\n"
 "PO-Revision-Date: 2008-07-28 17:16+0800\n"
 "Last-Translator: Jayden Suen <no.sun@163.com>\n"
 "Language-Team: Chinese <no.sun@163.com>\n"
@@ -735,12 +735,17 @@ msgstr "界面"
 
 #: mirage.py:2496
 #, fuzzy
-msgid "Background color:  "
+msgid "Background color:"
 msgstr "背景色"
 
 #: mirage.py:2500
 msgid "Sets the background color for the application."
 msgstr "设置程序的背景色"
+
+#: mirage.py:2506
+#, fuzzy
+msgid "Simple background color:"
+msgstr "背景色"
 
 #: mirage.py:2515
 msgid "Open Mirage in fullscreen mode"
@@ -748,7 +753,7 @@ msgstr "以全屏模式打开Mirage"
 
 #: mirage.py:2518
 #, fuzzy
-msgid "Thumbnail size:  "
+msgid "Thumbnail size:"
 msgstr "缩略图大小"
 
 #: mirage.py:2545
@@ -907,7 +912,7 @@ msgstr "确认删除图片"
 
 #: mirage.py:2682
 #, fuzzy
-msgid "Scaling quality: "
+msgid "Scaling quality:"
 msgstr "缩放品质"
 
 #: mirage.py:2684

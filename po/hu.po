@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: hu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-20 16:18+0200\n"
+"POT-Creation-Date: 2010-07-23 14:40+0200\n"
 "PO-Revision-Date: 2008-02-28 19:58+0100\n"
 "Last-Translator: Lisovszki  <lisovszki@gmail.com>\n"
 "Language-Team: hungarian <hu@li.org>\n"
@@ -741,12 +741,17 @@ msgstr "Felület"
 
 #: mirage.py:2496
 #, fuzzy
-msgid "Background color:  "
+msgid "Background color:"
 msgstr "Háttérszín"
 
 #: mirage.py:2500
 msgid "Sets the background color for the application."
 msgstr "Állítsd be az alkalmazás hátterének a színét."
+
+#: mirage.py:2506
+#, fuzzy
+msgid "Simple background color:"
+msgstr "Háttérszín"
 
 #: mirage.py:2515
 msgid "Open Mirage in fullscreen mode"
@@ -754,7 +759,7 @@ msgstr "Program megnyitása teljes képernyős módban"
 
 #: mirage.py:2518
 #, fuzzy
-msgid "Thumbnail size:  "
+msgid "Thumbnail size:"
 msgstr "Előnézeti kép méret"
 
 #: mirage.py:2545
@@ -925,7 +930,7 @@ msgstr "Kép törlés megerősítése"
 
 #: mirage.py:2682
 #, fuzzy
-msgid "Scaling quality: "
+msgid "Scaling quality:"
 msgstr "Méretezés minősége"
 
 #: mirage.py:2684
