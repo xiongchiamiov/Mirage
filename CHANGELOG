@@ -3,6 +3,7 @@ v0.10.0 - Future
 	+ Changes: various code updates
 
 v0.9.5.1 - July 23, 2010
+	+ Added dutch translation
 	+ Bug: Mirage showed verbose output by default
 	+ Bug: Misplaced parenthesis in Open Remote Image dialog code
 	+ Changes: Fixed translations again...
