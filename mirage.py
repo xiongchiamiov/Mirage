@@ -1777,7 +1777,7 @@ class Base:
 		location.set_size_request(300, -1)
 		location.set_activates_default(True)
 		hbox = gtk.HBox()
-		hbox.pack_start(gtk.Label(_("Image Location (URL):"), False, False, 5))
+		hbox.pack_start(gtk.Label(_("Image Location (URL):")), False, False, 5)
 		hbox.pack_start(location, True, True, 5)
 		dialog.vbox.pack_start(hbox, True, True, 10)
 		dialog.set_default_response(gtk.RESPONSE_OK)
