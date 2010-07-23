@@ -1,0 +1,1087 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Mirage 0.9.5 (rev295)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-07-23 14:40+0200\n"
+"PO-Revision-Date: 2010-07-23 11:52+0100\n"
+"Last-Translator: Pascal De Vuyst <pascal.devuyst@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: mirage.py:266
+msgid "_File"
+msgstr "_Bestand"
+
+#: mirage.py:267
+msgid "_Edit"
+msgstr "Be_werken"
+
+#: mirage.py:268
+msgid "_View"
+msgstr "Bee_ld"
+
+#: mirage.py:269
+msgid "_Go"
+msgstr "_Ga"
+
+#: mirage.py:270
+msgid "_Help"
+msgstr "_Help"
+
+#: mirage.py:271
+msgid "Custom _Actions"
+msgstr "Aangepaste _acties"
+
+#: mirage.py:272
+msgid "_Open Image..."
+msgstr "Afbeelding _openen..."
+
+#: mirage.py:272
+msgid "Open Image"
+msgstr "Afbeelding openen"
+
+#: mirage.py:273
+msgid "Open _Remote image..."
+msgstr "Afbeelding op a_fstand openen..."
+
+#: mirage.py:273
+msgid "Open Remote Image"
+msgstr "Afbeelding op afstand openen"
+
+#: mirage.py:274
+msgid "Open _Folder..."
+msgstr "_Map openen..."
+
+#: mirage.py:274
+msgid "Open Folder"
+msgstr "Map openen"
+
+#: mirage.py:275
+msgid "_Save Image"
+msgstr "Afbeelding op_slaan"
+
+#: mirage.py:275
+msgid "Save Image"
+msgstr "Afbeelding opslaan"
+
+#: mirage.py:276
+msgid "Save Image _As..."
+msgstr "Afbeelding opslaan a_ls..."
+
+#: mirage.py:276
+msgid "Save Image As"
+msgstr "Afbeelding opslaan als"
+
+#: mirage.py:277
+msgid "_Crop..."
+msgstr "_Bijsnijden..."
+
+#: mirage.py:277 mirage.py:3343
+msgid "Crop Image"
+msgstr "Afbeelding bijsnijden"
+
+#: mirage.py:278
+msgid "R_esize..."
+msgstr "_Schalen..."
+
+#: mirage.py:278 mirage.py:3588
+msgid "Resize Image"
+msgstr "Afbeelding schalen"
+
+#: mirage.py:279
+msgid "_Saturation..."
+msgstr "Ver_zadiging..."
+
+#: mirage.py:279
+msgid "Modify saturation"
+msgstr "Verzadiging aanpassen"
+
+#: mirage.py:280
+msgid "_Quit"
+msgstr "_Afsluiten"
+
+#: mirage.py:280
+msgid "Quit"
+msgstr "Afsluiten"
+
+#: mirage.py:281
+msgid "_Previous Image"
+msgstr "Vo_rige afbeelding"
+
+#: mirage.py:281 mirage.py:321 mirage.py:323 mirage.py:325
+msgid "Previous Image"
+msgstr "Vorige afbeelding"
+
+#: mirage.py:282
+msgid "_Next Image"
+msgstr "Vol_gende afbeelding"
+
+#: mirage.py:282 mirage.py:313 mirage.py:322 mirage.py:324
+msgid "Next Image"
+msgstr "Volgende afbeelding"
+
+#: mirage.py:283
+msgid "_Previous"
+msgstr "Vo_rige"
+
+#: mirage.py:283
+msgid "Previous"
+msgstr "Vorige"
+
+#: mirage.py:284
+msgid "_Next"
+msgstr "Vol_gende"
+
+#: mirage.py:284
+msgid "Next"
+msgstr "Volgende"
+
+#: mirage.py:285
+msgid "_Random Image"
+msgstr "_Willekeurige afbeelding"
+
+#: mirage.py:285
+msgid "Random Image"
+msgstr "Willekeurige afbeelding"
+
+#: mirage.py:286
+msgid "_First Image"
+msgstr "_Eerste afbeelding"
+
+#: mirage.py:286
+msgid "First Image"
+msgstr "Eerste afbeelding"
+
+#: mirage.py:287
+msgid "_Last Image"
+msgstr "_Laatste afbeelding"
+
+#: mirage.py:287
+msgid "Last Image"
+msgstr "Laatste afbeelding"
+
+#: mirage.py:288
+msgid "Zoom _In"
+msgstr "_Inzoomen"
+
+#: mirage.py:288 mirage.py:311 mirage.py:312 mirage.py:317 mirage.py:327
+msgid "Zoom In"
+msgstr "Inzoomen"
+
+#: mirage.py:289
+msgid "Zoom _Out"
+msgstr "_Uitzoomen"
+
+#: mirage.py:289 mirage.py:310 mirage.py:316 mirage.py:328
+msgid "Zoom Out"
+msgstr "Uitzoomen"
+
+#: mirage.py:290
+msgid "Zoom To _Fit"
+msgstr "_Passend zoomen"
+
+#: mirage.py:290 mirage.py:314 mirage.py:318
+msgid "Fit"
+msgstr "Passend"
+
+#: mirage.py:291
+msgid "_1:1"
+msgstr "_1:1"
+
+#: mirage.py:291 mirage.py:315 mirage.py:319 mirage.py:326
+msgid "1:1"
+msgstr "1:1"
+
+#: mirage.py:292
+msgid "Rotate _Left"
+msgstr "_Links draaien"
+
+#: mirage.py:292
+msgid "Rotate Left"
+msgstr "Links draaien"
+
+#: mirage.py:293
+msgid "Rotate _Right"
+msgstr "_Rechts draaien"
+
+#: mirage.py:293
+msgid "Rotate Right"
+msgstr "Rechts draaien"
+
+#: mirage.py:294
+msgid "Flip _Vertically"
+msgstr "_Verticaal spiegelen"
+
+#: mirage.py:294
+msgid "Flip Vertically"
+msgstr "_Verticaal spiegelen"
+
+#: mirage.py:295
+msgid "Flip _Horizontally"
+msgstr "_Horizontaal spiegelen"
+
+#: mirage.py:295
+msgid "Flip Horizontally"
+msgstr "Horizontaal spiegelen"
+
+#: mirage.py:296
+msgid "_About"
+msgstr "_Over"
+
+#: mirage.py:296
+msgid "About"
+msgstr "Over"
+
+#: mirage.py:297
+msgid "_Contents"
+msgstr "_Inhoudstafel"
+
+#: mirage.py:297
+msgid "Contents"
+msgstr "Inhoudstafel"
+
+#: mirage.py:298
+msgid "_Preferences..."
+msgstr "Voor_keuren..."
+
+#: mirage.py:298
+msgid "Preferences"
+msgstr "Voorkeuren"
+
+#: mirage.py:299
+msgid "_Full Screen"
+msgstr "_Volledig scherm"
+
+#: mirage.py:299
+msgid "Full Screen"
+msgstr "Volledig scherm"
+
+#: mirage.py:300
+msgid "E_xit Full Screen"
+msgstr "Volledig scherm _verlaten"
+
+#: mirage.py:300 mirage.py:309
+msgid "Exit Full Screen"
+msgstr "Volledig scherm verlaten"
+
+#: mirage.py:301
+msgid "_Start Slideshow"
+msgstr "Diavoorstelling _starten"
+
+#: mirage.py:301
+msgid "Start Slideshow"
+msgstr "Diavoorstelling starten"
+
+#: mirage.py:302
+msgid "_Stop Slideshow"
+msgstr "Diavoorstelling _stoppen"
+
+#: mirage.py:302
+msgid "Stop Slideshow"
+msgstr "Diavoorstelling stoppen"
+
+#: mirage.py:303
+msgid "_Delete..."
+msgstr "Ver_wijderen..."
+
+#: mirage.py:303 mirage.py:2874
+msgid "Delete Image"
+msgstr "Afbeelding verwijderen"
+
+#: mirage.py:304
+msgid "Re_name..."
+msgstr "Her_noemen..."
+
+#: mirage.py:304 mirage.py:2807
+msgid "Rename Image"
+msgstr "Afbeelding hernoemen"
+
+#: mirage.py:305
+msgid "_Take Screenshot..."
+msgstr "Screenshot _nemen..."
+
+#: mirage.py:305
+msgid "Take Screenshot"
+msgstr "Screenshot nemen"
+
+#: mirage.py:306
+msgid "_Properties..."
+msgstr "_Eigenschappen..."
+
+#: mirage.py:306 mirage.py:2397
+msgid "Properties"
+msgstr "Eigenschappen"
+
+#: mirage.py:307
+msgid "_Configure..."
+msgstr "_Instellen..."
+
+#: mirage.py:307
+msgid "Custom Actions"
+msgstr "Aangepaste acties"
+
+#: mirage.py:331
+msgid "_Status Bar"
+msgstr "_Statusbalk"
+
+#: mirage.py:331
+msgid "Status Bar"
+msgstr "Statusbalk"
+
+#: mirage.py:332
+msgid "_Toolbar"
+msgstr "_Werkbalk"
+
+#: mirage.py:332
+msgid "Toolbar"
+msgstr "Werkbalk"
+
+#: mirage.py:333
+msgid "Thumbnails _Pane"
+msgstr "_Miniatuurweergave paneel"
+
+#: mirage.py:333
+msgid "Thumbnails Pane"
+msgstr "Miniatuurweergave paneel"
+
+#: mirage.py:1057
+#, python-format
+msgid "Couldn't find the image %s. Please check your installation."
+msgstr "Kon de afbeelding %s niet vinden. Controleer a.u.b uw installatie."
+
+#: mirage.py:1278
+#, python-format
+msgid "Action: %s"
+msgstr "Actie: %s"
+
+#: mirage.py:1281
+#, python-format
+msgid "Action return code: %s"
+msgstr "Actie return code: %s"
+
+#: mirage.py:1283
+#, python-format
+msgid ""
+"Unable to launch \"%s\". Please specify a valid command from Edit > Custom "
+"Actions."
+msgstr ""
+"Kan \"%s\" niet uitvoeren. Stel a.u.b. een geldig commando in onder Bewerken "
+"> Aangepaste acties."
+
+#: mirage.py:1285 mirage.py:2140 mirage.py:2175
+msgid "Invalid Custom Action"
+msgstr "Ongeldige aangepaste actie"
+
+#: mirage.py:1410
+msgid "Version: Mirage"
+msgstr "Versie: Mirage"
+
+#: mirage.py:1411
+msgid "Website: http://mirageiv.berlios.de"
+msgstr "Website: http://mirageiv.berlios.de"
+
+#: mirage.py:1416
+msgid "Usage: mirage [OPTION]... FILES|FOLDERS..."
+msgstr "Gebruik: mirage [OPTIE]... BESTANDEN|MAPPEN..."
+
+#: mirage.py:1418
+msgid "Options"
+msgstr "Opties"
+
+#: mirage.py:1419
+msgid "Show this help and exit"
+msgstr "Toon deze help en beëindig"
+
+#: mirage.py:1420
+msgid "Show version information and exit"
+msgstr "Toon versie-informatie en beëindig"
+
+#: mirage.py:1421
+msgid "Show more detailed information"
+msgstr "Toon meer gedetailleerde informatie"
+
+#: mirage.py:1422
+msgid "Recursively include all images found in"
+msgstr "Alle afbeeldingen gevonden in submappen"
+
+#: mirage.py:1423
+msgid "subdirectories of FOLDERS"
+msgstr "van MAPPEN recursief toevoegen"
+
+#: mirage.py:1424
+msgid "Start in slideshow mode"
+msgstr "Start in diavoorstellingsmodus"
+
+#: mirage.py:1425
+msgid "Start in fullscreen mode"
+msgstr "Start in volledig scherm modus"
+
+#: mirage.py:1426
+msgid "Execute 'cmd' when an image is loaded"
+msgstr "'cmd' uitvoeren wanneer een afbeelding wordt"
+
+#: mirage.py:1427
+msgid "uses same syntax as custom actions,"
+msgstr "geladen (gebruikt dezelfde syntax als aangepaste "
+
+#: mirage.py:1428
+msgid "i.e. mirage -o 'echo file is %F'"
+msgstr "acties, bvb. mirage -o 'echo bestand is %F')"
+
+#: mirage.py:1664
+msgid "Save As"
+msgstr "Opslaan als"
+
+#: mirage.py:1705
+#, python-format
+msgid ""
+"The %s format is not supported for saving. Do you wish to save the file in a "
+"different format?"
+msgstr ""
+"Het formaat %s is niet ondersteund voor opslaan. Wilt u het bestand in een "
+"ander formaat opslaan?"
+
+#: mirage.py:1706 mirage.py:1717
+msgid "Save"
+msgstr "Opslaan"
+
+#: mirage.py:1716
+#, python-format
+msgid "Unable to save %s"
+msgstr "Kan %s niet opslaan"
+
+#: mirage.py:1733
+msgid "The current image has been modified. Save changes?"
+msgstr "De huidige afbeelding is gewijzigd. Wijzigingen opslaan?"
+
+#: mirage.py:1737
+msgid "Save?"
+msgstr "Opslaan?"
+
+#: mirage.py:1775
+msgid "Open Remote"
+msgstr "Op afstand openen"
+
+#: mirage.py:1780
+msgid "Image Location (URL):"
+msgstr "Afbeeldingslocatie (URL):"
+
+#: mirage.py:1811
+msgid "Open"
+msgstr "Openen"
+
+#: mirage.py:1814
+msgid "Images"
+msgstr "Afbeeldingen"
+
+#: mirage.py:1818
+msgid "All files"
+msgstr "Alle bestanden"
+
+#: mirage.py:1828
+msgid "Include images in subdirectories"
+msgstr "Afbeeldingen in submappen openen"
+
+#: mirage.py:1983
+msgid "Cannot load image."
+msgstr "Kan afbeelding niet laden."
+
+#: mirage.py:1987
+#, python-format
+msgid "Custom actions: %(current)i of  %(total)i"
+msgstr "Aangepaste acties: %(current)i van %(total)i"
+
+#: mirage.py:1989
+msgid "Scanning..."
+msgstr "Scannen..."
+
+#: mirage.py:1993
+msgid "Configure Custom Actions"
+msgstr "Configureer aangepaste acties"
+
+#: mirage.py:2011
+msgid "Batch"
+msgstr "Batch"
+
+#: mirage.py:2012
+msgid "Action"
+msgstr "Actie"
+
+#: mirage.py:2013
+msgid "Shortcut"
+msgstr "Sneltoets"
+
+#: mirage.py:2025
+msgid "Add action"
+msgstr "Actie toevoegen"
+
+#: mirage.py:2029
+msgid "Edit selected action."
+msgstr "Geselecteerde actie bewerken."
+
+#: mirage.py:2033
+msgid "Remove selected action."
+msgstr "Geselecteerde actie verwijderen."
+
+#: mirage.py:2037
+msgid "Move selected action up."
+msgstr "Verplaats geselecteerde actie naar omhoog."
+
+#: mirage.py:2041
+msgid "Move selected action down."
+msgstr "Verplaats geselecteerde actie naar omlaag."
+
+#: mirage.py:2044
+msgid "Parameters"
+msgstr "Parameters"
+
+#: mirage.py:2044
+msgid "File path, name, and extension"
+msgstr "Bestandspad, -naam en -extensie"
+
+#: mirage.py:2044
+msgid "File path"
+msgstr "Bestandspad"
+
+#: mirage.py:2044
+msgid "File name without file extension"
+msgstr "Bestandsnaam zonder bestandsextensie"
+
+#: mirage.py:2044
+msgid "File extension (i.e. \".png\")"
+msgstr "Bestandsextensie (bvb. \"png\")"
+
+#: mirage.py:2044
+msgid "List of files, space-separated"
+msgstr "Bestandslijst, gescheiden door spaties"
+
+#: mirage.py:2047
+msgid "Operations"
+msgstr "Bewerkingen"
+
+#: mirage.py:2047
+msgid "Go to next image"
+msgstr "Ga naar volgende afbeelding"
+
+#: mirage.py:2047
+msgid "Go to previous image"
+msgstr "Ga naar vorige afbeelding"
+
+#: mirage.py:2066
+msgid ""
+"Here you can define custom actions with shortcuts. Actions use the built-in "
+"parameters and operations listed below and can have multiple statements "
+"separated by a semicolon. Batch actions apply to all images in the list."
+msgstr ""
+"Hier kan u aangepaste acties met sneltoetsen definiëren. Acties gebruiken de "
+"hieronder weergeven ingebouwde parameters en bewerkingen, en kunnen meerdere "
+"statements gescheiden door puntkomma's bevatten. Batch acties zijn van "
+"toepassing op alle afbeeldingen in de lijst."
+
+#: mirage.py:2102
+msgid "Add Custom Action"
+msgstr "Aangepaste actie toevoegen"
+
+#: mirage.py:2104
+msgid "Edit Custom Action"
+msgstr "Aangepaste actie bewerken"
+
+#: mirage.py:2107
+msgid "Action Name:"
+msgstr "Actienaam:"
+
+#: mirage.py:2109
+msgid "Command:"
+msgstr "Commando:"
+
+#: mirage.py:2111
+msgid "Shortcut:"
+msgstr "Sneltoets:"
+
+#: mirage.py:2125
+msgid "Perform action on all images (Batch)"
+msgstr "Actie toepassen op alle afbeeldingen (batch)"
+
+#: mirage.py:2139
+msgid "[PREV] and [NEXT] are only valid alone or at the end of the command"
+msgstr ""
+"[PREV] en [NEXT] zijn enkel geldig op zichzelf of op het einde van een "
+"commando"
+
+#: mirage.py:2174
+msgid "Incomplete custom action specified."
+msgstr "Onvolledige aangepaste actie gespecifieerd."
+
+#: mirage.py:2252
+msgid "Action Shortcut"
+msgstr "Actie sneltoets"
+
+#: mirage.py:2253
+msgid "Press the desired shortcut for the action."
+msgstr "Druk de gewenste sneltoets voor de actie."
+
+#: mirage.py:2270 mirage.py:2277
+#, python-format
+msgid "The shortcut '%(shortcut)s' is already used for '%(key)s'."
+msgstr "De sneltoets '%(shortcut)s' is al gebruikt voor '%(key)s'."
+
+#: mirage.py:2271 mirage.py:2278
+msgid "Invalid Shortcut"
+msgstr "Ongeldige sneltoets"
+
+#: mirage.py:2320
+msgid "Screenshot"
+msgstr "Screenshot"
+
+#: mirage.py:2321
+msgid "_Snap"
+msgstr "_Nemen"
+
+#: mirage.py:2326
+msgid "Location"
+msgstr "Gebied"
+
+#: mirage.py:2329
+msgid "Entire screen"
+msgstr "Volledig scherm"
+
+#: mirage.py:2330
+msgid "Window under pointer"
+msgstr "Venster onder de muiscursor"
+
+#: mirage.py:2335
+msgid "Delay"
+msgstr "Vertraging"
+
+#: mirage.py:2343
+msgid " seconds"
+msgstr " seconden"
+
+#: mirage.py:2411
+msgid "File name:"
+msgstr "Bestandsnaam:"
+
+#: mirage.py:2413
+msgid "File modified:"
+msgstr "Bestand gewijzigd:"
+
+#: mirage.py:2415
+msgid "Dimensions:"
+msgstr "Afmetingen:"
+
+#: mirage.py:2417
+msgid "File size:"
+msgstr "Bestandsgrootte:"
+
+#: mirage.py:2419
+msgid "File type:"
+msgstr "Bestandstype:"
+
+#: mirage.py:2421
+msgid "Transparency:"
+msgstr "Transparantie:"
+
+#: mirage.py:2423
+msgid "Animation:"
+msgstr "Animatie:"
+
+#: mirage.py:2425
+msgid "Bits per sample:"
+msgstr "Bits per sample:"
+
+#: mirage.py:2427
+msgid "Channels:"
+msgstr "Kanalen:"
+
+#: mirage.py:2446 mirage.py:2452 mirage.py:2623
+msgid "Yes"
+msgstr "Ja"
+
+#: mirage.py:2448 mirage.py:2450 mirage.py:2622
+msgid "No"
+msgstr "Nee"
+
+#: mirage.py:2487
+msgid "Mirage Preferences"
+msgstr "Mirage voorkeuren"
+
+#: mirage.py:2493 mirage.py:2727
+msgid "Interface"
+msgstr "Interface"
+
+#: mirage.py:2496
+#, fuzzy
+msgid "Background color:"
+msgstr "Achtergrondkleur:"
+
+#: mirage.py:2500
+msgid "Sets the background color for the application."
+msgstr "Stelt de achtergrondkleur van de toepassing in."
+
+#: mirage.py:2506
+#, fuzzy
+msgid "Simple background color:"
+msgstr "Achtergrondkleur:"
+
+#: mirage.py:2515
+msgid "Open Mirage in fullscreen mode"
+msgstr "Open Mirage in volledig scherm modus"
+
+#: mirage.py:2518
+#, fuzzy
+msgid "Thumbnail size:"
+msgstr "Grootte miniatuurweergave:"
+
+#: mirage.py:2545
+msgid "Open Behavior"
+msgstr "Gedrag bij openen"
+
+#: mirage.py:2548
+msgid "Open new image in:"
+msgstr "Open nieuwe afbeelding in:"
+
+#: mirage.py:2550
+msgid "Smart Mode"
+msgstr "Slimme modus"
+
+#: mirage.py:2551
+msgid "Zoom To Fit Mode"
+msgstr "Passend zoomen modus"
+
+#: mirage.py:2552
+msgid "1:1 Mode"
+msgstr "1:1 modus"
+
+#: mirage.py:2553
+msgid "Last Active Mode"
+msgstr "Laatste actieve modus"
+
+#: mirage.py:2556
+msgid "Load all images in current directory"
+msgstr "Alle afbeeldingen in de huidige map laden"
+
+#: mirage.py:2558
+msgid ""
+"If enabled, opening an image in Mirage will automatically load all images "
+"found in that image's directory."
+msgstr ""
+"Indien geactiveerd zal 'Afbeelding openen' in Mirage automatisch alle "
+"afbeeldingen in de map van die afbeelding laden."
+
+#: mirage.py:2559
+msgid "Allow loading hidden files"
+msgstr "Toelaten om verborgen bestanden te laden"
+
+#: mirage.py:2561
+msgid ""
+"If checked, Mirage will open hidden files. Otherwise, hidden files will be "
+"ignored."
+msgstr ""
+"Indien aangevinkt dan zal Mirage verborgen bestanden openen. Anders zullen "
+"verborgen bestanden worden genegeerd."
+
+#: mirage.py:2563
+msgid "Use Numerical aware sort"
+msgstr "Gebruik numeriekbewuste sortering"
+
+#: mirage.py:2565
+msgid ""
+"If checked, Mirage will sort the images based on a numerical aware sort."
+msgstr "Indien aangevinkt zal Mirage de afbeeldingen numeriek sorteren."
+
+#: mirage.py:2567
+msgid "Casesensitive sort"
+msgstr "Hoofdlettergevoelige sortering"
+
+#: mirage.py:2569
+msgid "If checked, a case-sensitive sort will be used"
+msgstr ""
+"Indien aangevinkt zal een hoofdlettergevoelige sortering gebruikt worden"
+
+#: mirage.py:2574
+msgid "Use last chosen directory"
+msgstr "Gebruik laatst gekozen map"
+
+#: mirage.py:2575
+msgid "The default 'Open' directory will be the last directory used."
+msgstr "De laatst gebruikte map als standaardmap voor openen gebruiken."
+
+#: mirage.py:2576
+msgid "Use this fixed directory:"
+msgstr "Gebruik deze vaste map:"
+
+#: mirage.py:2578
+msgid "The default 'Open' directory will be this specified directory."
+msgstr "De gespecifieerde map als standaardmap voor openen gebruiken."
+
+#: mirage.py:2614 mirage.py:2726
+msgid "Navigation"
+msgstr "Navigatie"
+
+#: mirage.py:2616
+msgid "Preload images for faster navigation"
+msgstr "Afbeeldingen voorladen voor snellere navigatie"
+
+#: mirage.py:2618
+msgid ""
+"If enabled, the next and previous images in the list will be preloaded "
+"during idle time. Note that the speed increase comes at the expense of "
+"memory usage, so it is recommended to disable this option on machines with "
+"limited ram."
+msgstr ""
+"Indien geactiveerd dan zullen de volgende en vorige afbeeldingen in de lijst "
+"worden voorgeladen gedurende niet-benutte tijd. Merk op dat de geboekte "
+"snelheidswinst ten koste gaat van het geheugengebruik, het is aangeraden om "
+"deze optie uit te schakelen op machines met beperkt geheugen."
+
+#: mirage.py:2620
+msgid "Wrap around imagelist:"
+msgstr "Doorlopen bij afbeeldingslijst:"
+
+#: mirage.py:2624
+msgid "Prompt User"
+msgstr "Gebruiker vragen"
+
+#: mirage.py:2643 mirage.py:4587
+msgid "Slideshow Mode"
+msgstr "Diavoorstelling"
+
+#: mirage.py:2646
+msgid "Delay between images in seconds:"
+msgstr "Vertraging tussen afbeeldingen in seconden:"
+
+#: mirage.py:2651
+msgid "Randomize order of images"
+msgstr "Afbeeldigen in willekeurige volgorde"
+
+#: mirage.py:2653
+msgid ""
+"If enabled, a random image will be chosen during slideshow mode (without "
+"loading any image twice)."
+msgstr ""
+"Indien geactiveerd dan zal een willekeurige afbeelding worden gekozen "
+"tijdens diavoorstellingsmodus (zonder de afbeelding tweemaal te laden)."
+
+#: mirage.py:2654
+msgid "Disable screensaver in slideshow mode"
+msgstr "Schermbeveiliging in diavoorstellingsmodus uitschakelen"
+
+#: mirage.py:2656
+msgid ""
+"If enabled, xscreensaver will be temporarily disabled during slideshow mode."
+msgstr ""
+"Indien geactiveerd dan zal xscreensaver tijdelijk worden uitgeschakeld "
+"tijdens diavoorstellingsmodus."
+
+#: mirage.py:2657
+msgid "Always start in fullscreen mode"
+msgstr "Altijd in volledig scherm modus starten"
+
+#: mirage.py:2658
+msgid ""
+"If enabled, starting a slideshow will put the application in fullscreen mode."
+msgstr ""
+"Indien geactiveerd dan zal het starten van een diavoorstelling de toepassing "
+"in volledige scherm modus plaatsen."
+
+#: mirage.py:2676
+msgid "Image Editing"
+msgstr "Afbeelding bewerken"
+
+#: mirage.py:2678
+msgid "Confirm image delete"
+msgstr "Verwijderen van afbeeldingen bevestigen"
+
+#: mirage.py:2682
+#, fuzzy
+msgid "Scaling quality:"
+msgstr "Schaalkwaliteit:"
+
+#: mirage.py:2684
+msgid "Nearest (Fastest)"
+msgstr "Dichtse benadering (snelst)"
+
+#: mirage.py:2685
+msgid "Tiles"
+msgstr "Tegels"
+
+#: mirage.py:2686
+msgid "Bilinear"
+msgstr "Bilinear"
+
+#: mirage.py:2687
+msgid "Hyper (Best)"
+msgstr "Hyper (best)"
+
+#: mirage.py:2693
+msgid "Modified images:"
+msgstr "Gewijzigde afbeeldingen:"
+
+#: mirage.py:2695
+msgid "Ignore Changes"
+msgstr "Wijzigingen negeren"
+
+#: mirage.py:2696
+msgid "Auto-Save"
+msgstr "Automatisch opslaan"
+
+#: mirage.py:2697
+msgid "Prompt For Action"
+msgstr "Vragen wat er dient te gebeuren"
+
+#: mirage.py:2703
+msgid "Quality to save in:"
+msgstr "Opslaan in kwaliteit:"
+
+#: mirage.py:2725
+msgid "Behavior"
+msgstr "Gedrag"
+
+#: mirage.py:2728
+msgid "Slideshow"
+msgstr "Diavoorstelling"
+
+#: mirage.py:2729
+msgid "Image"
+msgstr "Afbeelding"
+
+#: mirage.py:2813
+msgid "_Rename"
+msgstr "_Hernoemen"
+
+#: mirage.py:2824
+msgid "Enter the new name:"
+msgstr "Geef de nieuwe naam:"
+
+#: mirage.py:2856
+#, python-format
+msgid "Unable to rename %s"
+msgstr "Kan %s niet hernoemen"
+
+#: mirage.py:2857
+msgid "Unable to rename"
+msgstr "Kan niet hernoemen"
+
+#: mirage.py:2876
+#, python-format
+msgid "Are you sure you wish to permanently delete %s?"
+msgstr "Bent u zeker dat u %s definitief wilt verwijderen?"
+
+#: mirage.py:2937
+#, python-format
+msgid "Unable to delete %s"
+msgstr "Kan %s niet verwijderen"
+
+#: mirage.py:2938
+msgid "Unable to delete"
+msgstr "Kan niet verwijderen"
+
+#: mirage.py:2946
+msgid "Choose directory"
+msgstr "Kies map"
+
+#: mirage.py:2994
+msgid "A fast GTK+ Image Viewer."
+msgstr "Een snel GTK+ afbeeldingsweergaveprogramma."
+
+#: mirage.py:3036
+msgid "Unable to launch a suitable browser."
+msgstr "Kan geen geschikte browser starten."
+
+#: mirage.py:3344
+msgid "C_rop"
+msgstr "_Bijsnijden"
+
+#: mirage.py:3386 mirage.py:3599
+msgid "Width:"
+msgstr "Breedte:"
+
+#: mirage.py:3393 mirage.py:3610
+msgid "Height:"
+msgstr "Hoogte:"
+
+#: mirage.py:3539
+msgid "Saturation"
+msgstr "Verzadiging"
+
+#: mirage.py:3540
+msgid "_Saturate"
+msgstr "_Verzadigen"
+
+#: mirage.py:3551
+msgid "Saturation level:"
+msgstr "Verzadigingsniveau:"
+
+#: mirage.py:3589
+msgid "_Resize"
+msgstr "_Schalen"
+
+#: mirage.py:3603 mirage.py:3615
+msgid "pixels"
+msgstr "pixels"
+
+#: mirage.py:3617
+msgid "Preserve aspect ratio"
+msgstr "Verhouding behouden"
+
+#: mirage.py:3758
+msgid ""
+"You are viewing the first image in the list. Wrap around to the last image?"
+msgstr ""
+"U bekijkt de eerste afbeelding in de lijst. Doorlopen naar de laatste "
+"afbeelding?"
+
+#: mirage.py:3760
+msgid ""
+"You are viewing the last image in the list. Wrap around to the first image?"
+msgstr ""
+"U bekijkt de laatste afbeelding in de lijst. Doorlopen naar de eerste "
+"afbeelding?"
+
+#: mirage.py:3762
+msgid ""
+"All images have been viewed. Would you like to cycle through the images "
+"again?"
+msgstr ""
+"Alle afbeeldingen zijn bekeken. Wilt u de afbeeldingen opnieuw doorlopen?"
+
+#: mirage.py:3763
+msgid "Wrap?"
+msgstr "Doorgaan?"
+
+#: mirage.py:3862 mirage.py:3975 mirage.py:3992 mirage.py:4055 mirage.py:4349
+#, python-format
+msgid "Loading: %s"
+msgstr "Laden: %s"
+
+#: mirage.py:4136 mirage.py:4188
+#, python-format
+msgid "Preloading: %s"
+msgstr "Voorladen: %s"
+
+#: mirage.py:4259 mirage.py:4457
+#, python-format
+msgid "Skipping: %s"
+msgstr "Overslaan: %s"
+
+#: mirage.py:4316
+#, python-format
+msgid "Found: %(item)s [%(number)i]"
+msgstr "Gevonden: %(item)s [%(number)i]"
+
+#: mirage.py:4453
+#, python-format
+msgid "Found: %(fullpath)s [%(number)i]"
+msgstr "Gevonden: %(fullpath)s [%(number)i]"
+
+#: mirage.py:4585
+#, python-format
+msgid "[%(current)i of %(total)i]"
+msgstr "[%(current)i van %(total)i]"
