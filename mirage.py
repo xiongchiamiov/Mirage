@@ -1434,7 +1434,7 @@ class Base:
 			if self.curr_slideshow_random:
 				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
 			else:
-				self.timer_delay = gobject.timeout_add((self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
+				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
 		self.window.set_focus(self.layout)
 
 	def random_changed(self, action):
