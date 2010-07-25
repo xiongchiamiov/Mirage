@@ -1,7 +1,7 @@
 # $HeadURL$
 # $Id$
 
-__version__ = "0.9.5.1-svn"
+__version__ = "0.10-svn"
 
 __license__ = """
 Mirage, a fast GTK+ Image Viewer
@@ -3268,6 +3268,14 @@ class Base:
 				self.put_zoom_image_to_window(False)
 				self.update_statusbar()
 
+	def zoom_check_and_execute(self,action, is_preloadimg_next, is_preloadimg_prev):
+		if self.usettings['open_mode'] == self.open_mode_smart or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_smart):
+			self.zoom_to_fit_or_1_to_1(action, is_preloadimg_next, is_preloadimg_prev)
+		elif self.usettings['open_mode'] == self.open_mode_fit or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_fit):
+			self.zoom_to_fit_window(action, is_preloadimg_next, is_preloadimg_prev)
+		elif self.usettings['open_mode'] == self.open_mode_1to1 or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_1to1):
+			self.zoom_1_to_1(action, is_preloadimg_next, is_preloadimg_prev)
+
 	def rotate_left(self, action):
 		self.rotate_left_or_right(self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Left'), 90)
 
@@ -4062,12 +4070,8 @@ class Base:
 				if not use_current_pixbuf_original:
 					self.currimg_pixbuf_original = animtest.get_static_image()
 				self.set_image_sensitivities(True)
-				if self.usettings['open_mode'] == self.open_mode_smart or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_smart):
-					self.zoom_to_fit_or_1_to_1(None, False, False)
-				elif self.usettings['open_mode'] == self.open_mode_fit or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_fit):
-					self.zoom_to_fit_window(None, False, False)
-				elif self.usettings['open_mode'] == self.open_mode_1to1 or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_1to1):
-					self.zoom_1_to_1(None, False, False)
+				# Check zoomratio
+				self.zoom_check_and_execute(None, False, False)
 			else:
 				self.currimg_is_animation = True
 				if not use_current_pixbuf_original:
@@ -4113,12 +4117,7 @@ class Base:
 				if self.preloadimg_next_in_list == -1:
 					return
 				# Determine self.preloadimg_next_zoomratio
-				if self.usettings['open_mode'] == self.open_mode_smart or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_smart):
-					self.zoom_to_fit_or_1_to_1(None, True, False)
-				elif self.usettings['open_mode'] == self.open_mode_fit or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_fit):
-					self.zoom_to_fit_window(None, True, False)
-				elif self.usettings['open_mode'] == self.open_mode_1to1 or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_1to1):
-					self.zoom_1_to_1(None, True, False)
+				self.zoom_check_and_execute(None, True, False)
 				# Always start with the original image to preserve quality!
 				# Calculate image size:
 				self.preloadimg_next_width = int(self.preloadimg_next_pixbuf_original.get_width() * self.preloadimg_next_zoomratio)
@@ -4165,12 +4164,7 @@ class Base:
 				if self.preloadimg_prev_in_list == -1:
 					return
 				# Determine self.preloadimg_prev_zoomratio
-				if self.usettings['open_mode'] == self.open_mode_smart or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_smart):
-					self.zoom_to_fit_or_1_to_1(None, False, True)
-				elif self.usettings['open_mode'] == self.open_mode_fit or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_fit):
-					self.zoom_to_fit_window(None, False, True)
-				elif self.usettings['open_mode'] == self.open_mode_1to1 or (self.usettings['open_mode'] == self.open_mode_last and self.usettings['last_mode'] == self.open_mode_1to1):
-					self.zoom_1_to_1(None, False, True)
+				self.zoom_check_and_execute(None, False, True)
 				# Always start with the original image to preserve quality!
 				# Calculate image size:
 				self.preloadimg_prev_width = int(self.preloadimg_prev_pixbuf_original.get_width() * self.preloadimg_prev_zoomratio)
