@@ -83,8 +83,8 @@ class Base:
 		
 		# FIX THIS! Does not work on windows and what happens if mo-files exists
 		# in both dirs?
-		gettext.install('mirage', '/usr/share/locale')
-		gettext.install('mirage', '/usr/local/share/locale')
+		gettext.install('mirage', '/usr/share/locale', unicode=1)
+		gettext.install('mirage', '/usr/local/share/locale', unicode=1)
 
 		# Constants
 		self.open_mode_smart = 0
