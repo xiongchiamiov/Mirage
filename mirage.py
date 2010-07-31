@@ -3703,7 +3703,11 @@ class Base:
 		self.goto_image("LAST", action)
 		
 	def goto_image(self, location, action):
-		# location can be "LAST", "FIRST", "NEXT", "PREV", "RANDOM", or a number
+		"""Goes to the image specified by location. Location can be "LAST",
+			"FIRST", "NEXT", "PREV", "RANDOM", or a number. If  at last image
+			and "NEXT" is issued, it will wrap around or not depending on
+			self.usettings['listwrap_mode']. Same action is made for first image
+			and "PREV". """
 		if self.slideshow_mode and action != "ss":
 			gobject.source_remove(self.timer_delay)
 		if ((location=="PREV" or location=="NEXT" or location=="RANDOM") and len(self.image_list) > 1) or (location=="FIRST" and (len(self.image_list) > 1 and self.curr_img_in_list != 0)) or (location=="LAST" and (len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1)) or valid_int(location):
@@ -3712,6 +3716,7 @@ class Base:
 			if cancel:
 				return
 			check_wrap = False
+			prev_img = self.curr_img_in_list
 			if location != "RANDOM":
 				self.randomlist = []
 			if location == "FIRST":
@@ -3726,10 +3731,7 @@ class Base:
 						if not item:
 							all_items_are_true = False
 					if all_items_are_true:
-						if not self.slideshow_mode or (self.slideshow_mode and self.usettings['listwrap_mode'] == 1):
-							self.reinitialize_randomlist()
-						else:
-							check_wrap = True
+						check_wrap = True
 			elif location == "LAST":
 				self.curr_img_in_list = len(self.image_list)-1
 			elif location == "PREV":
@@ -3742,18 +3744,25 @@ class Base:
 					self.curr_img_in_list += 1
 				else:
 					check_wrap = True
-			if check_wrap:
+			if check_wrap: #we are at the beginning or end of the list or all images have been viewed in random mode
 				if self.usettings['listwrap_mode'] == 0:
-					if location == "NEXT":
-						if self.slideshow_mode:
-							self.toggle_slideshow(None)
-					return
-				elif (location == "PREV" or location == "NEXT") and self.usettings['listwrap_mode'] == 1:
+					if self.slideshow_mode and ((action == "ss" and (location == "NEXT" or location == "RANDOM")) or (action != "ss" and location == "NEXT")): #automatic next/random action or manual next action, stop slideshow
+						self.toggle_slideshow(None)
+						return
+					elif self.slideshow_mode and action != "ss" and location == "PREV": #manual prev action, keep slideshow going
+						pass
+					elif not self.slideshow_mode and action != "ss" and (location == "PREV" or location == "NEXT"): #manual prev/next action, ignore as if not pressed
+						return
+					elif not self.slideshow_mode and action != "ss" and location == "RANDOM": #always next random image when pressing 'R'
+						self.reinitialize_randomlist()
+				elif self.usettings['listwrap_mode'] == 1:
 					if location == "PREV":
 						self.curr_img_in_list = len(self.image_list) - 1
 					elif location == "NEXT":
 						self.curr_img_in_list = 0
-				else:
+					elif location == "RANDOM": #always next random image
+						self.reinitialize_randomlist()
+				elif self.usettings['listwrap_mode'] == 2:
 					if self.curr_img_in_list != self.loaded_img_in_list:
 						# Ensure that the user is looking at the correct "last" image before
 						# they are asked the wrap question:
@@ -3774,29 +3783,47 @@ class Base:
 					dialog.set_title(_("Wrap?"))
 					dialog.label.set_property('can-focus', False)
 					dialog.set_default_response(gtk.RESPONSE_YES)
-					self.user_prompt_visible = True
-					response = dialog.run()
+					# Wrapping dialog.run() and .destroy() in .threads_enter()/leave() to prevent a hangup on linux
+					# Could be done better with 'with gtk.gdk.lock:' but that doesn't work on windows.
+					try:
+						gtk.gdk.threads_enter()
+						self.user_prompt_visible = True
+						response = dialog.run()
+					except:
+						gtk.gdk.threads_leave()
+						self.user_prompt_visible = False
 					if response == gtk.RESPONSE_YES:
+						try:
+							dialog.destroy()
+							self.user_prompt_visible = False
+						finally:
+							gtk.gdk.threads_leave()
 						if location == "PREV":
 							self.curr_img_in_list = len(self.image_list)-1
 						elif location == "NEXT":
 							self.curr_img_in_list = 0
 						elif location == "RANDOM":
 							self.reinitialize_randomlist()
-						dialog.destroy()
-						self.user_prompt_visible = False
+
 						if self.fullscreen_mode:
 							self.hide_cursor
 					else:
-						dialog.destroy()
-						self.user_prompt_visible = False
+						try:
+							dialog.destroy()
+							self.user_prompt_visible = False
+						finally:
+							gtk.gdk.threads_leave()
 						if self.fullscreen_mode:
 							self.hide_cursor
 						else:
 							self.change_cursor(None)
-						if self.slideshow_mode:
+						if self.slideshow_mode and action != "ss" and location == "PREV": #manual prev action, keep slideshow going
+							pass
+						elif self.slideshow_mode and ((action == "ss" and (location == "NEXT" or location == "RANDOM")) or (action != "ss" and location == "NEXT")): #automatic next/random action or manual next action, stop slideshow
 							self.toggle_slideshow(None)
-						return
+							return
+						elif not self.slideshow_mode and action != "ss" and (location == "PREV" or location == "NEXT" or location == "RANDOM"): #manual prev/next/random action, ignore as if not pressed
+							return
 			if location == "RANDOM":
 				# Find random image that hasn't already been chosen:
 				j = random.randint(0, len(self.image_list)-1)
@@ -3806,22 +3833,22 @@ class Base:
 				self.randomlist[j] = True
 				self.currimg_name = str(self.image_list[self.curr_img_in_list])
 			if valid_int(location):
-				prev_img = self.curr_img_in_list
 				self.curr_img_in_list = int(location)
-			if not self.fullscreen_mode and (not self.slideshow_mode or (self.slideshow_mode and action != "ss")):
-				self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-			if location == "PREV" or (valid_int(location) and int(location) == prev_img-1):
-				self.load_when_idle = gobject.idle_add(self.load_new_image, True, False, True, True, True, True)
-			else:
-				self.load_when_idle = gobject.idle_add(self.load_new_image, False, False, True, True, True, True)
-			self.set_go_navigation_sensitivities(False)
+			if self.curr_img_in_list != prev_img: #don't load the same image again if already loaded
+				if not self.fullscreen_mode and (not self.slideshow_mode or (self.slideshow_mode and action != "ss")):
+					self.change_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+				if location == "PREV" or (valid_int(location) and int(location) == prev_img-1):
+					self.load_when_idle = gobject.idle_add(self.load_new_image, True, False, True, True, True, True)
+				else:
+					self.load_when_idle = gobject.idle_add(self.load_new_image, False, False, True, True, True, True)
+				self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode:
 				if self.curr_slideshow_random:
 					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
 				else:
 					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
 			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
-		
+
 	def set_go_navigation_sensitivities(self, skip_initial_check):
 		# setting skip_image_list_check to True is useful when calling from
 		# expand_filelist_and_load_image() for example, as self.image_list has not
