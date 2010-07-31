@@ -1,6 +1,9 @@
 v0.10.0 - Future
 	+ Added Numerical Aware Comparison (numacomp) as a sorting option.
+	+ Bug: Fixing an issue where the Wrap?-dialog would hangup in slideshow mode
+		when wrap mode was set to ask
 	+ Changes: various code updates
+	+ Changes: Behaviour of slideshow mode modified
 
 v0.9.5.1 - July 23, 2010
 	+ Added dutch translation

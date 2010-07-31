@@ -3784,35 +3784,27 @@ class Base:
 					dialog.label.set_property('can-focus', False)
 					dialog.set_default_response(gtk.RESPONSE_YES)
 					# Wrapping dialog.run() and .destroy() in .threads_enter()/leave() to prevent a hangup on linux
-					# Could be done better with 'with gtk.gdk.lock:' but that doesn't work on windows.
+					# Could also be done with 'with gtk.gdk.lock:' but that doesn't work on windows.
 					try:
 						gtk.gdk.threads_enter()
 						self.user_prompt_visible = True
 						response = dialog.run()
+						dialog.destroy()
 					except:
+						response = None
+					finally:
 						gtk.gdk.threads_leave()
 						self.user_prompt_visible = False
 					if response == gtk.RESPONSE_YES:
-						try:
-							dialog.destroy()
-							self.user_prompt_visible = False
-						finally:
-							gtk.gdk.threads_leave()
 						if location == "PREV":
 							self.curr_img_in_list = len(self.image_list)-1
 						elif location == "NEXT":
 							self.curr_img_in_list = 0
 						elif location == "RANDOM":
 							self.reinitialize_randomlist()
-
 						if self.fullscreen_mode:
 							self.hide_cursor
 					else:
-						try:
-							dialog.destroy()
-							self.user_prompt_visible = False
-						finally:
-							gtk.gdk.threads_leave()
 						if self.fullscreen_mode:
 							self.hide_cursor
 						else:
