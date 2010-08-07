@@ -1086,7 +1086,7 @@ class Base:
 	def topwindow_keypress(self, widget, event):
 		# For whatever reason, 'Left' and 'Right' cannot be used as menu
 		# accelerators so we will manually check for them here:
-		if event.state != gtk.gdk.SHIFT_MASK and event.state != gtk.gdk.CONTROL_MASK and event.state != gtk.gdk.MOD1_MASK and event.state != gtk.gdk.CONTROL_MASK | gtk.gdk.MOD2_MASK and event.state != gtk.gdk.LOCK_MASK | gtk.gdk.CONTROL_MASK:
+		if (not (event.state & gtk.gdk.SHIFT_MASK)) and not (event.state & gtk.gdk.CONTROL_MASK) and not (event.state & gtk.gdk.MOD1_MASK) and not (event.state & gtk.gdk.MOD2_MASK) and not (event.state & gtk.gdk.LOCK_MASK):
 			if event.keyval == gtk.gdk.keyval_from_name('Left') or event.keyval == gtk.gdk.keyval_from_name('Up'):
 				self.goto_prev_image(None)
 				return
