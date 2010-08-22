@@ -2492,62 +2492,39 @@ class Base:
 		hbox = gtk.HBox()
 		hbox.pack_start(vbox_left, False, False, 3)
 		hbox.pack_start(vbox_right, False, False, 3)
-
+		includes_exif = False
 		if HAS_EXIF:
 			exifd = pyexiv2.ImageMetadata(self.currimg_name)
 			exifd.read()
-			if "Exif.Photo" in exifd.exif_keys:
+			if ([x for x in exifd.exif_keys if "Exif.Photo" in x]):
+				includes_exif = True
 				# The exif data
 				exif_lbox = gtk.VBox()
 				exif_title = gtk.Label(_("Exifdata"))
 				exif_title.set_alignment(1,1)
-				aperture_l = gtk.Label(_("Aperture:"))
-				aperture_l.set_alignment(1, 1)
-				expo_l = gtk.Label(_("Exposure time:"))
-				expo_l.set_alignment(1, 1)
-				focal_l = gtk.Label(_("Focal length:"))
-				focal_l.set_alignment(1, 1)
-				date_l = gtk.Label(_("Time taken:"))
-				date_l.set_alignment(1, 1)
+				#for line alignment
+				exif_vbox = gtk.VBox()
+				exif_empty = gtk.Label(" ")
+
+				expo_l, expo_v = self.exif_return_label(exifd, _("Exposure time:"), _("%s sec"),"Exif.Photo.ExposureTime", "rat_frac")
+				aperture_l, aperture_v = self.exif_return_label(exifd, _("Aperture:"), _("%s"),"Exif.Photo.FNumber", "rat_float")
+				focal_l, focal_v = self.exif_return_label(exifd, _("Focal length:"), _("%s mm"),"Exif.Photo.FocalLength", "rat_int")
+				date_l, date_v = self.exif_return_label(exifd, _("Time taken:"), _("%s"),"Exif.Photo.DateTimeOriginal", "str")
+				ISO_l, ISO_v = self.exif_return_label(exifd, _("ISO Speed:"), _("%s"),"Exif.Photo.ISOSpeedRatings", "int")
 				exif_lbox.pack_start(exif_title, False, False, 2)
 				exif_lbox.pack_start(aperture_l, False, False, 2)
 				exif_lbox.pack_start(expo_l, False, False, 2)
 				exif_lbox.pack_start(focal_l, False, False, 2)
+				exif_lbox.pack_start(ISO_l, False, False, 2)
+				
 				exif_lbox.pack_start(date_l, False, False, 2)
 
-				# The exif values
-				key = "Exif.Photo.FNumber"
-				if key in exifd.exif_keys:
-					aperture_v = gtk.Label(str(exifd[key].value.to_float()))
-				else:
-					aperture_v = gtk.Label("-")
-				aperture_v.set_alignment(0,1)
 
-				key = "Exif.Photo.ExposureTime"
-				if key in exifd.exif_keys:
-					expo_v = gtk.Label( _("%s sec") % Fraction(str(exifd[key].value)))
-				else:
-					expo_v = gtk.Label("-")
-				expo_v.set_alignment(0,1)
-
-				key = "Exif.Photo.FocalLength"
-				if key in exifd.exif_keys:
-					focal_v = gtk.Label(_("%d mm") % int(exifd[key].value.to_float()))
-				else:
-					focal_v = gtk.Label("-")
-				focal_v.set_alignment(0,1)
-				key = "Exif.Photo.DateTimeOriginal"
-				if key in exifd.exif_keys:
-					date_v = gtk.Label(exifd[key].value)
-				else:
-					date_v = gtk.Label("-")
-
-				exif_vbox = gtk.VBox()
-				exif_empty = gtk.Label(" ")
 				exif_vbox.pack_start(exif_empty, False, False, 2)
 				exif_vbox.pack_start(aperture_v, False, False, 2)
 				exif_vbox.pack_start(expo_v, False, False, 2)
 				exif_vbox.pack_start(focal_v, False, False, 2)
+				exif_vbox.pack_start(ISO_v, False, False, 2)
 				exif_vbox.pack_start(date_v, False, False, 2)
 
 				hbox2 = gtk.HBox()
@@ -2557,7 +2534,7 @@ class Base:
 		#Show the box
 		table.attach(image, 1, 2, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table.attach(hbox, 2, 3, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
-		if HAS_EXIF and ("Exif.Photo" in exifd.exif_keys):
+		if HAS_EXIF and includes_exif:
 			table.attach(hbox2, 3, 4, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		show_props.vbox.pack_start(table, False, False, 15)
 		show_props.vbox.show_all()
@@ -2565,6 +2542,27 @@ class Base:
 		close_button.grab_focus()
 		show_props.run()
 		show_props.destroy()
+
+	def exif_return_label(self, exif, label_v, format, tag, type="str"):
+		label = gtk.Label(label_v)
+		label.set_alignment(1, 1)
+		if tag in exif.exif_keys:
+			raw = exif[tag].value
+			if type == "rat_frac":
+				val = Fraction(str(raw))
+			elif type == "rat_float":
+				val = raw.to_float()
+			elif type == "rat_int":
+				val = int(raw.to_float())
+			elif type == "int":
+				val = int(raw)
+			else:
+				val = raw
+			value = gtk.Label(format % str(val))
+		else:
+			value = gtk.Label("-")
+		value.set_alignment(0,1)
+		return label, value
 
 	def show_prefs(self, action):
 		prev_thumbnail_size = self.usettings['thumbnail_size']
