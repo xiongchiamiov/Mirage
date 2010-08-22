@@ -33,8 +33,8 @@ import tempfile, socket, threading
 from fractions import Fraction 
 
 try:
- 	import mirage_numacomp as numacomp
- 	HAVE_NUMACOMP = True
+	import mirage_numacomp as numacomp
+	HAVE_NUMACOMP = True
 except:
 	HAVE_NUMACOMP = False
 	print "mirage_numacomp.so not found, unable to do numerical aware sorting."
@@ -101,14 +101,14 @@ class Base:
 		self.open_mode_1to1 = 2
 		self.open_mode_last = 3
 		self.min_zoomratio = 0.02
-		
+
 		# Create a dictionary with all settings the users can do in the interface
 		self.usettings = {}
 		# Initialize vars:
 		self.usettings['window_width'] = 600
 		self.usettings['window_height'] = 400
 		self.usettings['simple_bgcolor'] = False
-		
+
 		# Current image:
 		self.curr_img_in_list = 0
 		self.currimg_name = ""
@@ -124,7 +124,7 @@ class Base:
 		# In this case, self.curr_img_in_list will increment while
 		# self.loaded_img_in_list will retain the current loaded image.
 		self.loaded_img_in_list = 0
-		
+
 		# Next preloaded image:
 		self.preloadimg_next_in_list = -1
 		self.preloadimg_next_name = ""
@@ -134,7 +134,7 @@ class Base:
 		self.preloadimg_next_pixbuf_original = None
 		self.preloadimg_next_zoomratio = 1
 		self.preloadimg_next_is_animation = False
-		
+
 		# Previous preloaded image:
 		self.preloadimg_prev_in_list = -1
 		self.preloadimg_prev_name = ""
@@ -144,7 +144,7 @@ class Base:
 		self.preloadimg_prev_pixbuf_original = None
 		self.preloadimg_prev_zoomratio = 1
 		self.preloadimg_prev_is_animation = False
-		
+
 		# Settings, misc:
 		self.usettings['toolbar_show'] = True
 		self.usettings['thumbpane_show'] = True
@@ -199,7 +199,7 @@ class Base:
 		self.usettings['use_numacomp'] = False
 		self.usettings['case_numacomp'] = False
 		self.thumbnail_sizes = ["128", "96", "72", "64", "48", "32"]
-		self.usettings['thumbnail_size'] = 128 					# Default to 128 x 128
+		self.usettings['thumbnail_size'] = 128	# Default to 128 x 128
 		self.thumbnail_loaded = []
 		self.thumbpane_updating = False
 		self.usettings['recentfiles'] = ["", "", "", "", ""]
@@ -240,7 +240,7 @@ class Base:
 		self.config_dir = (os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')) + '/mirage'
 		# Load config from disk:
 		self.read_config_and_set_settings()
-		
+
 		# slideshow_delay is the user's preference, whereas curr_slideshow_delay is
 		# the current delay (which can be changed without affecting the 'default')
 		self.curr_slideshow_delay = self.usettings['slideshow_delay']
@@ -249,7 +249,7 @@ class Base:
 
 		# Find application images/pixmaps
 		self.resource_path_list = False
-		
+
 		self.blank_image = gtk.gdk.pixbuf_new_from_file(self.find_path("mirage_blank.png"))
 
 		# Define the main menubar and toolbar:
@@ -343,7 +343,7 @@ class Base:
 			('Status Bar', None, _('_Status Bar'), None, _('Status Bar'), self.toggle_status_bar, self.usettings['statusbar_show']),
 			('Toolbar', None, _('_Toolbar'), None, _('Toolbar'), self.toggle_toolbar, self.usettings['toolbar_show']),
 			('Thumbnails Pane', None, _('Thumbnails _Pane'), None, _('Thumbnails Pane'), self.toggle_thumbpane, self.usettings['thumbpane_show'])
-				)
+			)
 
 		# Populate keys[]:
 		self.keys=[]
@@ -514,7 +514,7 @@ class Base:
 		self.thumbscroll = gtk.ScrolledWindow()
 		self.thumbscroll.set_policy(gtk.POLICY_NEVER, gtk.POLICY_ALWAYS)
 		self.thumbscroll.add(self.thumbpane)
-		
+
 		self.table.attach(self.thumbscroll, 0, 1, 0, 1, 0, gtk.FILL|gtk.EXPAND, 0, 0)
 		self.table.attach(self.layout, 1, 2, 0, 1, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 0, 0)
 		self.table.attach(self.hscroll, 1, 2, 1, 2, gtk.FILL|gtk.SHRINK, gtk.FILL|gtk.SHRINK, 0, 0)
@@ -541,7 +541,7 @@ class Base:
 		self.window.add(vbox)
 		self.window.set_property('allow-shrink', False)
 		self.window.set_default_size(self.usettings['window_width'],self.usettings['window_height'])
-		
+
 		# Slideshow control:
 		self.slideshow_window = gtk.Window(gtk.WINDOW_POPUP)
 		self.slideshow_controls = gtk.HBox()
@@ -591,7 +591,7 @@ class Base:
 		except:
 			self.ss_randomize.set_label("Rand")
 		self.ss_randomize.connect('toggled', self.random_changed)
-		
+
 		spin_adj = gtk.Adjustment(self.usettings['slideshow_delay'], 0, 50000, 1,100, 0)
 		self.ss_delayspin = gtk.SpinButton(spin_adj, 1.0, 0)
 		self.ss_delayspin.set_numeric(True)
@@ -677,7 +677,7 @@ class Base:
 		self.UIManager.get_widget('/Popup/Exit Full Screen').hide()
 		self.layout.set_flags(gtk.CAN_FOCUS)
 		self.window.set_focus(self.layout)
-		
+
 		#sets the visibility of some menu entries
 		self.set_slideshow_sensitivities()
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
@@ -799,7 +799,7 @@ class Base:
 			# Read accel_map file, if it exists
 			if os.path.isfile(self.config_dir + '/accel_map'):
 				gtk.accel_map_load(self.config_dir + '/accel_map')
-		
+
 	def refresh_recent_files_menu(self):
 		if self.merge_id_recent:
 			self.UIManager.remove_ui(self.merge_id_recent)
@@ -860,7 +860,7 @@ class Base:
 		self.merge_id = self.UIManager.add_ui_from_string(uiDescription)
 		self.UIManager.insert_action_group(self.actionGroupCustom, 0)
 		self.UIManager.get_widget('/MainMenu/MiscKeysMenuHidden').set_property('visible', False)
-		
+
 	def thumbpane_update_images(self, clear_first=False, force_upto_imgnum=-1):
 		self.stop_now = False
 		# When first populating the thumbpane, make sure we go up to at least
@@ -903,7 +903,7 @@ class Base:
 					gobject.idle_add(self.thumbpane_select, force_upto_imgnum)
 			imgnum += 1
 		self.thumbpane_updating = False
-	
+
 	def thumbpane_clear_list(self):
 		self.thumbpane_bottom_coord_loaded = 0
 		self.thumbscroll.get_vscrollbar().handler_block(self.thumb_scroll_handler)
@@ -931,19 +931,19 @@ class Base:
 					except:
 						pass
 					self.thumbscroll.get_vscrollbar().handler_unblock(self.thumb_scroll_handler)
-	
+
 	def thumbnail_get_name(self, image_name):
 		filename = os.path.expanduser('file://' + image_name)
 		uriname = os.path.expanduser('file://' + urllib.pathname2url(image_name))
 		if HAS_HASHLIB:
-		    m = hashlib.md5()
+			m = hashlib.md5()
 		else:
-		    m = md5.new()
+			m = md5.new()
 		m.update(uriname)
 		mhex = m.hexdigest()
 		mhex_filename = os.path.expanduser('~/.thumbnails/normal/' + mhex + '.png')
 		return filename, mhex_filename
-		
+
 	def thumbpane_get_pixbuf(self, thumb_url, image_url, force_generation):
 		# Returns a valid pixbuf or None if a pixbuf cannot be generated. Tries to re-use
 		# a thumbnail from ~/.thumbails/normal/, otherwise generates one with the
@@ -972,11 +972,11 @@ class Base:
 			return pix
 		except:
 			return None
-	
+
 	def thumbpane_load_image(self, treeview, imgnum):
 		if imgnum != self.curr_img_in_list:
 			gobject.idle_add(self.goto_image, str(imgnum), None)
-		
+
 	def thumbpane_selection_changed(self, treeview):
 		cancel = self.autosave_image()
 		if cancel:
@@ -991,7 +991,7 @@ class Base:
 			gobject.idle_add(self.thumbpane_load_image, treeview, imgnum)
 		except:
 			pass
-		
+
 	def thumbpane_select(self, imgnum):
 		if self.usettings['thumbpane_show']:
 			self.thumbpane.get_selection().handler_block(self.thumb_sel_handler)
@@ -1005,10 +1005,10 @@ class Base:
 	def thumbpane_set_size(self):
 		self.thumbcolumn.set_fixed_width(self.thumbpane_get_size())
 		self.window_resized(None, self.window.allocation, True)
-	
+
 	def thumbpane_get_size(self):
 		return int(self.usettings['thumbnail_size'] * 1.3)
-	
+
 	def thumbpane_scrolled(self, range):
 		self.thumbpane_update_images()
 
@@ -1087,7 +1087,7 @@ class Base:
 					self.zoom_to_fit_or_1_to_1(None, False, False)
 				else:
 					self.zoom_to_fit_window(None, False, False)
-	
+
 	def toolbar_focused(self, widget, direction):
 		self.layout.grab_focus()
 		return True
@@ -1213,7 +1213,7 @@ class Base:
 				self.recent_file_remove_and_refresh(index_num)
 				break
 			index_num += index_num
-	
+
 	def recent_file_remove_and_refresh(self, index_num):
 		i = index_num
 		while i < len(self.usettings['recentfiles'])-1:
@@ -1796,7 +1796,7 @@ class Base:
 		dialog.vbox.show_all()
 		dialog.connect('response', self.open_file_remote_response,  location)
 		response = dialog.show()
-	
+
 	def open_file_remote_response(self, dialog, response, location):
 		if response == gtk.RESPONSE_OK:
 			filenames = []
@@ -1849,7 +1849,7 @@ class Base:
 				dialog.set_current_folder(self.usettings['fixed_dir'])
 		dialog.connect("response", self.open_file_or_folder_response, isfile, recursivebutton)
 		response = dialog.show()
-	
+
 	def open_file_or_folder_response(self, dialog, response, isfile, recursivebutton):
 		if response == gtk.RESPONSE_OK:
 			if self.usettings['use_last_dir']:
@@ -1953,7 +1953,7 @@ class Base:
 				self.zoom_to_fit_or_1_to_1(None, False, False)
 			else:
 				self.zoom_to_fit_window(None, False, False)
-				
+
 	def toggle_thumbpane(self, action):
 		if self.thumbscroll.get_property('visible'):
 			self.thumbscroll.hide()
@@ -2323,7 +2323,7 @@ class Base:
 		self.tvcolumn1.set_attributes(self.cell, markup=1)
 		self.tvcolumn2.set_attributes(self.cell, text=2)
 		self.tvcolumn1.set_expand(True)
-	
+
 	def screenshot(self, action):
 		cancel = self.autosave_image()
 		if cancel:
@@ -2378,7 +2378,7 @@ class Base:
 			gobject.timeout_add(int(self.usettings['screenshot_delay']*1000), self._screenshot_grab, area1.get_active())
 		else:
 			dialog.destroy()
-	
+
 	def _screenshot_grab(self, entire_screen):
 		root_win = gtk.gdk.get_default_root_window()
 		if entire_screen:
@@ -2419,7 +2419,7 @@ class Base:
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180, self.zoom_quality)
 			image_is_anim = True
 		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
-		
+
 		# The generic info
 		vbox_left = gtk.VBox()
 		title = gtk.Label(_("Generic:"))
@@ -2520,9 +2520,7 @@ class Base:
 				exif_lbox.pack_start(bias_l, False, False, 2)
 				exif_lbox.pack_start(ISO_l, False, False, 2)
 				exif_lbox.pack_start(model_l, False, False, 2)
-				
 				exif_lbox.pack_start(date_l, False, False, 2)
-
 
 				exif_vbox.pack_start(exif_empty, False, False, 2)
 				exif_vbox.pack_start(aperture_v, False, False, 2)
@@ -2589,7 +2587,7 @@ class Base:
 		color_hbox.pack_start(colortext, False, False, 0)
 		color_hbox.pack_start(self.colorbutton, False, False, 0)
 		color_hbox.pack_start(gtk.Label(), True, True, 0)
-		
+
 		simplecolor_hbox = gtk.HBox(False, 0)
 		simplecolortext = gtk.Label(_('Simple background color:'))
 		simplecolorbutton = gtk.CheckButton()
@@ -2599,7 +2597,7 @@ class Base:
 		simplecolor_hbox.pack_start(gtk.Label(), True, True, 0)
 		if self.usettings['simple_bgcolor']:
 				simplecolorbutton.set_active(True)
-		
+
 		fullscreen = gtk.CheckButton(_("Open Mirage in fullscreen mode"))
 		fullscreen.set_active(self.usettings['start_in_fullscreen'])
 		thumbbox = gtk.HBox()
@@ -2657,7 +2655,7 @@ class Base:
 		case_numacomp.set_tooltip_text(_("If checked, a case-sensitive sort will be used"))
 		case_numacomp.set_sensitive(usenumacomp.get_active())
 		usenumacomp.connect('toggled', self.toggle_sensitivy_of_other,case_numacomp) 		
-		
+
 		openpref = gtk.RadioButton()
 		openpref1 = gtk.RadioButton(group=openpref, label=_("Use last chosen directory"))
 		openpref1.set_tooltip_text(_("The default 'Open' directory will be the last directory used."))
@@ -2695,7 +2693,7 @@ class Base:
 		table_behavior.attach(openpref2, 1, 2, 12, 13, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 30, 0)
 		table_behavior.attach(hbox_defaultdir, 1, 2, 13, 14, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
 		table_behavior.attach(gtk.Label(), 1, 2, 14, 15, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 45, 0)
-		
+
 		# "Navigation" tab:
 		table_navigation = gtk.Table(14, 2, False)
 		navlabel = gtk.Label()
@@ -2765,7 +2763,7 @@ class Base:
 		imagelabel.set_alignment(0, 1)
 		deletebutton = gtk.CheckButton(_("Confirm image delete"))
 		deletebutton.set_active(self.usettings['confirm_delete'])
-		
+
 		zoom_hbox = gtk.HBox()
 		zoom_hbox.pack_start(gtk.Label(_('Scaling quality:')), False, False, 0)
 		zoomcombo = gtk.combo_box_new_text()
@@ -2776,7 +2774,7 @@ class Base:
 		zoomcombo.set_active(self.usettings['zoomvalue'])
 		zoom_hbox.pack_start(zoomcombo, False, False, 0)
 		zoom_hbox.pack_start(gtk.Label(), True, True, 0)
-		
+
 		hbox_save = gtk.HBox()
 		savelabel = gtk.Label(_("Modified images:"))
 		savecombo = gtk.combo_box_new_text()
@@ -2786,7 +2784,7 @@ class Base:
 		savecombo.set_active(self.usettings['savemode'])
 		hbox_save.pack_start(savelabel, False, False, 0)
 		hbox_save.pack_start(savecombo, False, False, 5)
-		
+
 		hbox_quality = gtk.HBox()
 		qualitylabel = gtk.Label(_("Quality to save in:"))
 		qspin_adj = gtk.Adjustment(self.usettings['quality_save'], 0, 100, 1, 100, 0)
@@ -3366,7 +3364,7 @@ class Base:
 
 	def rotate_right(self, action):
 		self.rotate_left_or_right(self.UIManager.get_widget('/MainMenu/EditMenu/Rotate Right'), 270)
-	
+
 	def rotate_left_or_right(self, widget, angle):
 		if self.currimg_name != "" and widget.get_property('sensitive'):
 			self.currimg_pixbuf_original = self.image_rotate(self.currimg_pixbuf_original, angle)
@@ -3384,7 +3382,6 @@ class Base:
 				self.center_image()
 				self.update_statusbar()
 			self.image_modified = True
-		
 
 	def flip_image_vert(self, action):
 		self.flip_image_vert_or_horiz(self.UIManager.get_widget('/MainMenu/EditMenu/Flip Vertically'), True)
@@ -3398,7 +3395,7 @@ class Base:
 			self.currimg_pixbuf_original = self.image_flip(self.currimg_pixbuf_original, vertical)
 			self.imageview.set_from_pixbuf(self.currimg_pixbuf)
 			self.image_modified = True
-		
+
 	def get_pixbuf_of_size(self, pixbuf, size, zoom_quality):
 		# Creates a pixbuf that fits in the specified square of sizexsize
 		# while preserving the aspect ratio
@@ -3786,7 +3783,7 @@ class Base:
 
 	def goto_last_image(self, action):
 		self.goto_image("LAST", action)
-		
+
 	def goto_image(self, location, action):
 		"""Goes to the image specified by location. Location can be "LAST",
 			"FIRST", "NEXT", "PREV", "RANDOM", or a number. If  at last image
