@@ -2511,20 +2511,26 @@ class Base:
 				focal_l, focal_v = self.exif_return_label(exifd, _("Focal length:"), _("%s mm"),"Exif.Photo.FocalLength", "rat_int")
 				date_l, date_v = self.exif_return_label(exifd, _("Time taken:"), _("%s"),"Exif.Photo.DateTimeOriginal", "str")
 				ISO_l, ISO_v = self.exif_return_label(exifd, _("ISO Speed:"), _("%s"),"Exif.Photo.ISOSpeedRatings", "int")
+				bias_l, bias_v = self.exif_return_label(exifd, _("Exposure bias:"), _("%s"),"Exif.Photo.ExposureBiasValue", "rat_frac")
+				model_l, model_v = self.exif_return_label(exifd, _("Camera:"), _("%s"),"Exif.Image.Model", "str")
 				exif_lbox.pack_start(exif_title, False, False, 2)
 				exif_lbox.pack_start(aperture_l, False, False, 2)
-				exif_lbox.pack_start(expo_l, False, False, 2)
 				exif_lbox.pack_start(focal_l, False, False, 2)
+				exif_lbox.pack_start(expo_l, False, False, 2)
+				exif_lbox.pack_start(bias_l, False, False, 2)
 				exif_lbox.pack_start(ISO_l, False, False, 2)
+				exif_lbox.pack_start(model_l, False, False, 2)
 				
 				exif_lbox.pack_start(date_l, False, False, 2)
 
 
 				exif_vbox.pack_start(exif_empty, False, False, 2)
 				exif_vbox.pack_start(aperture_v, False, False, 2)
-				exif_vbox.pack_start(expo_v, False, False, 2)
 				exif_vbox.pack_start(focal_v, False, False, 2)
+				exif_vbox.pack_start(expo_v, False, False, 2)
+				exif_vbox.pack_start(bias_v, False, False, 2)
 				exif_vbox.pack_start(ISO_v, False, False, 2)
+				exif_vbox.pack_start(model_v, False, False, 2)
 				exif_vbox.pack_start(date_v, False, False, 2)
 
 				hbox2 = gtk.HBox()
