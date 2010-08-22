@@ -30,6 +30,7 @@ import os, sys, getopt, ConfigParser, string, gc
 import random, urllib, gobject, gettext, locale
 import stat, time, subprocess, shutil, filecmp
 import tempfile, socket, threading
+from fractions import Fraction 
 
 try:
  	import mirage_numacomp as numacomp
@@ -56,6 +57,14 @@ try:
 except:
 	HAS_XMOUSE = False
 	print "xmouse.so module not found, some screenshot capabilities will be disabled."
+
+try:
+	import pyexiv2
+	HAS_EXIF = True
+except:
+	HAS_EXIF = False
+	print "pyexiv2 module not found, exifdata reading/writing are disabled"
+
 try:
 	import gconf
 except:
@@ -67,7 +76,7 @@ if gtk.gtk_version < (2, 10, 0):
 if gtk.pygtk_version < (2, 12, 0):
 	sys.stderr.write("Mirage requires PyGTK 2.12.0 or newer.\n")
 	sys.exit(1)
-	
+
 def valid_int(inputstring):
 	try:
 		x = int(inputstring)
@@ -2400,7 +2409,7 @@ class Base:
 		show_props = gtk.Dialog(_("Properties"), self.window)
 		show_props.set_has_separator(False)
 		show_props.set_resizable(False)
-		table = gtk.Table(3, 3, False)
+		table = gtk.Table(3, 4, False)
 		image = gtk.Image()
 		animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
 		image_is_anim = False
@@ -2410,7 +2419,11 @@ class Base:
 			pixbuf, image_width, image_height = self.get_pixbuf_of_size(animtest.get_static_image(), 180, self.zoom_quality)
 			image_is_anim = True
 		image.set_from_pixbuf(self.pixbuf_add_border(pixbuf))
+		
+		# The generic info
 		vbox_left = gtk.VBox()
+		title = gtk.Label(_("Generic:"))
+		title.set_alignment(1, 1)
 		filename = gtk.Label(_("File name:"))
 		filename.set_alignment(1, 1)
 		filedate = gtk.Label(_("File modified:"))
@@ -2429,6 +2442,7 @@ class Base:
 		bits.set_alignment(1, 1)
 		channels = gtk.Label(_("Channels:"))
 		channels.set_alignment(1, 1)
+		vbox_left.pack_start(title, False, False, 2)
 		vbox_left.pack_start(filename, False, False, 2)
 		vbox_left.pack_start(filedate, False, False, 2)
 		vbox_left.pack_start(imagesize, False, False, 2)
@@ -2464,6 +2478,8 @@ class Base:
 		animation2.set_alignment(0, 1)
 		bits2.set_alignment(0, 1)
 		channels2.set_alignment(0, 1)
+		empty = gtk.Label(" ") # An empty label to align the rows correctly
+		vbox_right.pack_start(empty, False, False, 2)
 		vbox_right.pack_start(filename2, False, False, 2)
 		vbox_right.pack_start(filedate2, False, False, 2)
 		vbox_right.pack_start(imagesize2, False, False, 2)
@@ -2476,8 +2492,73 @@ class Base:
 		hbox = gtk.HBox()
 		hbox.pack_start(vbox_left, False, False, 3)
 		hbox.pack_start(vbox_right, False, False, 3)
+
+		if HAS_EXIF:
+			exifd = pyexiv2.ImageMetadata(self.currimg_name)
+			exifd.read()
+			if "Exif.Photo" in exifd.exif_keys:
+				# The exif data
+				exif_lbox = gtk.VBox()
+				exif_title = gtk.Label(_("Exifdata"))
+				exif_title.set_alignment(1,1)
+				aperture_l = gtk.Label(_("Aperture:"))
+				aperture_l.set_alignment(1, 1)
+				expo_l = gtk.Label(_("Exposure time:"))
+				expo_l.set_alignment(1, 1)
+				focal_l = gtk.Label(_("Focal length:"))
+				focal_l.set_alignment(1, 1)
+				date_l = gtk.Label(_("Time taken:"))
+				date_l.set_alignment(1, 1)
+				exif_lbox.pack_start(exif_title, False, False, 2)
+				exif_lbox.pack_start(aperture_l, False, False, 2)
+				exif_lbox.pack_start(expo_l, False, False, 2)
+				exif_lbox.pack_start(focal_l, False, False, 2)
+				exif_lbox.pack_start(date_l, False, False, 2)
+
+				# The exif values
+				key = "Exif.Photo.FNumber"
+				if key in exifd.exif_keys:
+					aperture_v = gtk.Label(str(exifd[key].value.to_float()))
+				else:
+					aperture_v = gtk.Label("-")
+				aperture_v.set_alignment(0,1)
+
+				key = "Exif.Photo.ExposureTime"
+				if key in exifd.exif_keys:
+					expo_v = gtk.Label( _("%s sec") % Fraction(str(exifd[key].value)))
+				else:
+					expo_v = gtk.Label("-")
+				expo_v.set_alignment(0,1)
+
+				key = "Exif.Photo.FocalLength"
+				if key in exifd.exif_keys:
+					focal_v = gtk.Label(_("%d mm") % int(exifd[key].value.to_float()))
+				else:
+					focal_v = gtk.Label("-")
+				focal_v.set_alignment(0,1)
+				key = "Exif.Photo.DateTimeOriginal"
+				if key in exifd.exif_keys:
+					date_v = gtk.Label(exifd[key].value)
+				else:
+					date_v = gtk.Label("-")
+
+				exif_vbox = gtk.VBox()
+				exif_empty = gtk.Label(" ")
+				exif_vbox.pack_start(exif_empty, False, False, 2)
+				exif_vbox.pack_start(aperture_v, False, False, 2)
+				exif_vbox.pack_start(expo_v, False, False, 2)
+				exif_vbox.pack_start(focal_v, False, False, 2)
+				exif_vbox.pack_start(date_v, False, False, 2)
+
+				hbox2 = gtk.HBox()
+				hbox2.pack_start(exif_lbox, False, False, 2)
+				hbox2.pack_start(exif_vbox, False, False, 2)
+
+		#Show the box
 		table.attach(image, 1, 2, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		table.attach(hbox, 2, 3, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
+		if HAS_EXIF and ("Exif.Photo" in exifd.exif_keys):
+			table.attach(hbox2, 3, 4, 1, 3, gtk.FILL|gtk.EXPAND, gtk.FILL|gtk.EXPAND, 15, 0)
 		show_props.vbox.pack_start(table, False, False, 15)
 		show_props.vbox.show_all()
 		close_button = show_props.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)

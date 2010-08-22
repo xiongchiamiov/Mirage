@@ -5,6 +5,7 @@ REQUIREMENTS:
 	(Required) PyGTK 2.10.0 or newer
 	(Required) GTK 2.12.0 or newer
 	(Optional) Gnome-python if you want Mirage's toolbar to follow your Gnome setting
+	(Optional) pyexiv2 for reading of Exif data on filetypes supported by exiv2
 	(Building) GCC
 	(Building) python-dev and libX11-dev (on some distros)
 
@@ -17,6 +18,7 @@ USAGE:
 
 FEATURES:
 	+ Supports png, jpg, svg, xpm, gif, bmp, tiff, and others
+	+ Supports viewing of basic Exif data
 	+ Cycling through multiple images (with preloading)
 	+ Thumbnail pane for quick navigation
 	+ Slideshow and fullscreen modes

@@ -1,5 +1,6 @@
 v0.10.0 - Future
 	+ Added Numerical Aware Comparison (numacomp) as a sorting option.
+	+ Added Exif data reading on supported files through pyexiv2
 	+ Bug: Fixing an issue where the Wrap?-dialog would hangup in slideshow mode
 		when wrap mode was set to ask
 	+ Changes: various code updates
