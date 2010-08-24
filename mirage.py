@@ -4164,7 +4164,10 @@ class Base:
 			# Need to load the current image
 			self.currimg_pixbuf = None
 			self.currimg_zoomratio = 1
-			self.currimg_name = str(self.image_list[self.curr_img_in_list])
+			try:
+				self.currimg_name = str(self.image_list[self.curr_img_in_list])
+			except:
+				pass
 			if self.verbose and self.currimg_name != "":
 				print _("Loading: %s") % self.currimg_name
 			animtest = gtk.gdk.PixbufAnimation(self.currimg_name)
@@ -4371,6 +4374,28 @@ class Base:
 				self.update_title()
 				return
 		init_image = os.path.abspath(inputlist[0])
+		if self.valid_image(init_image):
+			print "valid image"
+			try:
+				self.currimg_name = init_image
+				self.load_new_image2(False, False, True, True)
+				# Calling load_new_image2 will reset the following two vars
+				# to 0, so ensure they are -1 again (no images preloaded)
+				self.preloadimg_prev_in_list = -1
+				self.preloadimg_next_in_list = -1
+				if not self.currimg_is_animation:
+					self.previmg_width = self.currimg_pixbuf.get_width()
+				else:
+					self.previmg_width = self.currimg_pixbuf.get_static_image().get_width()
+				self.image_loaded = True
+				first_image_loaded_successfully = True
+				print "loaded"
+				if not self.closing_app:
+					while gtk.events_pending():
+						gtk.main_iteration(True)
+			except:
+				pass
+
 		self.stop_now = False
 		# If open all images in dir...
 		if self.usettings['open_all_images']:
