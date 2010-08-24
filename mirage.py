@@ -1444,9 +1444,9 @@ class Base:
 		if self.slideshow_mode:
 			gobject.source_remove(self.timer_delay)
 			if self.curr_slideshow_random:
-				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
+				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss", True)
 			else:
-				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
+				self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss", True)
 		self.window.set_focus(self.layout)
 
 	def random_changed(self, action):
@@ -3772,11 +3772,11 @@ class Base:
 	def goto_prev_image(self, action):
 		self.goto_image("PREV", action)
 
-	def goto_next_image(self, action):
-		self.goto_image("NEXT", action)
+	def goto_next_image(self, action, through_timeout=False):
+		self.goto_image("NEXT", action, through_timeout)
 
-	def goto_random_image(self, action):
-		self.goto_image("RANDOM", action)
+	def goto_random_image(self, action, through_timeout=False):
+		self.goto_image("RANDOM", action, through_timeout)
 
 	def goto_first_image(self, action):
 		self.goto_image("FIRST", action)
@@ -3784,7 +3784,7 @@ class Base:
 	def goto_last_image(self, action):
 		self.goto_image("LAST", action)
 
-	def goto_image(self, location, action):
+	def goto_image(self, location, action, called_by_timeout=False):
 		"""Goes to the image specified by location. Location can be "LAST",
 			"FIRST", "NEXT", "PREV", "RANDOM", or a number. If  at last image
 			and "NEXT" is issued, it will wrap around or not depending on
@@ -3868,14 +3868,16 @@ class Base:
 					# Wrapping dialog.run() and .destroy() in .threads_enter()/leave() to prevent a hangup on linux
 					# Could also be done with 'with gtk.gdk.lock:' but that doesn't work on windows.
 					try:
-						gtk.gdk.threads_enter()
+						if called_by_timeout:
+							gtk.gdk.threads_enter()
 						self.user_prompt_visible = True
 						response = dialog.run()
 						dialog.destroy()
 					except:
 						response = None
 					finally:
-						gtk.gdk.threads_leave()
+						if called_by_timeout:
+							gtk.gdk.threads_leave()
 						self.user_prompt_visible = False
 					if response == gtk.RESPONSE_YES:
 						if location == "PREV":
@@ -3918,9 +3920,9 @@ class Base:
 				self.set_go_navigation_sensitivities(False)
 			if self.slideshow_mode:
 				if self.curr_slideshow_random:
-					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss",True)
 				else:
-					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss", True)
 			gobject.idle_add(self.thumbpane_select, self.curr_img_in_list)
 
 	def set_go_navigation_sensitivities(self, skip_initial_check):
@@ -4660,7 +4662,7 @@ class Base:
 				self.update_title()
 				self.set_slideshow_sensitivities()
 				if not self.curr_slideshow_random:
-					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss")
+					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_next_image, "ss", True)
 				else:
 					self.reinitialize_randomlist()
 					self.timer_delay = gobject.timeout_add(int(self.curr_slideshow_delay*1000), self.goto_random_image, "ss")
