@@ -178,9 +178,9 @@ class Base:
 		self.closing_app = False
 		self.usettings['confirm_delete'] = True
 		self.usettings['preloading_images'] = True
-		self.usettings['action_names'] = ["Open in GIMP", "Create Thumbnail", "Create Thumbnails", "Move to Favorites"]
+		self.usettings['action_names'] = [_("Open in GIMP"), _("Create Thumbnail"), _("Create Thumbnails"), _("Move to Favorites")]
 		self.usettings['action_shortcuts'] = ["<Control>e", "<Alt>t", "<Control><Alt>t", "<Control><Alt>f"]
-		self.usettings['action_commands'] = ["gimp-remote-2.4 %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXT]"]
+		self.usettings['action_commands'] = ["gimp %F", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "convert %F -thumbnail 150x150 %Pt_%N.jpg", "mkdir -p ~/mirage-favs; mv %F ~/mirage-favs; [NEXT]"]
 		self.usettings['action_batch'] = [False, False, True, False]
 		self.onload_cmd = None
 		self.searching_for_images = False
