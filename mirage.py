@@ -160,6 +160,7 @@ class Base:
 		self.usettings['last_dir'] = os.path.expanduser("~")
 		self.usettings['fixed_dir'] = os.path.expanduser("~")
 		self.image_list = []
+		self.firstimgindex_subfolders_list = []
 		self.usettings['open_mode'] = self.open_mode_smart
 		self.usettings['last_mode'] = self.open_mode_smart
 		self.usettings['listwrap_mode'] = 0					# 0=no, 1=yes, 2=ask
@@ -291,7 +292,9 @@ class Base:
 			('Saturation', None, _('_Saturation...'), None, _('Modify saturation'), self.saturation),
 			('Quit', gtk.STOCK_QUIT, _('_Quit'), '<Ctrl>Q', _('Quit'), self.exit_app),
 			('Previous Image', gtk.STOCK_GO_BACK, _('_Previous Image'), 'Left', _('Previous Image'), self.goto_prev_image),
+			('Previous Subfolder', gtk.STOCK_MEDIA_REWIND, _('Pre_vious Subfolder'), '<Shift>Left', _('Previous Subfolder'), self.goto_first_image_prev_subfolder),
 			('Next Image', gtk.STOCK_GO_FORWARD, _('_Next Image'), 'Right', _('Next Image'), self.goto_next_image),
+			('Next Subfolder', gtk.STOCK_MEDIA_FORWARD, _('Ne_xt Subfolder'), '<Shift>Right', _('Next Subfolder'), self.goto_first_image_next_subfolder),
 			('Previous2', gtk.STOCK_GO_BACK, _('_Previous'), 'Left', _('Previous'), self.goto_prev_image),
 			('Next2', gtk.STOCK_GO_FORWARD, _('_Next'), 'Right', _('Next'), self.goto_next_image),
 			('Random Image', None, _('_Random Image'), 'R', _('Random Image'), self.goto_random_image),
@@ -335,6 +338,10 @@ class Base:
 			('PgUp', None, '', 'Page_Up', _('Previous Image'), self.goto_prev_image),
 			('PgDn', None, '', 'Page_Down', _('Next Image'), self.goto_next_image),
 			('BackSpace', None, '', 'BackSpace', _('Previous Image'), self.goto_prev_image),
+			('Prev Subfolder 2', None, '', '<Shift>Up', _('Previous Subfolder'), self.goto_first_image_prev_subfolder),
+			('Next Subfolder 2', None, '', '<Shift>Down', _('Next Subfolder'), self.goto_first_image_next_subfolder),
+			('Prev Subfolder 3', None, '', '<Shift>Page_Up', _('Previous Subfolder'), self.goto_first_image_prev_subfolder),
+			('Next Subfolder 3', None, '', '<Shift>Page_Down', _('Next Subfolder'), self.goto_first_image_next_subfolder),
 			('OriginalSize', None, '', '1', _('1:1'), self.zoom_1_to_1_action),
 			('ZoomIn', None, '', 'KP_Add', _('Zoom In'), self.zoom_in),
 			('ZoomOut', None, '', 'KP_Subtract', _('Zoom Out'), self.zoom_out)
@@ -426,6 +433,9 @@ class Base:
 			      <menuitem action="First Image"/>
 			      <menuitem action="Last Image"/>
 			      <separator name="FM2"/>
+			      <menuitem action="Next Subfolder"/>
+			      <menuitem action="Previous Subfolder"/>
+			      <separator name="FM3"/>
 			      <menuitem action="Start Slideshow"/>
 			      <menuitem action="Stop Slideshow"/>
 			    </menu>
@@ -450,6 +460,10 @@ class Base:
 			      <menuitem action="Next"/>
 			      <menuitem action="PgUp"/>
 			      <menuitem action="PgDn"/>
+			      <menuitem action="Prev Subfolder 2"/>
+			      <menuitem action="Next Subfolder 2"/>
+			      <menuitem action="Prev Subfolder 3"/>
+			      <menuitem action="Next Subfolder 3"/>
 			      <menuitem action="OriginalSize"/>	
 			      <menuitem action="BackSpace"/>
 			      <menuitem action="ZoomIn"/>
@@ -1309,6 +1323,8 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/GoMenu/Random Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/First Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainMenu/GoMenu/Last Image').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Subfolder').set_sensitive(enable)
+		self.UIManager.get_widget('/MainMenu/GoMenu/Next Subfolder').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Previous Image').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Next Image').set_sensitive(enable)
 		self.UIManager.get_widget('/MainToolbar/Previous2').set_sensitive(enable)
@@ -1373,6 +1389,12 @@ class Base:
 		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Image').set_sensitive(enable)
 		self.UIManager.get_widget('/Popup/Previous Image').set_sensitive(enable)
 		self.ss_back.set_sensitive(enable)
+
+	def set_next_subfolder_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainMenu/GoMenu/Next Subfolder').set_sensitive(enable)
+
+	def set_previous_subfolder_sensitivities(self, enable):
+		self.UIManager.get_widget('/MainMenu/GoMenu/Previous Subfolder').set_sensitive(enable)
 
 	def set_first_image_sensitivities(self, enable):
 		self.UIManager.get_widget('/MainMenu/GoMenu/First Image').set_sensitive(enable)
@@ -3784,6 +3806,12 @@ class Base:
 	def goto_last_image(self, action):
 		self.goto_image("LAST", action)
 
+	def goto_first_image_prev_subfolder(self, action):
+		self.goto_image("PREV_SUBFOLDER", action)
+
+	def goto_first_image_next_subfolder(self, action):
+		self.goto_image("NEXT_SUBFOLDER", action)
+
 	def goto_image(self, location, action, called_by_timeout=False):
 		"""Goes to the image specified by location. Location can be "LAST",
 			"FIRST", "NEXT", "PREV", "RANDOM", or a number. If  at last image
@@ -3792,7 +3820,7 @@ class Base:
 			and "PREV". """
 		if self.slideshow_mode and action != "ss":
 			gobject.source_remove(self.timer_delay)
-		if ((location=="PREV" or location=="NEXT" or location=="RANDOM") and len(self.image_list) > 1) or (location=="FIRST" and (len(self.image_list) > 1 and self.curr_img_in_list != 0)) or (location=="LAST" and (len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1)) or valid_int(location):
+		if ((location=="PREV" or location=="NEXT" or location=="RANDOM") and len(self.image_list) > 1) or ((location == "PREV_SUBFOLDER" or location == "NEXT_SUBFOLDER") and len(self.firstimgindex_subfolders_list) >= 2) or (location=="FIRST" and (len(self.image_list) > 1 and self.curr_img_in_list != 0)) or (location=="LAST" and (len(self.image_list) > 1 and self.curr_img_in_list != len(self.image_list)-1)) or valid_int(location):
 			self.load_new_image_stop_now()
 			cancel = self.autosave_image()
 			if cancel:
@@ -3826,6 +3854,16 @@ class Base:
 					self.curr_img_in_list += 1
 				else:
 					check_wrap = True
+			elif location == "PREV_SUBFOLDER":
+				if self.curr_img_in_list >= self.firstimgindex_subfolders_list[1]: #not in first subfolder
+					self.curr_img_in_list = self.get_firstimgindex_curr_next_prev_subfolder(self.curr_img_in_list)[-1]
+				else: #in first subfolder
+					check_wrap = True
+			elif location == "NEXT_SUBFOLDER":
+				if self.curr_img_in_list < self.firstimgindex_subfolders_list[-1]: #not in last subfolder
+					self.curr_img_in_list = self.get_firstimgindex_curr_next_prev_subfolder(self.curr_img_in_list)[1]
+				else: #in last subfolder
+					check_wrap = True
 			if check_wrap: #we are at the beginning or end of the list or all images have been viewed in random mode
 				if self.usettings['listwrap_mode'] == 0:
 					if self.slideshow_mode and ((action == "ss" and (location == "NEXT" or location == "RANDOM")) or (action != "ss" and location == "NEXT")): #automatic next/random action or manual next action, stop slideshow
@@ -3840,8 +3878,10 @@ class Base:
 				elif self.usettings['listwrap_mode'] == 1:
 					if location == "PREV":
 						self.curr_img_in_list = len(self.image_list) - 1
-					elif location == "NEXT":
+					elif location == "NEXT" or location == "NEXT_SUBFOLDER":
 						self.curr_img_in_list = 0
+					elif location == "PREV_SUBFOLDER":
+						self.curr_img_in_list = self.firstimgindex_subfolders_list[-1]
 					elif location == "RANDOM": #always next random image
 						self.reinitialize_randomlist()
 				elif self.usettings['listwrap_mode'] == 2:
@@ -3860,6 +3900,10 @@ class Base:
 						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the first image in the list. Wrap around to the last image?"))
 					elif location == "NEXT":
 						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the last image in the list. Wrap around to the first image?"))
+					elif location == "PREV_SUBFOLDER":
+						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the first folder in the list. Wrap around to the first image of the last folder?"))
+					elif location == "NEXT_SUBFOLDER":
+						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("You are viewing the last folder in the list. Wrap around to the first image of the first folder?"))
 					elif location == "RANDOM":
 						dialog = gtk.MessageDialog(self.window, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_QUESTION, gtk.BUTTONS_YES_NO, _("All images have been viewed. Would you like to cycle through the images again?"))
 					dialog.set_title(_("Wrap?"))
@@ -3882,8 +3926,10 @@ class Base:
 					if response == gtk.RESPONSE_YES:
 						if location == "PREV":
 							self.curr_img_in_list = len(self.image_list)-1
-						elif location == "NEXT":
+						elif location == "NEXT" or location == "NEXT_SUBFOLDER":
 							self.curr_img_in_list = 0
+						elif location == "PREV_SUBFOLDER":
+							self.curr_img_in_list = self.firstimgindex_subfolders_list[-1]
 						elif location == "RANDOM":
 							self.reinitialize_randomlist()
 						if self.fullscreen_mode:
@@ -3930,35 +3976,70 @@ class Base:
 		# expand_filelist_and_load_image() for example, as self.image_list has not
 		# yet fully populated
 		if (not self.image_loaded or len(self.image_list) == 1) and not skip_initial_check:
-			self.set_previous_image_sensitivities(False)
-			self.set_first_image_sensitivities(False)
-			self.set_next_image_sensitivities(False)
-			self.set_last_image_sensitivities(False)
-			self.set_random_image_sensitivities(False)
+			self.set_common_image_sensitivities(False)
+			self.set_previous_subfolder_sensitivities(False)
+			self.set_next_subfolder_sensitivities(False)
 		elif self.curr_img_in_list == 0:
 			if self.usettings['listwrap_mode'] == 0:
 				self.set_previous_image_sensitivities(False)
+				self.set_previous_subfolder_sensitivities(False)
 			else:
 				self.set_previous_image_sensitivities(True)
+				if len(self.firstimgindex_subfolders_list) >= 2: #subfolders
+					self.set_previous_subfolder_sensitivities(True)
+				else: #no subfolders
+					self.set_previous_subfolder_sensitivities(False)
 			self.set_first_image_sensitivities(False)
 			self.set_next_image_sensitivities(True)
 			self.set_last_image_sensitivities(True)
 			self.set_random_image_sensitivities(True)
+			if len(self.firstimgindex_subfolders_list) >= 2: #subfolders
+				self.set_next_subfolder_sensitivities(True)
+			else: #no subfolders
+				self.set_next_subfolder_sensitivities(False)
 		elif self.curr_img_in_list == len(self.image_list)-1:
 			self.set_previous_image_sensitivities(True)
 			self.set_first_image_sensitivities(True)
 			if self.usettings['listwrap_mode'] == 0:
 				self.set_next_image_sensitivities(False)
+				self.set_next_subfolder_sensitivities(False)
 			else:
 				self.set_next_image_sensitivities(True)
+				if len(self.firstimgindex_subfolders_list) >= 2: #subfolders
+					self.set_next_subfolder_sensitivities(True)
+				else: #no subfolders
+					self.set_next_subfolder_sensitivities(False)
 			self.set_last_image_sensitivities(False)
 			self.set_random_image_sensitivities(True)
-		else:
-			self.set_previous_image_sensitivities(True)
-			self.set_first_image_sensitivities(True)
-			self.set_next_image_sensitivities(True)
-			self.set_last_image_sensitivities(True)
-			self.set_random_image_sensitivities(True)
+		elif len(self.firstimgindex_subfolders_list) >= 2 and self.curr_img_in_list < self.firstimgindex_subfolders_list[1]: #first subfolder
+			self.set_common_image_sensitivities(True)
+			if self.usettings['listwrap_mode'] == 0:
+				self.set_previous_subfolder_sensitivities(False)
+			else:
+				self.set_previous_subfolder_sensitivities(True)
+			self.set_next_subfolder_sensitivities(True)
+		elif len(self.firstimgindex_subfolders_list) >= 2 and self.curr_img_in_list >= self.firstimgindex_subfolders_list[-1]: #last subfolder
+			self.set_common_image_sensitivities(True)
+			self.set_previous_subfolder_sensitivities(True)
+			if self.usettings['listwrap_mode'] == 0:
+				self.set_next_subfolder_sensitivities(False)
+			else:
+				self.set_next_subfolder_sensitivities(True)
+		else: #inbetween first and last image/subfolder
+			self.set_common_image_sensitivities(True)
+			if len(self.firstimgindex_subfolders_list) >= 2: #subfolders
+				self.set_previous_subfolder_sensitivities(True)
+				self.set_next_subfolder_sensitivities(True)
+			else: #no subfolders
+				self.set_previous_subfolder_sensitivities(False)
+				self.set_next_subfolder_sensitivities(False)
+
+	def set_common_image_sensitivities(self, enable):
+		self.set_previous_image_sensitivities(enable)
+		self.set_first_image_sensitivities(enable)
+		self.set_next_image_sensitivities(enable)
+		self.set_last_image_sensitivities(enable)
+		self.set_random_image_sensitivities(enable)
 
 	def reinitialize_randomlist(self):
 		self.randomlist = []
@@ -4509,6 +4590,14 @@ class Base:
 			else:
 				self.do_image_list_stuff(first_image, second_image)
 				self.add_folderlist_images(folderlist, go_buttons_enabled)
+
+			prev_image = ''
+			self.firstimgindex_subfolders_list = []
+			for i, image in enumerate(self.image_list):
+				if os.path.dirname(image) != os.path.dirname(prev_image):
+					self.firstimgindex_subfolders_list.append(i)
+				prev_image = image
+
 			self.update_title()
 			if not self.closing_app:
 				while gtk.events_pending():
@@ -4703,11 +4792,37 @@ class Base:
 				self.ss_stop.hide()
 				self.ss_start.show()
 
+	def get_firstimgindex_curr_next_prev_subfolder(self, img_in_list):
+		"""Returns a tuple (current [0], next [1], previous [-1]) firstimgindex"""
+		if len(self.firstimgindex_subfolders_list) >= 2: #subfolders
+			for i, firstimgindex in enumerate(self.firstimgindex_subfolders_list):
+				if img_in_list < firstimgindex:
+					return self.firstimgindex_subfolders_list[i-1], self.firstimgindex_subfolders_list[i], self.firstimgindex_subfolders_list[i-2]
+			return self.firstimgindex_subfolders_list[-1], self.firstimgindex_subfolders_list[0], self.firstimgindex_subfolders_list[-2]
+		else:
+			return (-1,-1,-1)
+
+	def get_numimg_subfolder(self, firstimgindex_subfolder):
+		for i, index in enumerate(self.firstimgindex_subfolders_list):
+			if index == firstimgindex_subfolder:
+				if i < len(self.firstimgindex_subfolders_list)-1:
+					return self.firstimgindex_subfolders_list[i+1] - firstimgindex_subfolder
+				else:
+					return len(self.image_list) - firstimgindex_subfolder
+		return -1
+
 	def update_title(self):
 		if len(self.image_list) == 0:
 			title = "Mirage"
 		else:
-			title = "Mirage - " +_("[%(current)i of %(total)i]") % {'current': self.curr_img_in_list+1, 'total': len(self.image_list)} + ' ' + os.path.basename(self.currimg_name)
+			subfoldertitle = ''
+			firstimgindex_curr_subfolder = self.get_firstimgindex_curr_next_prev_subfolder(self.curr_img_in_list)[0]
+			if firstimgindex_curr_subfolder > -1:
+				currimg_subfolder = self.curr_img_in_list - firstimgindex_curr_subfolder + 1
+				numimg_curr_subfolder = self.get_numimg_subfolder(firstimgindex_curr_subfolder)
+				subfoldertitle = _("%(current)i of %(total)i") % {'current': currimg_subfolder, 'total': numimg_curr_subfolder} + ' '
+			title = "Mirage - " + subfoldertitle + _("[%(current)i of %(total)i]") % {'current': self.curr_img_in_list+1, 'total': len(self.image_list)} + ' ' + os.path.basename(self.currimg_name)
+
 			if self.slideshow_mode:
 				title = title + ' - ' + _('Slideshow Mode')
 		self.window.set_title(title)
