@@ -4456,7 +4456,6 @@ class Base:
 				return
 		init_image = os.path.abspath(inputlist[0])
 		if self.valid_image(init_image):
-			print "valid image"
 			try:
 				self.currimg_name = init_image
 				self.load_new_image2(False, False, True, True)
@@ -4470,7 +4469,7 @@ class Base:
 					self.previmg_width = self.currimg_pixbuf.get_static_image().get_width()
 				self.image_loaded = True
 				first_image_loaded_successfully = True
-				print "loaded"
+				print "quickloaded image ahead of imagelist"
 				if not self.closing_app:
 					while gtk.events_pending():
 						gtk.main_iteration(True)
